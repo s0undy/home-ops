@@ -20,3 +20,4 @@ resources:
   - ./intel.yaml
   - ./grafana.yaml
   - ./fairwinds.yaml
+  - ./angelnu.yaml

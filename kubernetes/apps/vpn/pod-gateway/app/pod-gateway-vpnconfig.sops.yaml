@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: Secret
+data:
+    WIREGUARD_PRIVATE_KEY: ENC[AES256_GCM,data:Q9rhxU/BbZySPztJTvRYoedh3ybqkdnzyhimNOoZ/ME4+UPAj4INoCBRzvFu1sO15/l13hVzG30YA/do,iv:BjalroAgfWsYV7JoWKAuvuerRcUue/uhj7SJeaBq0is=,tag:liCGdOwYQCpHK1USkDlflg==,type:str]
+    WIREGUARD_ADDRESSES: ENC[AES256_GCM,data:Xy8ChMw+1Qo76yIfyqVZg9hkZW3oBc7+,iv:ulQ1SXGdTRNMpQ9o+8QhY4zasf9PZbzHzpdPhOew5CI=,tag:wWlTsp2KLgorWiv+oF+Q2w==,type:str]
+metadata:
+    name: pod-gateway-vpnconfig
+    namespace: vpn
+type: Opaque
+sops:
+    kms: []
+    gcp_kms: []
+    azure_kv: []
+    hc_vault: []
+    age:
+        - recipient: age1mfc9sv89hdvmd2gsp4mnj3n0evaz8kw3hmu2h3gwvx9y0t42xcss28k08z
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBUSjJFRHFEeTlSOWZHb05l
+            V09ueEtZaDE3OHBzM1ZLVjNINjV5bVRHOWhNCk1SdjZVRG5NZEszeS83ZVpQUStU
+            bVVjdUtMUzRLNWltKzV6eTAwNnN6dG8KLS0tIFZ3dTErM1ZTeTgreFZHMFk5QzE1
+            Z3NJTXB6cDlJYkd1MWQ3WXJ2am01dWMKPprQfFXt58Us/jyEux0uzXokeuVUmlkS
+            h/ZbXXJ9g5oLkwqCeulHjKrv62WkPQalJlTeicyrYdun+XM9RlV9GA==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2023-01-08T21:49:56Z"
+    mac: ENC[AES256_GCM,data:Z9ZOdbYcSdzl+ovvg08lh/zQvRqObjTL5ecG4McnN4r5+oSkcbcihZ6OgCaX5Z/KhlZBf1h7flC/PzlHyC5zcF+wT3DXpoMpl0Qku4tRDsy+OA1fGTvEzTtm16I6/v+nTnwPvrgVPCaopgr32X9iHgNxu6kllQoNQUJlu5VIYpg=,iv:N0a61HePOpR0H4yuF1Rk8dqiOUmR25uGl69R/v9ZDLA=,tag:DId9Yy3PxDLk0+U+sUTrww==,type:str]
+    pgp: []
+    encrypted_regex: ^(data|stringData)$
+    version: 3.7.3
