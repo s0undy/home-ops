@@ -38,13 +38,13 @@ spec:
       media:
         enabled: true
         type: nfs
-        server: "ds412.${SECRET_DOMAIN}"
+        server: 10.10.10.30
         path: /volume2/media
         mountPath: /media
       downloads:
         enabled: true
         type: nfs
-        server: "ds412.${SECRET_DOMAIN}"
+        server: 10.10.10.30
         path: /volume2/media/downloads
         mountPath: /downloads
     ingress:
