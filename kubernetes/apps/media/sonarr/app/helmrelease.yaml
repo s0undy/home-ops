@@ -1,0 +1,76 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: sonarr
+  namespace: media
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 1.3.1
+      interval: 30m
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  values:
+    image:
+      repository: ghcr.io/onedr0p/sonarr-develop
+      tag: 4.0.0.369@sha256:72c82fc3284e019ac4a08e7cad870ff5a9a119a950fdddf0a7ac1364a40aded4
+    env:
+      TZ: Europe/Stockholm
+      SONARR__INSTANCE_NAME: Sonarr
+      SONARR__PORT: &port 8989
+      SONARR__APPLICATION_URL: "https://{{ .Release.Name }}.${SECRET_DOMAIN}"
+      SONARR__LOG_LEVEL: info
+    service:
+      main:
+        ports:
+          http:
+            port: *port
+    persistence:
+      config:
+        enabled: true
+        existingClaim: sonarr-config
+        mountPath: /config
+      media:
+        enabled: true
+        type: nfs
+        server: "ds412.${SECRET_DOMAIN}"
+        path: /volume2/media
+        mountPath: /media
+      downloads:
+        enabled: true
+        type: nfs
+        server: "ds412.${SECRET_DOMAIN}"
+        path: /volume2/media/downloads
+        mountPath: /downloads
+    ingress:
+      main:
+        enabled: true
+        ingressClassName: nginx
+        annotations:
+          hajimari.io/icon: "television-box"
+          hajimari.io/appName: "Sonarr"
+        hosts:
+          - host: &host "{{ .Release.Name }}.${SECRET_DOMAIN}"
+            paths:
+              - path: /
+        tls:
+          - hosts:
+              - *host
+    podSecurityContext:
+      runAsUser: 568
+      runAsGroup: 568
+      fsGroup: 568
+      fsGroupChangePolicy: "OnRootMismatch"
+      supplementalGroups:
+        - 100
+    resources:
+      requests:
+        cpu: 15m
+        memory: 183Mi
+      limits:
+        memory: 500Mi
