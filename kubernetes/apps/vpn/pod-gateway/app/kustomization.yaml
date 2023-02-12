@@ -6,6 +6,7 @@ namespace: vpn
 resources:
   - ./helmrelease.yaml
   - ./pod-gateway-vpnconfig.sops.yaml
+  - ./networkpolicy.yaml
 commonLabels:
   app.kubernetes.io/name: pod-gateway
   app.kubernetes.io/instance: pod-gateway
