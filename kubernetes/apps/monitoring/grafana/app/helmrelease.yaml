@@ -1,0 +1,127 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: grafana
+  namespace: monitoring
+spec:
+  interval: 15m
+  chart:
+    spec:
+      chart: grafana
+      version: 6.50.7
+      sourceRef:
+        kind: HelmRepository
+        name: grafana
+        namespace: flux-system
+  maxHistory: 3
+  install:
+    createNamespace: true
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  uninstall:
+    keepHistory: false
+  values:
+    replicas: 1
+    rbac:
+      pspEnabled: false
+    testFramework:
+      enabled: false
+    admin:
+      existingSecret: grafana-secret
+      userKey: adminUser
+      passwordKey: adminPass
+    grafana.ini:
+      auth.basic:
+        enabled: true
+        disable_login_form: false
+    dashboardProviders:
+      dashboardproviders.yaml:
+        apiVersion: 1
+        providers:
+          - name: "default"
+            orgId: 1
+            folder: ""
+            type: file
+            disableDeletion: false
+            editable: false
+            options:
+              path: /var/lib/grafana/dashboards/default
+    dashboards:
+      default:
+        # Ref: https://grafana.com/grafana/dashboards/2842
+        ceph-cluster:
+          gnetId: 2842
+          revision: 14
+          datasource: Prometheus
+        # Ref: https://grafana.com/grafana/dashboards/5336
+        ceph-osd:
+          gnetId: 5336
+          revision: 5
+          datasource: Prometheus
+        # Ref: https://grafana.com/grafana/dashboards/5342
+        ceph-pools:
+          gnetId: 5342
+          revision: 5
+          datasource: Prometheus
+        #Ref: https://github.com/fluxcd/flux2/tree/main/manifests/monitoring/monitoring-config/dashboards
+        flux-cluster:
+          url: https://raw.githubusercontent.com/fluxcd/flux2/main/manifests/monitoring/monitoring-config/dashboards/cluster.json
+          datasource: Prometheus
+        flux-control-plane:
+          url: https://raw.githubusercontent.com/fluxcd/flux2/main/manifests/monitoring/monitoring-config/dashboards/control-plane.json
+          datasource: Prometheus
+        flux-logs:
+          url: https://raw.githubusercontent.com/fluxcd/flux2/main/manifests/monitoring/monitoring-config/dashboards/logs.json
+          datasource: Prometheus
+    datasources:
+      datasources.yaml:
+        apiVersion: 1
+        datasources:
+          - name: Prometheus
+            type: prometheus
+            access: proxy
+            url: http://kube-prometheus-stack-prometheus:9090/
+            isDefault: true
+    sidecar:
+      dashboards:
+        enabled: true
+        searchNamespace: ALL
+      datasources:
+        enabled: true
+        searchNamespace: ALL
+    plugins:
+      - natel-discrete-panel
+      - pr0ps-trackmap-panel
+      - grafana-piechart-panel
+      - vonage-status-panel
+      - grafana-worldmap-panel
+      - grafana-clock-panel
+    serviceMonitor:
+      enabled: true
+    ingress:
+      enabled: true
+      ingressClassName: nginx
+      annotations:
+        hajimari.io/icon: simple-icons:grafana
+        hajimari.io/appName: "Grafana"
+      hosts:
+        - &host "grafana.${SECRET_DOMAIN}"
+      tls:
+        - hosts:
+            - *host
+    imageRenderer:
+      enabled: true
+      replicas: 1
+    persistence:
+      enabled: false
+    resources:
+      limits:
+        memory: 219M
+      requests:
+        cpu: 10m
+        memory: 127M
