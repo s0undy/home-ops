@@ -6,11 +6,9 @@ metadata:
   namespace: flux-system
 spec:
   interval: 30m
-  url: ssh://git@github.com/s0undy/kube-ops
+  url: "https://github.com/s0undy/kube-ops"
   ref:
     branch: main
-  secretRef:
-    name: github-deploy-key
   ignore: |
     # exclude all
     /*
