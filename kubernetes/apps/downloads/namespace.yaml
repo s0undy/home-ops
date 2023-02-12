@@ -4,6 +4,7 @@ kind: Namespace
 metadata:
   name: downloads
   labels:
+    routed-gateway: "true"
     kustomize.toolkit.fluxcd.io/prune: disabled
 #ADD Goldilocks later
 #    goldilocks.fairwinds.com/enabled: "true"
