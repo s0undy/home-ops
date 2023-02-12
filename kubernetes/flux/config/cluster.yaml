@@ -8,7 +8,7 @@ spec:
   interval: 30m
   ref:
     branch: main
-  url: "https://github.com/s0undy/kube-ops"
+  url: ssh://git@github.com/s0undy/kube-ops
   ignore: |
     # exclude all
     /*
