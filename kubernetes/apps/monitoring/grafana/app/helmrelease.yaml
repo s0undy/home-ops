@@ -109,7 +109,7 @@ spec:
       annotations:
         hajimari.io/icon: simple-icons:grafana
         hajimari.io/appName: "Grafana"
-        hajimari.io/group: "Monitoring"
+        hajimari.io/group: "monitoring"
       hosts:
         - &host "grafana.${SECRET_DOMAIN}"
       tls:

@@ -42,7 +42,7 @@ spec:
         annotations:
           hajimari.io/icon: mdi:align-vertical-top
           hajimari.io/appName: "Goldilocks"
-          hajimari.io/group: "Monitoring"
+          hajimari.io/group: "monitoring"
         hosts:
           - host: &host "goldilocks.${SECRET_DOMAIN}"
             paths:

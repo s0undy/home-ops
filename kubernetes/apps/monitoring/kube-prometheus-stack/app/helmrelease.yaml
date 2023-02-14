@@ -80,6 +80,7 @@ spec:
         annotations:
           hajimari.io/appName: "Alert Manager"
           hajimari.io/icon: mdi:alert-decagram-outline
+          hajimari.io/group: "monitoring"
         hosts:
           - &host "alert-manager.${SECRET_DOMAIN}"
         tls:
@@ -180,6 +181,7 @@ spec:
         annotations:
           hajimari.io/appName: Prometheus
           hajimari.io/icon: simple-icons:prometheus
+          hajimari.io/group: "monitoring"
         pathType: Prefix
         hosts:
           - &host "prometheus.${SECRET_DOMAIN}"
