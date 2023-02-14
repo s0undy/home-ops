@@ -43,6 +43,7 @@ spec:
         ingressClassName: nginx
         annotations:
           hajimari.io/icon: "download-circle-outline"
+          hajimari.io/group: "Media"
         hosts:
           - host: &host "qbitt.${SECRET_DOMAIN}"
             paths:

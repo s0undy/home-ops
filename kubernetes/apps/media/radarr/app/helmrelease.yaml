@@ -54,6 +54,7 @@ spec:
         annotations:
           hajimari.io/icon: "mdi:filmstrip"
           hajimari.io/appName: "Radarr"
+          hajimari.io/group: "Media"
         hosts:
           - host: &host "{{ .Release.Name }}.${SECRET_DOMAIN}"
             paths:

@@ -54,6 +54,7 @@ spec:
         annotations:
           hajimari.io/icon: "television-box"
           hajimari.io/appName: "Sonarr"
+          hajimari.io/group: "Media"
         hosts:
           - host: &host "{{ .Release.Name }}.${SECRET_DOMAIN}"
             paths:
