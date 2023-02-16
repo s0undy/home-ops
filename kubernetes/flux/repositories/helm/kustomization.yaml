@@ -21,3 +21,4 @@ resources:
   - ./grafana.yaml
   - ./fairwinds.yaml
   - ./angelnu.yaml
+  - ./cloudnative-pg.yaml
