@@ -1,0 +1,97 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: &app minio
+  namespace: storage
+spec:
+  interval: 15m
+  chart:
+    spec:
+      chart: app-template
+      version: 1.3.2
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  maxHistory: 3
+  install:
+    createNamespace: true
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  uninstall:
+    keepHistory: false
+  values:
+    image:
+      repository: quay.io/minio/minio
+      tag: RELEASE.2023-03-13T19-46-17Z
+    env:
+      TZ: "${TIMEZONE}"
+      MINIO_UPDATE: "off"
+      MINIO_BROWSER_REDIRECT_URL: "https://minio.${SECRET_DOMAIN}"
+      MINIO_SERVER_URL: "https://s3.${SECRET_DOMAIN}"
+    envFrom:
+      - secretRef:
+          name: minio-secret
+    args: ["server", "/data", "--console-address", ":9001"]
+    service:
+      main:
+        enabled: true
+        ports:
+          http:
+            port: &console-port 9001
+          api:
+            enabled: true
+            port: &api-port 9000
+    ingress:
+      main:
+        enabled: true
+        ingressClassName: "nginx"
+        annotations:
+          nginx.ingress.kubernetes.io/whitelist-source-range: |
+            10.0.0.0/8,172.16.0.0/12,192.168.0.0/16
+          hajimari.io/appName: "Minio Console"
+          hajimari.io/enable: "true"
+          hajimari.io/icon: mdi:pail
+        hosts:
+          - host: "{{ .Release.Name }}.${SECRET_DOMAIN}"
+            paths:
+              - path: /
+                pathType: Prefix
+                service:
+                  port: *console-port
+      s3:
+        enabled: true
+        ingressClassName: "nginx"
+        annotations:
+          nginx.ingress.kubernetes.io/whitelist-source-range: |
+            10.0.0.0/8,172.16.0.0/12,192.168.0.0/16
+          nginx.ingress.kubernetes.io/proxy-connect-timeout: "300"
+          nginx.ingress.kubernetes.io/proxy-body-size: 5000m
+          nginx.ingress.kubernetes.io/proxy-request-buffering: "off"
+          nginx.ingress.kubernetes.io/configuration-snippet: |
+            chunked_transfer_encoding off;
+        hosts:
+          - host: "s3.${SECRET_DOMAIN}"
+            paths:
+              - path: /
+                pathType: Prefix
+                service:
+                  port: *api-port
+    persistence:
+      config:
+        enabled: true
+        type: nfs
+        server: 10.10.10.30
+        path: /volume1/minio
+        mountPath: /data
+    resources:
+      requests:
+        memory: 100Mi
+        cpu: 100m
+      limits:
+        memory: 750Mi

@@ -45,6 +45,7 @@ spec:
           - rook-ceph
           - media
           - downloads
+          - storage
     ingress:
       main:
         enabled: true
