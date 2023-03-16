@@ -34,6 +34,9 @@ spec:
       MINIO_UPDATE: "off"
       MINIO_BROWSER_REDIRECT_URL: "https://minio.${SECRET_DOMAIN}"
       MINIO_SERVER_URL: "https://s3.${SECRET_DOMAIN}"
+      CONSOLE_MINIO_SERVER: "https://minio.${SECRET_DOMAIN}"
+      MINIO_DOMAIN: "https://s3.${SECRET_DOMAIN}"
+      MINIO_API_CORS_ALLOW_ORIGIN: "https://minio.${SECRET_DOMAIN},https://s3.${SECRET_DOMAIN}"
     envFrom:
       - secretRef:
           name: minio-secret
@@ -70,11 +73,12 @@ spec:
         annotations:
           nginx.ingress.kubernetes.io/whitelist-source-range: |
             10.0.0.0/8,172.16.0.0/12,192.168.0.0/16
-          nginx.ingress.kubernetes.io/proxy-connect-timeout: "300"
-          nginx.ingress.kubernetes.io/proxy-body-size: 5000m
+          nginx.ingress.kubernetes.io/proxy-connect-timeout: "180"
+          nginx.ingress.kubernetes.io/proxy-body-size: 1024m
           nginx.ingress.kubernetes.io/proxy-request-buffering: "off"
           nginx.ingress.kubernetes.io/configuration-snippet: |
             chunked_transfer_encoding off;
+          hajimari.io/enable: "false"
         hosts:
           - host: "s3.${SECRET_DOMAIN}"
             paths:
