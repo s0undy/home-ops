@@ -88,6 +88,6 @@ spec:
               - *host
     resources:
       requests:
-        memory: 64
+        memory: 64M
       limits:
-        memory: 100
+        memory: 100M
