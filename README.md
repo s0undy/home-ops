@@ -16,21 +16,22 @@
 [![GitHub issues](https://img.shields.io/github/issues/s0undy/kube-ops?style=for-the-badge&logo=github)](https://github.com/s0undy/kube-ops/issues)
 [![GitHub pull requests](https://img.shields.io/github/issues-pr/s0undy/kube-ops?style=for-the-badge&logo=github)](https://github.com/s0undy/kube-ops/pulls)
 [![GitHub repository stars](https://img.shields.io/github/stars/s0undy/kube-ops?style=for-the-badge&logo=github)](https://github.com/s0undy/kube-ops/stargazers)
-[![GitHub repository lines](https://img.shields.io/tokei/lines/github/s0undy/kube-ops?style=for-the-badge&logo=github)](https://github.com/s0undy/kube-ops/graphs/contributors)
 
 </div>
 
 ## Hardware
 | Device                    | Count | OS Disk Size | Data Disk Size              | Ram  | Operating System | Purpose             |
 |---------------------------|-------|--------------|-----------------------------|------|------------------|---------------------|
-| Lenovo ThinkCentre M710q  | 3     | 128GB SSD    | -                           | 16GB | Ubuntu 22.04     | K8S Control Plane   |
-| Lenovo ThinkCentre M920q  | 3     | 128GB SSD    | 1TB NVMe Crucial P3 (ceph)  | 32GB | Ubuntu           | Kubernetes Workers  |
+| Lenovo ThinkCentre M710q  | 3     | 128GB SSD    | -                           | 16GB | Ubuntu 22.04     | Kubernetes Control Plane   |
+| Lenovo ThinkCentre M920q  | 3     | 128GB SSD    | 1TB NVMe Crucial P3 (ceph)  | 32GB | Ubuntu 22.04     | Kubernetes Workers  |
 | Synology DS412            | 1     | -            | 4x3TB SHR                   | 2GB  | DSM              | NFS                 |
 | Netgear ReadyNAS 2100     | 1     | -            | 4x2TB                       | 2GB  | ReadyNAS OS6     | Backup & Testing    |
-| Raspberry Pi 4            | 1     | 32GB(SD)     | -                           | 4GB  | Raspbian         | DNS-Backup          |
+| Raspberry Pi 4            | 1     | 32GB (SD)    | -                           | 4GB  | Raspbian         | DNS-Backup          |
 | UniFi Dream Machine Pro   | 1     | -            | -                           | -    | -                | Firewall/Controller |
 | UniFi Switch 16-POE 150W  | 1     | -            | -                           | -    | -                | Switching           |
 | UniFi UAP-AC-LR           | 1     | -            | -                           | -    | -                | Wirless Networking  |
+| IKEA Tradfri Gateway      | 1     | -            | -                           | -    | -                | Smart Home          |
+
 ## 🤝 Thanks
 Shoutout to [k8s@home](https://discord.gg/Yv2gzFy) and specially [onedr0p](https://github.com/onedr0p) for creating [flux-cluster-template](https://github.com/onedr0p/flux-cluster-template) to enable a "simple" way for anyone to get going with k8s.
 ## TODO
