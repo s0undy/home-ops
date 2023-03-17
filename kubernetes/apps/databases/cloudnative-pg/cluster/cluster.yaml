@@ -26,7 +26,7 @@ spec:
       wal:
         compression: bzip2
         maxParallel: 8
-      destinationPath: s3://cnpg/
+      destinationPath: s3://cnpg
       endpointURL: "https://s3.${SECRET_DOMAIN}"
       serverName: postgres-v15
       s3Credentials:
