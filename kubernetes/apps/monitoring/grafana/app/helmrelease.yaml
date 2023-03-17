@@ -78,6 +78,9 @@ spec:
         flux-logs:
           url: https://raw.githubusercontent.com/fluxcd/flux2/main/manifests/monitoring/monitoring-config/dashboards/logs.json
           datasource: Prometheus
+        cnpg:
+          url: https://raw.githubusercontent.com/cloudnative-pg/cloudnative-pg/main/docs/src/samples/monitoring/grafana-dashboard.json
+          datasource: Prometheus
     datasources:
       datasources.yaml:
         apiVersion: 1
