@@ -81,6 +81,10 @@ spec:
         cnpg:
           url: https://raw.githubusercontent.com/cloudnative-pg/cloudnative-pg/main/docs/src/samples/monitoring/grafana-dashboard.json
           datasource: Prometheus
+        redis:
+          gnetId: 14091
+          revision: 2
+          datasource: Prometheus
     datasources:
       datasources.yaml:
         apiVersion: 1
