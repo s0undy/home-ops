@@ -14,10 +14,6 @@ spec:
   nfs:
     server: 10.10.10.30
     path: /volume3/nextcloud
-  mountOptions:
-    - nfsvers=4.2
-    - nconnect=8
-    - hard
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
