@@ -16,7 +16,7 @@ spec:
     name: postgres-superuser
   postgresql:
     parameters:
-      max_connections: "400"
+      max_connections: "300"
       shared_buffers: 512MB
   monitoring:
     enablePodMonitor: true
