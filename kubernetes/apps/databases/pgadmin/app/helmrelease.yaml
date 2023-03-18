@@ -1,0 +1,64 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: pgadmin
+  namespace: databases
+spec:
+  interval: 15m
+  chart:
+    spec:
+      chart: pgadmin4
+      version: 1.14.5
+      sourceRef:
+        kind: HelmRepository
+        name: runix
+        namespace: flux-system
+  maxHistory: 3
+  install:
+    createNamespace: true
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  uninstall:
+    keepHistory: false
+  values:
+    image:
+      registry: docker.io
+      repository: dpage/pgadmin4
+    strategy:
+      type: Recreate
+    env:
+      email: "antonjosefsson@hotmail.se"
+    existingSecret: pgadmin-secrets
+    ingress:
+      enabled: true
+      ingressClassName: nginx
+      annotations:
+        hajimari.io/appName: "pgAdmin"
+        hajimari.io/enable: "true"
+        hajimari.io/icon: simple-icons:postgresql
+      hosts:
+        - host: &host "pgadmin.${SECRET_DOMAIN}"
+          paths:
+            - path: /
+              pathType: Prefix
+      tls:
+        - hosts:
+            - *host
+    persistentVolume:
+      enabled: true
+      storageClass: ceph-block
+      accessModes:
+        - ReadWriteOnce
+      size: 1Gi
+    resources:
+      requests:
+        cpu: 15m
+        memory: 183M
+      limits:
+        # cpu: 15m
+        memory: 283M
