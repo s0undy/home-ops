@@ -39,7 +39,7 @@ spec:
       existingSecret:
         enabled: true
         secretName: nextcloud-secret
-      host: &host nc.${CLUSTER_DOMAIN}
+      host: &host nc.${SECRET_DOMAIN}
     internalDatabase:
       enabled: false
     externalDatabase:
