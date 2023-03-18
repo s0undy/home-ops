@@ -83,7 +83,7 @@ spec:
           datasource: Prometheus
         redis:
           gnetId: 14091
-          revision: 2
+          revision: 1
           datasource: Prometheus
     datasources:
       datasources.yaml:
