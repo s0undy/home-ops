@@ -46,6 +46,7 @@ spec:
           - media
           - downloads
           - storage
+          - databases
     ingress:
       main:
         enabled: true

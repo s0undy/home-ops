@@ -40,6 +40,7 @@ spec:
       annotations:
         hajimari.io/appName: "pgAdmin"
         hajimari.io/enable: "true"
+        hajimari.io/group: "Infrastructure"
         hajimari.io/icon: simple-icons:postgresql
       hosts:
         - host: &host "pgadmin.${SECRET_DOMAIN}"
