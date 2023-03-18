@@ -13,7 +13,7 @@ spec:
     size: 30Gi
     storageClass: local-path
   superuserSecret:
-    name: cloudnative-pg-secret
+    name: postgres-superuser
   postgresql:
     parameters:
       max_connections: "300"
