@@ -10,7 +10,7 @@ spec:
   imageName: ghcr.io/cloudnative-pg/postgresql:15.2
   primaryUpdateStrategy: unsupervised
   storage:
-    size: 30Gi
+    size: 50Gi
     storageClass: local-path
   superuserSecret:
     name: postgres-superuser
@@ -31,8 +31,8 @@ spec:
       serverName: postgres-v15
       s3Credentials:
         accessKeyId:
-          name: cloudnative-pg-secret
+          name: cloudnative-pg-minio
           key: aws-access-key-id
         secretAccessKey:
-          name: cloudnative-pg-secret
+          name: cloudnative-pg-minio
           key: aws-secret-access-key

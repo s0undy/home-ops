@@ -4,8 +4,9 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: databases
 resources:
-#  - ./cluster.yaml
-#  - ./scheduledbackup.yaml
-#  - ./prometheusrule.yaml
+  - ./cluster.yaml
+  - ./scheduledbackup.yaml
+  - ./prometheusrule.yaml
   - ./service.yaml
-#  - ./cnpg-superuser.secret.sops.yaml
+  - ./cnpg-superuser.secret.sops.yaml
+  - ./cnpg-minio.secret.sops.yaml
