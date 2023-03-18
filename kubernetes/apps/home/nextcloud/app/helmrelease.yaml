@@ -31,11 +31,11 @@ spec:
       enabled: true
     nextcloud:
       datadir: /var/www/data
-      extraEnv:
-        - name: REDIS_HOST
-          value: redis.databases.svc.cluster.local
-        - name: REDIS_HOST_PORT
-          value: "6379"
+#      extraEnv:
+#        - name: REDIS_HOST
+#          value: redis.databases.svc.cluster.local
+#        - name: REDIS_HOST_PORT
+#          value: "6379"
       existingSecret:
         enabled: true
         secretName: nextcloud-secret
