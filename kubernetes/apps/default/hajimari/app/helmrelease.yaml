@@ -47,6 +47,7 @@ spec:
           - downloads
           - storage
           - databases
+          - home
     ingress:
       main:
         enabled: true
