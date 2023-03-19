@@ -7,7 +7,6 @@ metadata:
 spec:
   accessModes:
     - ReadWriteOnce
-  defaultMode: 0755
   resources:
     requests:
       storage: 5Gi
