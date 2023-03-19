@@ -9,7 +9,8 @@
     },
     "yaml.schemas": {
         "ansible": "ansible/*.yml",
-        "Kubernetes": "kubernetes/*.yaml"
+        "Kubernetes": "kubernetes/*.yaml",
+        "https://kubernetes-schemas.devbu.io/kustomization_v1beta2.json": "file:///home/s0undy/kube-ops/kubernetes/apps/databases/redis/ks.yaml"
     },
     "editor.bracketPairColorization.enabled": true,
     "editor.guides.bracketPairs": true,
