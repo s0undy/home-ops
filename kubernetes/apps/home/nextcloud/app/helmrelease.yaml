@@ -134,10 +134,10 @@ spec:
     persistence:
       enabled: true
       existingClaim: nextcloud-config
-      #nextcloudData:
-      #  enabled: true
-      #  existingClaim: nextcloud-nfs
-      #  accessMode: ReadWriteMany
+      nextcloudData:
+        enabled: true
+        existingClaim: nextcloud-nfs
+        accessMode: ReadWriteMany
 
     resources:
       requests:
