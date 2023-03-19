@@ -167,6 +167,18 @@ spec:
       timeoutSeconds: 20
       failureThreshold: 60
       successThreshold: 1
+
+  extraSecurityContext:
+    runAsUser: "33"
+    runAsGroup: "33"
+    runAsNonRoot: true
+    readOnlyRootFilesystem: true
+
+    rbac:
+      enabled: false
+      serviceaccount:
+        create: true
+        name: nextcloud-serviceaccount
   valuesFrom:
     - targetPath: externalDatabase.user
       kind: Secret
