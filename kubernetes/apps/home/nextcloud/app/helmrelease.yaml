@@ -147,14 +147,14 @@ spec:
         memory: 5120Mi
 
     livenessProbe:
-      enabled: true
+      enabled: false
       initialDelaySeconds: 10
       periodSeconds: 30
       timeoutSeconds: 10
       failureThreshold: 3
       successThreshold: 1
     readinessProbe:
-      enabled: true
+      enabled: false
       initialDelaySeconds: 60
       periodSeconds: 60
       timeoutSeconds: 5
