@@ -67,10 +67,10 @@ spec:
       pathType: Prefix
       tls:
         - hosts:
-            - *host
+            - nc.${SECRET_DOMAIN}
 
     nextcloud:
-      host: &host nc.${SECRET_DOMAIN}
+      host: nc.${SECRET_DOMAIN}
       existingSecret:
         enabled: true
         secretName: nextcloud-secret
