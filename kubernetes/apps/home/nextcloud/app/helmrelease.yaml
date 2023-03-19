@@ -134,10 +134,10 @@ spec:
     persistence:
       enabled: true
       existingClaim: nextcloud-config
-      nextcloudData:
-        enabled: true
-        existingClaim: nextcloud-nfs
-        accessMode: ReadWriteMany
+      #nextcloudData:
+      #  enabled: true
+      #  existingClaim: nextcloud-nfs
+      #  accessMode: ReadWriteMany
 
     resources:
       requests:
@@ -167,12 +167,6 @@ spec:
       timeoutSeconds: 20
       failureThreshold: 60
       successThreshold: 1
-
-  extraSecurityContext:
-    runAsUser: "33"
-    runAsGroup: "33"
-    runAsNonRoot: true
-    readOnlyRootFilesystem: true
 
     rbac:
       enabled: false
