@@ -31,7 +31,6 @@ spec:
       tag: 25.0.4
       pullPolicy: IfNotPresent
     replicaCount: 1
-
     ingress:
       enabled: true
       className: nginx
@@ -68,7 +67,6 @@ spec:
       tls:
         - hosts:
             - nc.${SECRET_DOMAIN}
-
     nextcloud:
       host: nc.${SECRET_DOMAIN}
       existingSecret:
@@ -130,7 +128,6 @@ spec:
       host: postgres-v15-rw.databases.svc.cluster.local
     cronjob:
       enabled: true
-
     persistence:
       enabled: true
       existingClaim: nextcloud-config
@@ -138,23 +135,21 @@ spec:
         enabled: true
         existingClaim: nextcloud-nfs
         accessMode: ReadWriteMany
-
     resources:
       requests:
         cpu: 150m
         memory: 512Mi
       limits:
         memory: 5120Mi
-
     livenessProbe:
-      enabled: false
+      enabled: true
       initialDelaySeconds: 10
       periodSeconds: 30
       timeoutSeconds: 10
       failureThreshold: 3
       successThreshold: 1
     readinessProbe:
-      enabled: false
+      enabled: true
       initialDelaySeconds: 60
       periodSeconds: 60
       timeoutSeconds: 5
@@ -167,7 +162,6 @@ spec:
       timeoutSeconds: 20
       failureThreshold: 60
       successThreshold: 1
-
     rbac:
       enabled: false
       serviceaccount:
