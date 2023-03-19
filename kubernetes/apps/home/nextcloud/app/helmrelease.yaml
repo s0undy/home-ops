@@ -116,7 +116,7 @@ spec:
             'memcache.distributed' => '\OC\Memcache\Redis',
             'memcache.locking' => '\OC\Memcache\Redis',
             'redis' => array(
-              'host' => 'redis-headless.databases.svc.cluster.local',
+              'host' => 'redis-lb.databases.svc.cluster.local',
               'port' => 6379,
             )
           );

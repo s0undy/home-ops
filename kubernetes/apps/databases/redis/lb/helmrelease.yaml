@@ -62,7 +62,7 @@ spec:
           hajimari.io/appName: "Redis Load Balancer"
           hajimari.io/icon: simple-icons:redis
         hosts:
-          - host: "redis-ui.${SECRET_DOMAIN}"
+          - host: "redis-lb.${SECRET_DOMAIN}"
             paths:
               - path: /
                 pathType: Prefix
