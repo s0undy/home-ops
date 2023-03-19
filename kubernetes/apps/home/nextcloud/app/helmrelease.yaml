@@ -128,7 +128,6 @@ spec:
       enabled: true
       type: postgresql
       host: postgres-v15-rw.databases.svc.cluster.local
-      database: nextcloud
     cronjob:
       enabled: true
 
