@@ -175,16 +175,6 @@ spec:
       serviceaccount:
         create: true
         name: nextcloud-serviceaccount
-    metrics:
-      enabled: true
-      https: true
-      tlsSkipVerify: false
-      image:
-        repository: xperimental/nextcloud-exporter
-        tag: 0.6.0
-        pullPolicy: IfNotPresent
-      serviceMonitor:
-        enabled: true
   valuesFrom:
     - targetPath: externalDatabase.user
       kind: Secret
