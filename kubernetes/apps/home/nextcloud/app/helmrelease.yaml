@@ -62,6 +62,12 @@ spec:
           location ~ ^/(?:autotest|occ|issue|indie|db_|console) {
             deny all;
           }
+          location ^~ /.well-known {
+          return 301 /index.php$uri;
+          }
+          location = /.well-known/webfinger {
+          return 301 /index.php$uri;
+          }
       path: /
       pathType: Prefix
       tls:
@@ -167,6 +173,15 @@ spec:
       serviceaccount:
         create: true
         name: nextcloud-serviceaccount
+    metrics:
+      enabled: true
+      https: true
+      image:
+        repository: xperimental/nextcloud-exporter
+        tag: 0.6.0
+        pullPolicy: IfNotPresent
+      serviceMonitor:
+        enabled: true
   valuesFrom:
     - targetPath: externalDatabase.user
       kind: Secret
@@ -180,3 +195,7 @@ spec:
       kind: Secret
       name: nextcloud-secret
       valuesKey: POSTGRES_DB
+    - targetPath: metrics.token
+      kind: Secret
+      name: nextcloud-secret
+      valuesKey: nextcloud-token
