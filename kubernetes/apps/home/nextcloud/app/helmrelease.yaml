@@ -35,6 +35,8 @@ spec:
       enabled: true
       className: nginx
       annotations:
+        external-dns.alpha.kubernetes.io/target: "ipv4.${SECRET_DOMAIN}"
+        external-dns.home.arpa/enabled: "true"
         hajimari.io/icon: mdi:dropbox
         nginx.ingress.kubernetes.io/proxy-body-size: "10G"
         nginx.ingress.kubernetes.io/proxy-buffering: "off"
@@ -173,6 +175,14 @@ spec:
       serviceaccount:
         create: true
         name: nextcloud-serviceaccount
+    metrics:
+      enabled: true
+      https: true
+      tlsSkipVerify: false
+      image:
+        repository: xperimental/nextcloud-exporter
+        tag: 0.6.0
+        pullPolicy: IfNotPresent
   valuesFrom:
     - targetPath: externalDatabase.user
       kind: Secret
