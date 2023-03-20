@@ -86,8 +86,8 @@ spec:
           revision: 1
           datasource: Prometheus
         haproxy:
-          gnetId: 12693
-          revision: 5
+          gnetId: 2428
+          revision: 7
           datasource: Prometheus
     datasources:
       datasources.yaml:
