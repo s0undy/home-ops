@@ -191,8 +191,9 @@ spec:
       prometheusSpec:
         replicas: 3
         replicaExternalLabelName: __replica__
-        externalLabels:
-          cluster: home-kubernetes
+        #Breaks other metrics that has 'cluster'lable
+        #externalLabels:
+        #  cluster: home-kubernetes
         podAntiAffinity: hard
         ruleSelectorNilUsesHelmValues: false
         serviceMonitorSelectorNilUsesHelmValues: false
