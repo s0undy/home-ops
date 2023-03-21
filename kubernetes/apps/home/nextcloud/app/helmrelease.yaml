@@ -105,6 +105,10 @@ spec:
         autoconfig.php: false
         # SMTP default configuration
         smtp.config.php: true
+      mail:
+        enabled: true
+        fromAddress: nextcloud
+        domain: ${SECRET_DOMAIN}
       configs:
         custom.config.php: |-
           <?php
@@ -208,3 +212,19 @@ spec:
       kind: Secret
       name: nextcloud-secret
       valuesKey: nextcloud-token
+    - targetPath: nextcloud.mail.smtp.host
+      kind: Secret
+      name: nextcloud-secret
+      valuesKey: MAIL_HOST
+    - targetPath: nextcloud.mail.smtp.port
+      kind: Secret
+      name: nextcloud-secret
+      valuesKey: MAIL_PORT
+    - targetPath: nextcloud.mail.smtp.name
+      kind: Secret
+      name: nextcloud-secret
+      valuesKey: MAIL_USER
+    - targetPath: nextcloud.mail.smtp.password
+      kind: Secret
+      name: nextcloud-secret
+      valuesKey: MAIL_PASSWORD
