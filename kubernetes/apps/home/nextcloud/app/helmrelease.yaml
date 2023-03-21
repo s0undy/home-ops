@@ -223,8 +223,8 @@ spec:
     - targetPath: nextcloud.mail.smtp.name
       kind: Secret
       name: nextcloud-secret
-      valuesKey: MAIL_USER
+      valuesKey: smtp-username
     - targetPath: nextcloud.mail.smtp.password
       kind: Secret
       name: nextcloud-secret
-      valuesKey: MAIL_PASSWORD
+      valuesKey: smtp-password
