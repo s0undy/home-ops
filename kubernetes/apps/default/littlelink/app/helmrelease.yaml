@@ -22,8 +22,8 @@ spec:
       pullPolicy: Always
     env:
       TZ: Europe/Stockholm
-      META_TITLE: Anton Josefsson - Links Page
-      META_DESCRIPTION: Anton Josefsson - Links Page
+      META_TITLE: Anton Josefsson
+      META_DESCRIPTION: Anton Josefsson - Links
       META_AUTHOR: Anton Josefsson <antonjosefsson@hotmail.se>
       THEME: Dark
       FAVICON_URL: https://avatars.githubusercontent.com/u/18258738?v=4
@@ -32,35 +32,19 @@ spec:
       AVATAR_ALT: Anton Josefsson <antonjosefsson@hotmail.se>
       NAME: Anton Josefsson
       BIO: 🤘 Jammin' with the 💻 console 🤠 cowboys in 🌐 cyberspace
+      CUSTOM_BUTTON_TEXT: K8s Cluster
+      CUSTOM_BUTTON_URL: https://github.com/s0undy/kube-ops
+      CUSTOM_BUTTON_COLOR: #000000
+      CUSTOM_BUTTON_TEXT_COLOR: #ffffff
+      CUSTOM_BUTTON_ALT_TEXT: My GitOps managed Kubernetes cluster
+      CUSTOM_BUTTON_NAME: K8s Cluster
+      CUSTOM_BUTTON_ICON: fas fa-cog
       GITHUB: https://github.com/s0undy
-      # TWITTER: https://sprk.sh/twitter
-      # INSTAGRAM: https://www.instagram.com/techno.tim
-      #YOUTUBE: https://sprk.sh/youtube
-      # TWITCH: https://www.twitch.tv/technotim/
-      # DISCORD: https://discord.gg/DJKexrJ
-      # TIKTOK: https://www.tiktok.com/@technotim
-      # KIT: https://kit.co/TechnoTim
-      # FACEBOOK: https://facebook.com
-      # FACEBOOK_MESSENGER: https://facebook.com
       LINKED_IN: https://www.linkedin.com/in/anton-josefsson-925103133/
-      # PRODUCT_HUNT: https://www.producthunt.com/
-      # SNAPCHAT: https://www.snapchat.com/
-      # SPOTIFY: https://www.spotify.com/
-      # REDDIT: https://www.reddit.com/
-      # MEDIUM: https://medium.com
-      # PINTEREST: https://www.pinterest.com/
-      EMAIL: antonjosefsson@hotmail.se
-      # EMAIL_ALT: you@example.com
-      #SOUND_CLOUD: https://sprk.sh/music
-      # FIGMA: https://figma.com
-      # TELEGRAM: https://telegram.org/
-      # TUMBLR: https://www.tumblr.com/
-      # STEAM: https://steamcommunity.com/
-      # VIMEO: https://vimeo.com/
-      # WORDPRESS: https://wordpress.com/
-      # GOODREADS: https://www.goodreads.com/
-      # SKOOB: https://www.skoob.com.br/
-      FOOTER: Ses på LAN!
+      INSTAGRAM: https://www.instagram.com/antonjoosefssoon/
+      EMAIL: anton.josefsson@josefssonit.se
+      FOOTER: Anton Josefsson @ 2022
+      
     service:
       main:
         ports:
