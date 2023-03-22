@@ -35,11 +35,11 @@ spec:
       BUTTON_ORDER: K8S,GITHUB,LINKED_IN,INSTAGRAM,EMAIL
      
       CUSTOM_BUTTON_ALT_TEXT: My GitOps managed Kubernetes cluster
-      CUSTOM_BUTTON_ICON: fas fa-cog
+      CUSTOM_BUTTON_ICON: fas dharmachakra
       CUSTOM_BUTTON_NAME: K8S
       CUSTOM_BUTTON_COLOR: "#ffffff"
-      CUSTOM_BUTTON_TEXT: K8s Cluster
-      CUSTOM_BUTTON_TEXT_COLOR: "#ED2756"
+      CUSTOM_BUTTON_TEXT: GitOps Kubernetes
+      CUSTOM_BUTTON_TEXT_COLOR: "#326CE5"
       CUSTOM_BUTTON_URL: https://github.com/s0undy/kube-ops
       BUTTON_TARGET: _blank
       GITHUB: https://github.com/s0undy
