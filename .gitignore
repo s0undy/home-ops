@@ -3,12 +3,15 @@
 Thumbs.db
 # k8s
 kubeconfig
+# Private
+.private/
 # vscode-sops
 .decrypted~*.yaml
 .config.env
 *.agekey
 *.pub
 *.key
+*.pem
 # Ansible
 xanmanning.k3s*
 # Terraform
