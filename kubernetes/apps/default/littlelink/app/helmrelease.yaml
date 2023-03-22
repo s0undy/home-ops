@@ -33,19 +33,21 @@ spec:
       NAME: Anton Josefsson
       BIO: 🤘 Jammin' with the 💻 console 🤠 cowboys in 🌐 cyberspace
       BUTTON_ORDER: K8S,GITHUB,LINKED_IN,INSTAGRAM,EMAIL
-      CUSTOM_BUTTON_TEXT: K8s Cluster
-      CUSTOM_BUTTON_URL: https://github.com/s0undy/kube-ops
-      CUSTOM_BUTTON_COLOR: #000000
-      CUSTOM_BUTTON_TEXT_COLOR: #ffffff
+     
       CUSTOM_BUTTON_ALT_TEXT: My GitOps managed Kubernetes cluster
-      CUSTOM_BUTTON_NAME: K8S
       CUSTOM_BUTTON_ICON: fas fa-cog
+      CUSTOM_BUTTON_NAME: K8S
+      CUSTOM_BUTTON_COLOR: "#ffffff"
+      CUSTOM_BUTTON_TEXT: K8s Cluster
+      CUSTOM_BUTTON_TEXT_COLOR: "#ED2756"
+      CUSTOM_BUTTON_URL: https://github.com/s0undy/kube-ops
+      BUTTON_TARGET: _blank
       GITHUB: https://github.com/s0undy
       LINKED_IN: https://www.linkedin.com/in/anton-josefsson-925103133/
       INSTAGRAM: https://www.instagram.com/antonjoosefssoon/
       EMAIL: anton.josefsson@josefssonit.se
-      FOOTER: Anton Josefsson @ 2022
-      
+      EMAIL_TEXT: Email me!
+      FOOTER: Anton Josefsson © 2022
     service:
       main:
         ports:
