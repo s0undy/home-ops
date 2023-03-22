@@ -9,6 +9,10 @@ creation_rules:
     key_groups:
       - age:
           - age1y6admte6g24crgupz4lpaszp0vxr9nntyjprjk27trp9ustvzumsml44sg
+  - path_regex: kubernetes/.*\.sops\.json
+    key_groups:
+      - age:
+          - age1y6admte6g24crgupz4lpaszp0vxr9nntyjprjk27trp9ustvzumsml44sg
   - path_regex: terraform/.*\.sops\.ya?ml
     key_groups:
       - age:
