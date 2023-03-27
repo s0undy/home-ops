@@ -3,7 +3,7 @@ apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
   name: littlelink
-  namespace: default
+  namespace: web
 spec:
   interval: 30m
   chart:
@@ -33,7 +33,7 @@ spec:
       NAME: Anton Josefsson
       BIO: 🤘 Jammin' with the 💻 console 🤠 cowboys in 🌐 cyberspace
       BUTTON_ORDER: K8S,GITHUB,LINKED_IN,INSTAGRAM,EMAIL
-     
+
       CUSTOM_BUTTON_ALT_TEXT: My GitOps managed Kubernetes cluster
       CUSTOM_BUTTON_ICON: fas dharmachakra
       CUSTOM_BUTTON_NAME: K8S
