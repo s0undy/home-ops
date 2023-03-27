@@ -48,6 +48,7 @@ spec:
           - storage
           - databases
           - home
+          - web
     ingress:
       main:
         enabled: true

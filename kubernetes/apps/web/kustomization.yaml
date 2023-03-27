@@ -4,3 +4,4 @@ kind: Kustomization
 resources:
   - ./namespace.yaml
   - ./littlelink/ks.yaml
+  - ./matomo/ks.yaml
