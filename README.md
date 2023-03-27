@@ -21,7 +21,7 @@
 
 ## K8s Applications
 
-While all aplications are created equal(or not), some are more important than others. Following below is a list of (all) applications currently running in the cluster.
+While all aplications are created equal(or not), some are more important than others. Following below is a list of the core-components of the cluster.
 
 ### Core
 
@@ -38,7 +38,7 @@ While all aplications are created equal(or not), some are more important than ot
 
 ### Applications
 
-In no specific order heres what's running in the cluster. ~Subject to change~
+In no specific order heres rest of what's running in the cluster. ~Subject to change~
 
 - [CloudNativePG](https://cloudnative-pg.io/): Operator covering full lifecycle of HA PostgreSQL database cluster.
 - [MariaDB](https://github.com/bitnami/charts/tree/main/bitnami/mariadb): MariaDB SQL database server.
