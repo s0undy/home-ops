@@ -28,7 +28,7 @@ spec:
   values:
     image:
       repository: bitnami/phpmyadmin
-      tag: 10.11.2
+      tag: 5.2.1
     db:
       host: mariadb
     ingress:
