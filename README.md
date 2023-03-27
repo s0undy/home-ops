@@ -85,7 +85,7 @@ In no specific order heres what's running in the cluster. ~Subject to change~
 | UniFi Switch 16-POE 150W  | 1     | -            | -                           | -    | -                | Switching           |
 | UniFi UAP-AC-LR           | 1     | -            | -                           | -    | -                | Wirless Networking  |
 | IKEA Tradfri Gateway      | 1     | -            | -                           | -    | -                | Smart Home          |
-
+| HP ML350p Gen8            | 1     | 600GB        | 6x300GB                     | 64GB | ESXI             | Random tests not used for K8s  |
 ## 🤝 Thanks
 
 Shoutout to [k8s@home](https://discord.gg/Yv2gzFy) and specially [onedr0p](https://github.com/onedr0p).
