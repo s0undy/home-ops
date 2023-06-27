@@ -29,7 +29,7 @@ spec:
     image:
       registry: docker.io
       repository: bitnami/matomo
-      tag: 4.14.1
+      tag: 4.14.2
     replicaCount: 1
     matomoEmail: user@example.com
     ## matomoSkipInstall Skip Matomo installation wizard. Useful for migrations and restoring from SQL dump
