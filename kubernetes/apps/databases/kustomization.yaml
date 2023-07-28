@@ -6,5 +6,5 @@ resources:
   - ./cloudnative-pg/ks.yaml
   - ./pgadmin/ks.yaml
   - ./redis/ks.yaml
-  - ./mariadb/ks.yaml
-  - ./phpmyadmin/ks.yaml
+#  - ./mariadb/ks.yaml
+#  - ./phpmyadmin/ks.yaml
