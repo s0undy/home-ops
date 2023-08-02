@@ -6,3 +6,4 @@ namespace: downloads
 resources:
   - ./helmrelease.yaml
   - ./qbittorrent-config-pvc.yaml
+  - ./volsync.yaml
