@@ -12,6 +12,22 @@
         "Kubernetes": "kubernetes/*.yaml",
         "https://kubernetes-schemas.devbu.io/kustomization_v1beta2.json": "file:///home/s0undy/kube-ops/kubernetes/apps/databases/redis/ks.yaml"
     },
+    "material-icon-theme.folders.associations": {
+      ".taskfiles": "utils",
+      "bootstrap": "import",
+      "charts": "kubernetes",
+      "hack": "scripts",
+      "repositories": "database",
+      "terraforms": "terraform",
+      "vars": "other",
+      // namespaces
+      "cert-manager": "guard",
+      "external-secrets": "keys",
+      "kube-system": "kubernetes",
+      "monitoring": "event",
+      "networking": "connection",
+      "rook-ceph": "dump",
+  },
     "editor.bracketPairColorization.enabled": true,
     "editor.guides.bracketPairs": true,
     "editor.guides.bracketPairsHorizontal": true,
