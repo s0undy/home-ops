@@ -24,3 +24,4 @@ resources:
   - ./cloudnative-pg.yaml
   - ./runix.yaml
   - ./nextcloud.yaml
+  - ./piraeus.yaml
