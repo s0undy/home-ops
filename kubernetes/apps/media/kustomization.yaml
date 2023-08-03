@@ -6,4 +6,4 @@ resources:
   - ./prowlarr/ks.yaml
   - ./sonarr/ks.yaml
   - ./radarr/ks.yaml
-  - ./plex/ks.yaml
+#  - ./plex/ks.yaml
