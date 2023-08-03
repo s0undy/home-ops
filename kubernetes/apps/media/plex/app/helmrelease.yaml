@@ -69,7 +69,7 @@ spec:
     persistence:
       config:
         enabled: true
-        existingClaim: plex-config
+        existingClaim: plex-config-claim
         mountPath: /config
       media:
         enabled: true
