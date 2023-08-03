@@ -6,3 +6,4 @@ namespace: media
 resources:
   - ./plex-config-pvc.yaml
   - ./helmrelease.yaml
+  - ./volsync.yaml

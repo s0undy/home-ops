@@ -7,5 +7,6 @@ resources:
   - ./helmrelease.yaml
   - ./hass-config-pvc.yaml
   - ./hass-secret.sops.yaml
+  - ./volsync.yaml
 patchesStrategicMerge:
   - ./patches/addons.yaml
