@@ -1,0 +1,14 @@
+apiVersion: volsync.backube/v1alpha1
+kind: ReplicationDestination
+metadata:
+  name: "plex-restore"
+  namespace: "media"
+spec:
+  trigger:
+    manual: restore-once
+  restic:
+    repository: "plex-restic-secret"
+    destinationPVC: "plex-config"
+    copyMethod: Direct
+    storageClassName: ceph-block
+    previous: 1
