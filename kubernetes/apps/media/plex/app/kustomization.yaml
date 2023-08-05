@@ -6,4 +6,4 @@ namespace: media
 resources:
   - ./plex-config-claim.yaml
   - ./helmrelease.yaml
-  - ./volsync.yaml
+#  - ./volsync.yaml
