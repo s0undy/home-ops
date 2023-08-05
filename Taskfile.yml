@@ -17,9 +17,9 @@ includes:
   cluster: .taskfiles/ClusterTasks.yml
   precommit: .taskfiles/PrecommitTasks.yml
   terraform: .taskfiles/TerraformTasks.yml
+  volsync: .taskfiles/VolSync/Tasks.yaml
 
 tasks:
-
   init:
     desc: Initialize workstation dependencies with Brew
     cmds:
