@@ -54,7 +54,7 @@ spec:
           redis-sentinel:
             port: 26379
             targetPort: 26379
-      authentik-redis:
+      authentik:
         enabled: true
         type: LoadBalancer
         loadBalancerIP: "${SVC_AUTHENTIK_REDIS_ADDR}"
