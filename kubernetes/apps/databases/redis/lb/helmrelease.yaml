@@ -54,6 +54,24 @@ spec:
           redis-sentinel:
             port: 26379
             targetPort: 26379
+      authentik-redis:
+        enabled: true
+        type: LoadBalancer
+        loadBalancerIP: "${SVC_AUTHENTIK_REDIS_ADDR}"
+        externalTrafficPolicy: Local
+        ports:
+          http:
+            port: 8080
+            targetPort: 8080
+          redis-read:
+            port: 6380
+            targetPort: 6380
+          redis-write:
+            port: 6379
+            targetPort: 6379
+          redis-sentinel:
+            port: 26379
+            targetPort: 26379
     ingress:
       main:
         enabled: true
