@@ -66,6 +66,10 @@ spec:
             paths:
               - path: /
                 pathType: Prefix
+          - host: "redis-authentik.${SECRET_DOMAIN}"
+            paths:
+              - path: /
+                pathType: Prefix
     podSecurityContext:
       runAsUser: 99
       runAsGroup: 99
