@@ -18,6 +18,7 @@ includes:
   precommit: .taskfiles/PrecommitTasks.yml
   terraform: .taskfiles/TerraformTasks.yml
   volsync: .taskfiles/VolSync/Tasks.yaml
+  Troubleshooting: .taskfiles/Troubleshooting.yml
 
 tasks:
   init:

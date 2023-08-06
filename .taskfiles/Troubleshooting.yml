@@ -1,0 +1,12 @@
+---
+version: "3"
+x-task-vars: &task-vars
+  namespace: '{{.namespace}}'
+tasks:
+  netshoot:
+    desc: Creates a temporary netshoot container in choosen namespace. (ex. task Troubleshooting:netshoot namespace=default)
+    cmds:
+      - kubectl run tmp-shell -n {{.namespace}} --rm -it --image nicolaka/netshoot
+    vars:
+      namespace: '{{.namespace | default "default"}}'
+    env: *task-vars
