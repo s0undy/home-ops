@@ -2,7 +2,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: redis-lb
+  name: redis-nextcloud-haproxy
   namespace: databases
 spec:
   interval: 15m
@@ -39,25 +39,7 @@ spec:
       main:
         enabled: true
         type: LoadBalancer
-        loadBalancerIP: "${SVC_REDIS_ADDR}"
-        externalTrafficPolicy: Local
-        ports:
-          http:
-            port: 8080
-            targetPort: 8080
-          redis-read:
-            port: 6380
-            targetPort: 6380
-          redis-write:
-            port: 6379
-            targetPort: 6379
-          redis-sentinel:
-            port: 26379
-            targetPort: 26379
-      authentik:
-        enabled: true
-        type: LoadBalancer
-        loadBalancerIP: "${SVC_AUTHENTIK_REDIS_ADDR}"
+        loadBalancerIP: "${SVC_NEXTCLOUD_REDIS_ADDR}"
         externalTrafficPolicy: Local
         ports:
           http:
@@ -77,14 +59,10 @@ spec:
         enabled: true
         ingressClassName: nginx
         annotations:
-          hajimari.io/appName: "Redis Load Balancer"
+          hajimari.io/appName: "Nextcloud-Redis Load Balancer"
           hajimari.io/icon: simple-icons:redis
         hosts:
-          - host: "redis-lb.${SECRET_DOMAIN}"
-            paths:
-              - path: /
-                pathType: Prefix
-          - host: "redis-authentik.${SECRET_DOMAIN}"
+          - host: "redis-nextcloud.${SECRET_DOMAIN}"
             paths:
               - path: /
                 pathType: Prefix
