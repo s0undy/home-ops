@@ -75,7 +75,7 @@ spec:
       config:
         enabled: true
         type: configMap
-        name: redis-lb-configmap
+        name: redis-authentik-haproxy-configmap
         mountPath: /usr/local/etc/haproxy/haproxy.cfg
         subPath: haproxy.cfg
         readOnly: true
