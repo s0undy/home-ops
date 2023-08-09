@@ -75,7 +75,7 @@ spec:
       config:
         enabled: true
         type: configMap
-        name: redis-authentik-haproxy-configmap
+        name: redis-nextcloud-haproxy-configmap
         mountPath: /usr/local/etc/haproxy/haproxy.cfg
         subPath: haproxy.cfg
         readOnly: true
