@@ -5,9 +5,9 @@ namespace: databases
 resources:
   - helmrelease.yaml
 configMapGenerator:
-  - name: redis-authentik-haproxy-configmap
+  - name: redis-nextcloud-haproxy-configmap
     files:
-      - nextcloud-haproxy.cfg=nextcloud-haproxy.cfg
+      - haproxy.cfg=nextcloud-haproxy.cfg
 generatorOptions:
   disableNameSuffixHash: true
   annotations:
