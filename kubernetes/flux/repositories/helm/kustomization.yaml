@@ -26,3 +26,4 @@ resources:
   - ./runix.yaml
   - ./nextcloud.yaml
   - ./piraeus.yaml
+  - ./authentik-charts.yaml
