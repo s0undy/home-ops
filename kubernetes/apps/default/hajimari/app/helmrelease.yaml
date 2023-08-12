@@ -49,6 +49,7 @@ spec:
           - databases
           - home
           - web
+          - security
     ingress:
       main:
         enabled: true
