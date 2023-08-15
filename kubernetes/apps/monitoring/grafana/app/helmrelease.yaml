@@ -85,6 +85,22 @@ spec:
           gnetId: 14091
           revision: 1
           datasource: Prometheus
+        unifi-udmp:
+          gnetId: 11313
+          revision: 9
+          datasource: Prometheus
+        unifi-usw:
+          gnetId: 11312
+          revision: 9
+          datasource: Prometheus
+        unifi-uap:
+          gnetId: 11314
+          revision: 10
+          datasource: Prometheus
+        unifi-clients:
+          gnetId: 11315
+          revision: 9
+          datasource: Prometheus
     datasources:
       datasources.yaml:
         apiVersion: 1
