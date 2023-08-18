@@ -35,11 +35,7 @@ spec:
       UP_UNIFI_DEFAULT_VERIFY_SSL: false
       UP_INFLUXDB_DISABLE: true
       UP_PROMETHEUS_DISABLE: false
-      UP_PROMETHEUS_NAMESPACE: unpoller
       UP_UNIFI_DEFAULT_SAVE_DPI: true
-      UP_UNIFI_DEFAULT_SAVE_SITES: true
-      UP_UNIFI_DEFAULT_SITE_0: default
-
     envFrom:
       - secretRef:
           name: unifi-poller-secret
