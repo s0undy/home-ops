@@ -113,7 +113,7 @@ spec:
         enabled: true
         ingressClassName: internal
         hosts:
-          - host: &host "loki.${SECRET_DOMAIN}"
+          - host: &host loki.josefssonit.se
             paths:
               - path: /
                 pathType: Prefix
