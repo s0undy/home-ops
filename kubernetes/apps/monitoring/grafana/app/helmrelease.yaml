@@ -101,6 +101,14 @@ spec:
           gnetId: 11315
           revision: 9
           datasource: Prometheus
+        unifi-sites:
+          gnetId: 11311
+          revision: 5
+          datasource: Prometheus
+        unifi-client:
+          gnetId: 11310
+          revision: 5
+          datasource: Prometheus
     datasources:
       datasources.yaml:
         apiVersion: 1
