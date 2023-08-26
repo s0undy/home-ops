@@ -10,3 +10,4 @@ resources:
   - ./goldilocks/ks.yaml
   - ./unifi-poller/ks.yaml
   - ./loki/ks.yaml
+  - ./vector/ks.yaml
