@@ -31,11 +31,17 @@ spec:
       tag: v2.8.1
     env:
       TZ: Europe/Stockholm
+      UP_LOKI_UR: http://loki-gateway.monitoring.svc.cluster.local
       UP_UNIFI_DEFAULT_ROLE: kube-ops
       UP_UNIFI_DEFAULT_VERIFY_SSL: false
       UP_INFLUXDB_DISABLE: true
       UP_PROMETHEUS_DISABLE: false
+      UP_UNIFI_DEFAULT_SAVE_ALARMS: true
+      UP_UNIFI_DEFAULT_SAVE_ANOMALIES: true
       UP_UNIFI_DEFAULT_SAVE_DPI: true
+      UP_UNIFI_DEFAULT_SAVE_EVENTS: true
+      UP_UNIFI_DEFAULT_SAVE_IDS: true
+      UP_UNIFI_DEFAULT_SAVE_SITES: true
     envFrom:
       - secretRef:
           name: unifi-poller-secret
