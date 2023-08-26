@@ -9,3 +9,4 @@ resources:
   - ./vpa/ks.yaml
   - ./goldilocks/ks.yaml
   - ./unifi-poller/ks.yaml
+  - ./loki/ks.yaml
