@@ -31,7 +31,7 @@ spec:
       tag: v2.8.1
     env:
       TZ: Europe/Stockholm
-      UP_LOKI_UR: http://loki-gateway.monitoring.svc.cluster.local
+      UP_LOKI_URL: http://loki-gateway.monitoring.svc.cluster.local
       UP_UNIFI_DEFAULT_ROLE: kube-ops
       UP_UNIFI_DEFAULT_VERIFY_SSL: false
       UP_INFLUXDB_DISABLE: true
