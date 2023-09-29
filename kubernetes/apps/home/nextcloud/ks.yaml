@@ -8,7 +8,8 @@ spec:
   dependsOn:
     - name: cluster-apps-cloudnative-pg
     - name: cluster-apps-cloudnative-pg-cluster
-    - name: cluster-apps-redis
+    - name: cluster-apps-nextcloud-redis
+    - name: cluster-apps-nextcloud-redis-haproxy
     - name: cluster-apps-rook-ceph-cluster
   path: ./kubernetes/apps/home/nextcloud/app
   prune: true

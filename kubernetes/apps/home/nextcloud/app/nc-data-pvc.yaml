@@ -1,28 +1,13 @@
 ---
 apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: nextcloud-nfs
-  namespace: home
-spec:
-  capacity:
-    storage: 1Mi
-  accessModes:
-    - ReadWriteMany
-  storageClassName: nextcloud-nfs
-  persistentVolumeReclaimPolicy: Retain
-  nfs:
-    server: 10.10.10.30
-    path: /volume3/nextcloud
----
-apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: nextcloud-nfs
+  name: nextcloud-data
   namespace: home
 spec:
-  accessModes: ["ReadWriteMany"]
-  storageClassName: nextcloud-nfs
+  accessModes:
+    - ReadWriteMany
   resources:
     requests:
-      storage: 1Mi
+      storage: 100Gi
+  storageClassName: ceph-filesystem

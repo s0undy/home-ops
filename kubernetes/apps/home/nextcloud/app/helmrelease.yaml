@@ -28,7 +28,7 @@ spec:
   values:
     image:
       repository: nextcloud
-      tag: 27.1.1
+      tag: 27.1.1-apache
       pullPolicy: IfNotPresent
     replicaCount: 1
     ingress:
@@ -38,13 +38,15 @@ spec:
         external-dns.alpha.kubernetes.io/target: "ipv4.${SECRET_DOMAIN}"
         external-dns.home.arpa/enabled: "true"
         hajimari.io/icon: simple-icons:nextcloud
-        nginx.ingress.kubernetes.io/proxy-body-size: "10G"
+        nginx.ingress.kubernetes.io/cors-allow-headers: "X-Forwarded-For, X-Real-IP, X-Frame-Options, X-Content-Type-Options, X-Forwarded-Proto"
+        nginx.ingress.kubernetes.io/proxy-body-size: "16G"
         nginx.ingress.kubernetes.io/proxy-buffering: "off"
         nginx.ingress.kubernetes.io/proxy-request-buffering: "off"
         nginx.ingress.kubernetes.io/server-snippet: |-
           server_tokens off;
           proxy_hide_header X-Powered-By;
-          rewrite ^/.well-known/webfinger /public.php?service=webfinger last;
+          rewrite ^/.well-known/webfinger /index.php/.well-known/webfinger last;
+          rewrite ^/.well-known/nodeinfo /index.php/.well-known/nodeinfo last;
           rewrite ^/.well-known/host-meta /public.php?service=host-meta last;
           rewrite ^/.well-known/host-meta.json /public.php?service=host-meta-json;
           location = /.well-known/carddav {
@@ -64,22 +66,29 @@ spec:
           location ~ ^/(?:autotest|occ|issue|indie|db_|console) {
             deny all;
           }
-          location ^~ /.well-known {
-          return 301 /index.php$uri;
-          }
-          location = /.well-known/webfinger {
-          return 301 /index.php$uri;
-          }
       path: /
       pathType: Prefix
       tls:
         - hosts:
             - nc.${SECRET_DOMAIN}
     nextcloud:
+      extraInitContainers:
+        - name: init-db
+          image: ghcr.io/onedr0p/postgres-init:14.8
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - secretRef:
+                name: nextcloud-secret
       host: nc.${SECRET_DOMAIN}
       existingSecret:
         enabled: true
         secretName: nextcloud-secret
+      phpConfigs:
+        uploadLimit.ini: |
+          upload_max_filesize = 16G
+          post_max_size = 16G
+          max_input_time = 3600
+          max_execution_time = 36
       defaultConfigs:
         .htaccess: true
         redis.config.php: false
@@ -90,7 +99,7 @@ spec:
         # SMTP default configuration
         smtp.config.php: true
       mail:
-        enabled: true
+        enabled: false
       configs:
         custom.config.php: |-
           <?php
@@ -103,19 +112,19 @@ spec:
             'trusted_domains' =>
               [
                 'nextcloud',
-                'nc',
                 'nc.${SECRET_DOMAIN}'
               ],
             'trusted_proxies' =>
               [
-                'nginx'
+                '${NETWORK_K8S_CLUSTER_CIDR}',
               ],
             'forwarded_for_headers' =>
               [
                 0 => 'X-Forwarded-For',
-                1 => 'HTTP_X_FORWARDED_FOR',
+                1 => 'HTTP_X_FORWARDED_FOR'
               ],
             'default_phone_region' => 'SE',
+            'bulkupload.enabled' => false,
           );
         redis.config.php: |-
           <?php
@@ -124,7 +133,7 @@ spec:
             'memcache.distributed' => '\OC\Memcache\Redis',
             'memcache.locking' => '\OC\Memcache\Redis',
             'redis' => array(
-              'host' => 'redis-lb.databases.svc.cluster.local',
+              'host' => 'nextcloud-redis-haproxy.databases.svc.cluster.local',
               'port' => 6379,
             )
           );
@@ -143,8 +152,7 @@ spec:
       existingClaim: nextcloud-config
       nextcloudData:
         enabled: true
-        existingClaim: nextcloud-nfs
-        accessMode: ReadWriteMany
+        existingClaim: nextcloud-data
     resources:
       requests:
         cpu: 150m
@@ -190,31 +198,3 @@ spec:
       kind: Secret
       name: nextcloud-secret
       valuesKey: POSTGRES_DB
-    - targetPath: metrics.token
-      kind: Secret
-      name: nextcloud-secret
-      valuesKey: nextcloud-token
-    - targetPath: nextcloud.mail.smtp.host
-      kind: Secret
-      name: nextcloud-secret
-      valuesKey: MAIL_HOST
-    - targetPath: nextcloud.mail.smtp.port
-      kind: Secret
-      name: nextcloud-secret
-      valuesKey: MAIL_PORT
-    - targetPath: nextcloud.mail.smtp.name
-      kind: Secret
-      name: nextcloud-secret
-      valuesKey: smtp-username
-    - targetPath: nextcloud.mail.smtp.password
-      kind: Secret
-      name: nextcloud-secret
-      valuesKey: smtp-password
-    - targetPath: nextcloud.mail.fromAddress
-      kind: Secret
-      name: nextcloud-secret
-      valuesKey: MAIL_FROM
-    - targetPath: nextcloud.mail.domain
-      kind: Secret
-      name: nextcloud-secret
-      valuesKey: MAIL_DOMAIN
