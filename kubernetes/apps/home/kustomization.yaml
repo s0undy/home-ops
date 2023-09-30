@@ -5,4 +5,4 @@ resources:
   - ./namespace.yaml
   - ./home-assistant/ks.yaml
   - ./open-budgeteer/ks.yaml
-#  - ./nextcloud/ks.yaml
+  - ./nextcloud/ks.yaml
