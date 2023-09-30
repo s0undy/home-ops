@@ -49,7 +49,7 @@ spec:
         hajimari.io/icon: two-factor-authentication
         hajimari.io/group: "Infrastructure"
       hosts:
-        - host: &host "authentik.${SECRET_DOMAIN}"
+        - host: &host "auth.${SECRET_DOMAIN}"
           paths:
             - path: "/"
               pathType: Prefix
