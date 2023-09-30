@@ -2,7 +2,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: redis-authentik-haproxy
+  name: authentik-redis-haproxy
   namespace: databases
 spec:
   interval: 15m
@@ -62,7 +62,7 @@ spec:
           hajimari.io/appName: "Authentik-Redis Load Balancer"
           hajimari.io/icon: simple-icons:redis
         hosts:
-          - host: "redis-authentik.${SECRET_DOMAIN}"
+          - host: "authentik-redis.${SECRET_DOMAIN}"
             paths:
               - path: /
                 pathType: Prefix
