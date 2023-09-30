@@ -27,7 +27,7 @@ spec:
     keepHistory: false
   values:
     controller:
-      allowSnippetAnnotations: false
+      allowSnippetAnnotations: true
       extraEnvs:
         - name: TZ
           value: "${TIMEZONE}"
