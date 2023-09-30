@@ -63,7 +63,7 @@ spec:
       postgresql:
         enabled: false
       redis:
-        host: "redis-authentik-haproxy.databases.svc.cluster.local"
+        host: "authentik-redis-haproxy.databases.svc.cluster.local"
     envFrom:
       - secretRef:
           name: authentik-secret
