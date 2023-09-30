@@ -35,7 +35,30 @@ spec:
       existingSecret: grafana-secret
       userKey: adminUser
       passwordKey: adminPass
+    envFromSecrets:
+      - name: grafana-secret
+    env:
+      GF_SERVER_ROOT_URL: https://grafana.${SECRET_DOMAIN}
     grafana.ini:
+      analytics:
+        check_for_updates: false
+        check_for_plugin_updates: false
+        reporting_enabled: false
+      auth:
+        signout_redirect_url: https://authentik.${SECRET_DOMAIN}/application/o/grafana-provider/end-session/
+        oauth_auto_login: false
+        oauth_allow_insecure_email_lookup: true
+      auth.generic_oauth:
+        name: authentik
+        enabled: true
+        client_id: # Set by env vars secret
+        client_secret: # Set by env vars secret
+        scopes: openid email profile
+        auth_url: https://authentik.${SECRET_DOMAIN}/application/o/authorize/
+        token_url: https://authentik.${SECRET_DOMAIN}/application/o/token/
+        api_url: https://authentik.${SECRET_DOMAIN}/application/o/userinfo/
+        # Optionally map user groups to Grafana roles
+        role_attribute_path: contains(groups[*], 'Grafana Admins') && 'Admin' || contains(groups[*], 'Grafana Editors') && 'Editor' || 'Viewer'
       auth.basic:
         enabled: true
         disable_login_form: false
