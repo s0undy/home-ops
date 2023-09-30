@@ -47,23 +47,25 @@ spec:
         check_for_plugin_updates: false
         reporting_enabled: false
       auth:
-        signout_redirect_url: https://auth.${SECRET_DOMAIN}/application/o/grafana-provider/end-session/
         oauth_auto_login: false
-        oauth_allow_insecure_email_lookup: true
       auth.generic_oauth:
-        name: Authentik SSO
         enabled: true
-        client_id: # Set by env vars secret
-        client_secret: # Set by env vars secret
-        scopes: openid email profile
-        auth_url: https://auth.${SECRET_DOMAIN}/application/o/authorize/
-        token_url: https://auth.${SECRET_DOMAIN}/application/o/token/
-        api_url: https://auth.${SECRET_DOMAIN}/application/o/userinfo/
-        # Optionally map user groups to Grafana roles
-        role_attribute_path: contains(groups[*], 'Grafana Admins') && 'Admin' || contains(groups[*], 'Grafana Editors') && 'Editor' || 'Viewer'
+        name: Authentik
+        icon: signin
+        scopes: openid profile email
+        empty_scopes: false
+        use_pkce: true
+      auth.generic_oauth.group_mapping:
+        org_id: 1
+        role_attribute_path: |
+          contains(groups[*], 'Grafana Admins') && 'Admin' || contains(groups[*], 'Grafana Editors') && 'Editor' || 'Viewer'
       auth.basic:
         enabled: true
         disable_login_form: false
+      auth.anonymous:
+        enabled: false
+      server:
+        root_url: https://grafana.${EXTERNAL_DOMAIN}
     dashboardProviders:
       dashboardproviders.yaml:
         apiVersion: 1
