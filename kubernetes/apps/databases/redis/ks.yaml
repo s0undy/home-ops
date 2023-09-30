@@ -27,7 +27,7 @@ metadata:
   namespace: flux-system
 spec:
   dependsOn:
-    - name: cluster-apps-redis-authentik
+    - name: cluster-apps-authentik-redis
   path: ./kubernetes/apps/databases/redis/app/authentik/haproxy
   prune: true
   sourceRef:
