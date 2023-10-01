@@ -36,6 +36,7 @@ spec:
       className: nginx
       annotations:
         hajimari.io/enable: "true"
+        hajimari.io/group: "Home/Web"
         hajimari.io/icon: simple-icons:nextcloud
         nginx.ingress.kubernetes.io/cors-allow-headers: "X-Forwarded-For, X-Real-IP, X-Frame-Options, X-Content-Type-Options, X-Forwarded-Proto"
         nginx.ingress.kubernetes.io/proxy-body-size: "16G"

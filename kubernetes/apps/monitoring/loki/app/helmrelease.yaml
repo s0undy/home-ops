@@ -110,6 +110,8 @@ spec:
       image:
         registry: ghcr.io
       ingress:
+        annotations:
+          hajimari.io/enable: "true"
         enabled: true
         ingressClassName: nginx
         hosts:
