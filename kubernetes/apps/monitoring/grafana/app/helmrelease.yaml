@@ -136,6 +136,10 @@ spec:
           gnetId: 11310
           revision: 5
           datasource: Prometheus
+        authentik:
+          gnetId: 14837
+          revision: 2
+          datasource: Prometheus
     datasources:
       datasources.yaml:
         apiVersion: 1
