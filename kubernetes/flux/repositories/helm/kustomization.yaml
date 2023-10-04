@@ -27,3 +27,4 @@ resources:
   - ./nextcloud.yaml
   - ./piraeus.yaml
   - ./authentik-charts.yaml
+  - ./opensearch-operator.yaml

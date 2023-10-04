@@ -35,7 +35,7 @@
       "default": "test",
       "flux-system": "functions"
     },
-    "editor.fontFamily": "FiraCode Nerd Font",
+    "editor.fontFamily": "MesloLGS NF",
     "editor.bracketPairColorization.enabled": true,
     "editor.guides.bracketPairs": true,
     "editor.guides.bracketPairsHorizontal": true,
