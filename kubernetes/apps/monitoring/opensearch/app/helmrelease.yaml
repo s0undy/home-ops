@@ -55,7 +55,7 @@ spec:
       enable: true
       image:
         repository: "gcr.io/kubebuilder/kube-rbac-proxy"
-        tag: "v0.14.1"
+        tag: "v0.15.0"
       securityContext:
         # allowPrivilegeEscalation: false
       resources:
