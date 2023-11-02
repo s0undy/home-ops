@@ -28,7 +28,7 @@ spec:
   values:
     image:
       repository: bitnami/mariadb
-      tag: 11.0.3
+      tag: 11.1.2
     auth:
       existingSecret: mariadb-secret
     primary:
