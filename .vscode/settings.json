@@ -42,5 +42,6 @@
     "editor.guides.highlightActiveBracketPair": true,
     "editor.hover.delay": 1000,
     "files.trimTrailingWhitespace": true,
-    "editor.stickyScroll.enabled": false
+    "editor.stickyScroll.enabled": false,
+    "ansible.python.interpreterPath": "/home/linuxbrew/.linuxbrew/bin/python3.11"
 }
