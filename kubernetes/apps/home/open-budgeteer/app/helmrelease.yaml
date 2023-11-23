@@ -39,7 +39,7 @@ spec:
         reloader.stakater.com/auto: "true"
     image:
       repository: axelander/openbudgeteer
-      tag: pre-release@sha256:0e1b5b754bdc0c75bd610015a1c8c5232ad2764e54f6025320241d3ebe05d77b
+      tag: pre-release@sha256:fc9dd1f21e3eed2bdfa2eb433a1688ea67fa2d27ac978d5d91c26b73131d5df1
     env:
       APPSETTINGS_CULTURE: sv-SE
       APPSETTINGS_THEME: solar
