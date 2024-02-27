@@ -29,7 +29,7 @@ spec:
       repository: collabora/code
       tag: 23.05.9.1.1
     env:
-      extra_params: --o:ssl.termination=true --o:ssl.enable=true
+      extra_params: --o:ssl.termination=true --o:ssl.enable=false
     autoscaling:
       enabled: true
       minReplicas: 1
@@ -49,7 +49,9 @@ spec:
         annotations:
           hajimari.io/enable: "false"
           nginx.ingress.kubernetes.io/upstream-hash-by: "$arg_WOPISrc"
-          nginx.ingress.kubernetes.io/enable-global-auth: "false"
+          nginx.ingress.kubernetes.io/cors-allow-headers: "X-Forwarded-For, X-Real-IP, X-Frame-Options, X-Content-Type-Options, X-Forwarded-Proto"
+          external-dns.alpha.kubernetes.io/target: "ipv4.${SECRET_DOMAIN}"
+          external-dns.home.arpa/enabled: "true"
         hosts:
           - host: &host "collabora.${SECRET_DOMAIN}"
             paths:
