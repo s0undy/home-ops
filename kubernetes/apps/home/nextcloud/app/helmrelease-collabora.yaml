@@ -39,7 +39,7 @@ spec:
     service:
       main:
         ports:
-          http:
+          https:
             port: 9980
 
     ingress:
