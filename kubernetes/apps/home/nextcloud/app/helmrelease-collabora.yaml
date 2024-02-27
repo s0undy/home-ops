@@ -29,7 +29,7 @@ spec:
       repository: collabora/code
       tag: 23.05.9.1.1
     env:
-#      extra_params: --o:ssl.termination=true --o:ssl.enable=false
+      extra_params: --o:ssl.termination=true --o:ssl.enable=false
     autoscaling:
       enabled: true
       minReplicas: 1
@@ -39,7 +39,7 @@ spec:
     service:
       main:
         ports:
-          https:
+          http:
             port: 9980
 
     ingress:
@@ -47,6 +47,8 @@ spec:
         enabled: true
         ingressClassName: nginx
         annotations:
+          external-dns.alpha.kubernetes.io/target: "ipv4.${SECRET_DOMAIN}"
+          external-dns.home.arpa/enabled: "true"
           nginx.ingress.kubernetes.io/upstream-hash-by: "$arg_WOPISrc"
           nginx.ingress.kubernetes.io/proxy-body-size: "0"
           nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
