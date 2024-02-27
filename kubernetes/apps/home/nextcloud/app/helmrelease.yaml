@@ -126,6 +126,7 @@ spec:
                 1 => 'HTTP_X_FORWARDED_FOR'
               ],
             'default_phone_region' => 'SE',
+            'allow_local_remote_servers' => true,
             'bulkupload.enabled' => false,
           );
         redis.config.php: |-
