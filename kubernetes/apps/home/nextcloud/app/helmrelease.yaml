@@ -28,7 +28,7 @@ spec:
   values:
     image:
       repository: nextcloud
-      tag: 27.1.6-apache
+      tag: 28.0.2-apache
       pullPolicy: IfNotPresent
     replicaCount: 1
     ingress:
