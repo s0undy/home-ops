@@ -5,7 +5,7 @@
 #
 
 # (Optional) Cluster name; affects Cilium and Talos
-#   Default is "home-kubernetes"
+#   Default is "home-ops"
 bootstrap_cluster_name: ""
 
 # (Required) Generated schematic id from https://factory.talos.dev/
@@ -157,7 +157,7 @@ bootstrap_cloudflare:
   #      https://dash.cloudflare.com/profile/api-tokens
   #   2. Under the `API Tokens` section click the blue `Create Token` button.
   #   3. Click the blue `Use template` button for the `Edit zone DNS` template.
-  #   4. Name your token something like `home-kubernetes`
+  #   4. Name your token something like `home-ops`
   #   5. Under `Permissions`, click `+ Add More` and add each permission below:
   #      `Zone - DNS - Edit`
   #      `Account - Cloudflare Tunnel - Read`

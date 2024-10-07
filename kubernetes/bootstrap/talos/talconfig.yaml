@@ -1,0 +1,151 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/budimanjojo/talhelper/master/pkg/config/schemas/talconfig.json
+---
+# renovate: datasource=docker depName=ghcr.io/siderolabs/installer
+talosVersion: v1.8.0
+# renovate: datasource=docker depName=ghcr.io/siderolabs/kubelet
+kubernetesVersion: v1.31.1
+
+clusterName: "home-ops"
+endpoint: https://10.10.10.60:6443
+clusterPodNets:
+  - "10.69.0.0/16"
+clusterSvcNets:
+  - "10.96.0.0/16"
+additionalApiServerCertSans: &sans
+  - "10.10.10.60"
+  - 127.0.0.1 # KubePrism
+additionalMachineCertSans: *sans
+
+# Disable built-in Flannel to use Cilium
+cniConfig:
+  name: none
+
+nodes:
+  - hostname: "jit-m1"
+    ipAddress: "10.10.10.61"
+    installDisk: "/dev/nvme0n1"
+    talosImageURL: factory.talos.dev/installer/
+    controlPlane: true
+    networkInterfaces:
+      - deviceSelector:
+          hardwareAddr: "6c:4b:90:37:f4:8e"
+        dhcp: false
+        addresses:
+          - "10.10.10.61/24"
+        routes:
+          - network: 0.0.0.0/0
+            gateway: "10.10.10.1"
+        mtu: 1500
+        vip:
+          ip: "10.10.10.60"
+  - hostname: "jit-m2"
+    ipAddress: "10.10.10.62"
+    installDisk: "/dev/nvme0n1"
+    talosImageURL: factory.talos.dev/installer/
+    controlPlane: true
+    networkInterfaces:
+      - deviceSelector:
+          hardwareAddr: "6c:4b:90:47:a3:29"
+        dhcp: false
+        addresses:
+          - "10.10.10.62/24"
+        routes:
+          - network: 0.0.0.0/0
+            gateway: "10.10.10.1"
+        mtu: 1500
+        vip:
+          ip: "10.10.10.60"
+  - hostname: "jit-m3"
+    ipAddress: "10.10.10.63"
+    installDisk: "/dev/sdb"
+    talosImageURL: factory.talos.dev/installer/
+    controlPlane: true
+    networkInterfaces:
+      - deviceSelector:
+          hardwareAddr: "00:23:24:df:8d:6d"
+        dhcp: false
+        addresses:
+          - "10.10.10.63/24"
+        routes:
+          - network: 0.0.0.0/0
+            gateway: "10.10.10.1"
+        mtu: 1500
+        vip:
+          ip: "10.10.10.60"
+  - hostname: "jit-w1"
+    ipAddress: "10.10.10.64"
+    installDisk: "/dev/sdb"
+    talosImageURL: factory.talos.dev/installer/
+    controlPlane: false
+    networkInterfaces:
+      - deviceSelector:
+          hardwareAddr: "e8:6a:64:d2:e6:f2"
+        dhcp: false
+        addresses:
+          - "10.10.10.64/24"
+        routes:
+          - network: 0.0.0.0/0
+            gateway: "10.10.10.1"
+        mtu: 1500
+  - hostname: "jit-w2"
+    ipAddress: "10.10.10.65"
+    installDisk: "/dev/sdb"
+    talosImageURL: factory.talos.dev/installer/
+    controlPlane: false
+    networkInterfaces:
+      - deviceSelector:
+          hardwareAddr: "f8:75:a4:37:bf:b1"
+        dhcp: false
+        addresses:
+          - "10.10.10.65/24"
+        routes:
+          - network: 0.0.0.0/0
+            gateway: "10.10.10.1"
+        mtu: 1500
+  - hostname: "jit-w3"
+    ipAddress: "10.10.10.66"
+    installDisk: "/dev/sdb"
+    talosImageURL: factory.talos.dev/installer/
+    controlPlane: false
+    networkInterfaces:
+      - deviceSelector:
+          hardwareAddr: "f8:75:a4:37:be:cb"
+        dhcp: false
+        addresses:
+          - "10.10.10.66/24"
+        routes:
+          - network: 0.0.0.0/0
+            gateway: "10.10.10.1"
+        mtu: 1500
+
+# Global patches
+patches:
+  - # Force nameserver
+    |-
+    machine:
+      network:
+        nameservers:
+          - 1.1.1.1
+  - # Configure NTP
+    |-
+    machine:
+      time:
+        disabled: false
+        servers:
+          - ntp.se
+  - "@./patches/global/cluster-discovery.yaml"
+  - "@./patches/global/containerd.yaml"
+  - "@./patches/global/disable-search-domain.yaml"
+  - "@./patches/global/hostdns.yaml"
+  - "@./patches/global/kubelet.yaml"
+  - "@./patches/global/openebs-local.yaml"
+  - "@./patches/global/sysctl.yaml"
+
+# Controller patches
+controlPlane:
+  patches:
+    - "@./patches/controller/api-access.yaml"
+    - "@./patches/controller/cluster.yaml"
+    - "@./patches/controller/disable-admission-controller.yaml"
+    - "@./patches/controller/etcd.yaml"
+
