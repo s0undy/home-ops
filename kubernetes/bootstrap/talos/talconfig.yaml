@@ -23,7 +23,8 @@ cniConfig:
 nodes:
   - hostname: "jit-m1"
     ipAddress: "10.10.10.61"
-    installDisk: "/dev/nvme0n1"
+    installDiskSelector:
+      serial: "S35ENX1JB24638"
     talosImageURL: factory.talos.dev/installer/
     controlPlane: true
     networkInterfaces:
@@ -40,7 +41,8 @@ nodes:
           ip: "10.10.10.60"
   - hostname: "jit-m2"
     ipAddress: "10.10.10.62"
-    installDisk: "/dev/nvme0n1"
+    installDiskSelector:
+      serial: "S35ENA0K615231"
     talosImageURL: factory.talos.dev/installer/
     controlPlane: true
     networkInterfaces:
