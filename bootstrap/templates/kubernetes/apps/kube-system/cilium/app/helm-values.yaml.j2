@@ -12,7 +12,7 @@ cgroup:
   hostRoot: /sys/fs/cgroup
 cluster:
   id: 1
-  name: "#{ bootstrap_cluster_name|default('home-kubernetes', true) }#"
+  name: "#{ bootstrap_cluster_name|default('home-ops', true) }#"
 cni:
   exclusive: false
 # NOTE: devices might need to be set if you have more than one active NIC on your hosts

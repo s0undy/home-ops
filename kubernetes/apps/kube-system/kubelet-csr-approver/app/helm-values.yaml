@@ -1,0 +1,3 @@
+---
+providerRegex: ^(jit-m1|jit-m2|jit-m3|jit-w1|jit-w2|jit-w3)$
+bypassDnsResolution: true

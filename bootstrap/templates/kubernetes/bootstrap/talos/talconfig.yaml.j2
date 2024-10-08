@@ -5,7 +5,7 @@ talosVersion: v1.8.0
 # renovate: datasource=docker depName=ghcr.io/siderolabs/kubelet
 kubernetesVersion: v1.31.1
 
-clusterName: "#{ bootstrap_cluster_name | default('home-kubernetes', true) }#"
+clusterName: "#{ bootstrap_cluster_name | default('home-ops', true) }#"
 endpoint: https://#{ bootstrap_controller_vip }#:6443
 clusterPodNets:
   - "#{ bootstrap_pod_network.split(',')[0] }#"
