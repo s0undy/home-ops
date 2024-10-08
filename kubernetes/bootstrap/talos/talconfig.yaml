@@ -14,7 +14,7 @@ clusterSvcNets:
 additionalApiServerCertSans: &sans
   - "10.10.10.60"
   - 127.0.0.1 # KubePrism
-  - "talos.josefssonit.se"
+  - "k8s.josefssonit.se"
 additionalMachineCertSans: *sans
 
 # Disable built-in Flannel to use Cilium
@@ -129,7 +129,7 @@ patches:
     machine:
       network:
         nameservers:
-          - 10.0.5.3
+          - 1.1.1.1
   - # Configure NTP
     |-
     machine:
