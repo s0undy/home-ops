@@ -23,7 +23,7 @@ cniConfig:
 
 nodes:
   - hostname: "jit-m1"
-    ipAddress: "10.10.10.61"
+    ipAddress: ""
     installDiskSelector:
       serial: "S35ENX1JB24638"
     talosImageURL: factory.talos.dev/installer/97bf8e92fc6bba0f03928b859c08295d7615737b29db06a97be51dc63004e403
@@ -31,17 +31,12 @@ nodes:
     networkInterfaces:
       - deviceSelector:
           hardwareAddr: "6c:4b:90:37:f4:8e"
-        dhcp: false
-        addresses:
-          - "10.10.10.61/24"
-        routes:
-          - network: 0.0.0.0/0
-            gateway: "10.10.10.1"
+        dhcp: true
         mtu: 1500
         vip:
           ip: "10.10.10.60"
   - hostname: "jit-m2"
-    ipAddress: "10.10.10.62"
+    ipAddress: ""
     installDiskSelector:
       serial: "S35ENA0K615231"
     talosImageURL: factory.talos.dev/installer/97bf8e92fc6bba0f03928b859c08295d7615737b29db06a97be51dc63004e403
@@ -49,17 +44,12 @@ nodes:
     networkInterfaces:
       - deviceSelector:
           hardwareAddr: "6c:4b:90:47:a3:29"
-        dhcp: false
-        addresses:
-          - "10.10.10.62/24"
-        routes:
-          - network: 0.0.0.0/0
-            gateway: "10.10.10.1"
+        dhcp: true
         mtu: 1500
         vip:
           ip: "10.10.10.60"
   - hostname: "jit-m3"
-    ipAddress: "10.10.10.63"
+    ipAddress: ""
     installDiskSelector:
       serial: "S340NX0K305613"
     talosImageURL: factory.talos.dev/installer/97bf8e92fc6bba0f03928b859c08295d7615737b29db06a97be51dc63004e403
@@ -67,69 +57,43 @@ nodes:
     networkInterfaces:
       - deviceSelector:
           hardwareAddr: "00:23:24:df:8d:6d"
-        dhcp: false
-        addresses:
-          - "10.10.10.63/24"
-        routes:
-          - network: 0.0.0.0/0
-            gateway: "10.10.10.1"
+        dhcp: true
         mtu: 1500
         vip:
           ip: "10.10.10.60"
   - hostname: "jit-w1"
-    ipAddress: "10.10.10.64"
+    ipAddress: ""
     installDisk: "/dev/sdb"
     talosImageURL: factory.talos.dev/installer/97bf8e92fc6bba0f03928b859c08295d7615737b29db06a97be51dc63004e403
     controlPlane: false
     networkInterfaces:
       - deviceSelector:
           hardwareAddr: "e8:6a:64:d2:e6:f2"
-        dhcp: false
-        addresses:
-          - "10.10.10.64/24"
-        routes:
-          - network: 0.0.0.0/0
-            gateway: "10.10.10.1"
+        dhcp: true
         mtu: 1500
   - hostname: "jit-w2"
-    ipAddress: "10.10.10.65"
+    ipAddress: ""
     installDisk: "/dev/sdb"
     talosImageURL: factory.talos.dev/installer/97bf8e92fc6bba0f03928b859c08295d7615737b29db06a97be51dc63004e403
     controlPlane: false
     networkInterfaces:
       - deviceSelector:
           hardwareAddr: "f8:75:a4:37:bf:b1"
-        dhcp: false
-        addresses:
-          - "10.10.10.65/24"
-        routes:
-          - network: 0.0.0.0/0
-            gateway: "10.10.10.1"
+        dhcp: true
         mtu: 1500
   - hostname: "jit-w3"
-    ipAddress: "10.10.10.66"
+    ipAddress: ""
     installDisk: "/dev/sdb"
     talosImageURL: factory.talos.dev/installer/97bf8e92fc6bba0f03928b859c08295d7615737b29db06a97be51dc63004e403
     controlPlane: false
     networkInterfaces:
       - deviceSelector:
           hardwareAddr: "f8:75:a4:37:be:cb"
-        dhcp: false
-        addresses:
-          - "10.10.10.66/24"
-        routes:
-          - network: 0.0.0.0/0
-            gateway: "10.10.10.1"
+        dhcp: true
         mtu: 1500
 
 # Global patches
 patches:
-  - # Force nameserver
-    |-
-    machine:
-      network:
-        nameservers:
-          - 1.1.1.1
   - # Configure NTP
     |-
     machine:
