@@ -14,7 +14,6 @@ clusterSvcNets:
 additionalApiServerCertSans: &sans
   - "10.10.10.60"
   - 127.0.0.1 # KubePrism
-  - "127.0.0.1"
   - "talos.josefssonit.se"
 additionalMachineCertSans: *sans
 
@@ -27,7 +26,7 @@ nodes:
     ipAddress: "10.10.10.61"
     installDiskSelector:
       serial: "S35ENX1JB24638"
-    talosImageURL: factory.talos.dev/installer/
+    talosImageURL: factory.talos.dev/installer/97bf8e92fc6bba0f03928b859c08295d7615737b29db06a97be51dc63004e403
     controlPlane: true
     networkInterfaces:
       - deviceSelector:
@@ -41,13 +40,11 @@ nodes:
         mtu: 1500
         vip:
           ip: "10.10.10.60"
-    extraManifests:
-      - extra.yaml
   - hostname: "jit-m2"
     ipAddress: "10.10.10.62"
     installDiskSelector:
       serial: "S35ENA0K615231"
-    talosImageURL: factory.talos.dev/installer/
+    talosImageURL: factory.talos.dev/installer/97bf8e92fc6bba0f03928b859c08295d7615737b29db06a97be51dc63004e403
     controlPlane: true
     networkInterfaces:
       - deviceSelector:
@@ -61,13 +58,11 @@ nodes:
         mtu: 1500
         vip:
           ip: "10.10.10.60"
-    extraManifests:
-      - extra.yaml
   - hostname: "jit-m3"
     ipAddress: "10.10.10.63"
     installDiskSelector:
       serial: "S340NX0K305613"
-    talosImageURL: factory.talos.dev/installer/
+    talosImageURL: factory.talos.dev/installer/97bf8e92fc6bba0f03928b859c08295d7615737b29db06a97be51dc63004e403
     controlPlane: true
     networkInterfaces:
       - deviceSelector:
@@ -81,12 +76,10 @@ nodes:
         mtu: 1500
         vip:
           ip: "10.10.10.60"
-    extraManifests:
-      - extra.yaml
   - hostname: "jit-w1"
     ipAddress: "10.10.10.64"
     installDisk: "/dev/sdb"
-    talosImageURL: factory.talos.dev/installer/
+    talosImageURL: factory.talos.dev/installer/97bf8e92fc6bba0f03928b859c08295d7615737b29db06a97be51dc63004e403
     controlPlane: false
     networkInterfaces:
       - deviceSelector:
@@ -98,12 +91,10 @@ nodes:
           - network: 0.0.0.0/0
             gateway: "10.10.10.1"
         mtu: 1500
-    extraManifests:
-      - extra.yaml
   - hostname: "jit-w2"
     ipAddress: "10.10.10.65"
     installDisk: "/dev/sdb"
-    talosImageURL: factory.talos.dev/installer/
+    talosImageURL: factory.talos.dev/installer/97bf8e92fc6bba0f03928b859c08295d7615737b29db06a97be51dc63004e403
     controlPlane: false
     networkInterfaces:
       - deviceSelector:
@@ -115,12 +106,10 @@ nodes:
           - network: 0.0.0.0/0
             gateway: "10.10.10.1"
         mtu: 1500
-    extraManifests:
-      - extra.yaml
   - hostname: "jit-w3"
     ipAddress: "10.10.10.66"
     installDisk: "/dev/sdb"
-    talosImageURL: factory.talos.dev/installer/
+    talosImageURL: factory.talos.dev/installer/97bf8e92fc6bba0f03928b859c08295d7615737b29db06a97be51dc63004e403
     controlPlane: false
     networkInterfaces:
       - deviceSelector:
@@ -132,8 +121,6 @@ nodes:
           - network: 0.0.0.0/0
             gateway: "10.10.10.1"
         mtu: 1500
-    extraManifests:
-      - extra.yaml
 
 # Global patches
 patches:
