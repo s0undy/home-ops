@@ -52,6 +52,10 @@ spec:
         rollOutPods: true
         ingress:
           enabled: true
+          annotations:
+            hajimari.io/icon: mdi:SatelliteVariant
+            hajimari.io/appName: Hubble
+            hajimari.io/group: Observability
           className: internal
           hosts: ["hubble.${SECRET_DOMAIN}"]
     operator:

@@ -32,6 +32,10 @@ spec:
       createPrometheusRules: true
     ingress:
       dashboard:
+        annotations:
+          hajimari.io/icon: mdi:chess-rook
+          hajimari.io/appName: Rook
+          hajimari.io/group: Infrastructure
         ingressClassName: internal
         host:
           name: "rook.${SECRET_DOMAIN}"
@@ -206,6 +210,7 @@ spec:
           annotations:
             nginx.ingress.kubernetes.io/proxy-body-size: "0"
             nginx.ingress.kubernetes.io/proxy-request-buffering: "off"
+            hajimari.io/enable: "false"
           ingressClassName: internal
           host:
             name: "rgw.${SECRET_DOMAIN}"
