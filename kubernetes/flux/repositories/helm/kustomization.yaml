@@ -17,3 +17,4 @@ resources:
   - ./k8s-gateway.yaml
   - ./rook-ceph.yaml
   - ./hajimari-charts.yaml
+  - ./grafana.yaml
