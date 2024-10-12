@@ -214,6 +214,9 @@ spec:
     ingress:
       enabled: true
       annotations:
+        hajimari.io/icon: alpha-g-box-outline
+        hajimari.io/appName: Grafana
+        hajimari.io/group: Observability
 #        external-dns.alpha.kubernetes.io/target:
       ingressClassName: internal
       hosts: ["grafana.${SECRET_DOMAIN}"]
