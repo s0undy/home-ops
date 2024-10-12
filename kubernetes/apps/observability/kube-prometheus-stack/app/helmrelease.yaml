@@ -74,7 +74,7 @@ spec:
         enabled: true
         annotations:
 #          external-dns.alpha.kubernetes.io/target:
-          hajimari.io/icon: parking
+          hajimari.io/icon: alpha-p-box-outline
           hajimari.io/appName: Prometheus
           hajimari.io/group: Observability
         ingressClassName: internal
