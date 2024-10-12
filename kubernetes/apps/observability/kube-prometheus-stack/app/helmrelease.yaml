@@ -39,9 +39,9 @@ spec:
         enabled: true
         annotations:
 #          external-dns.alpha.kubernetes.io/target:
-            hajimari.io/icon: radio-am
-            hajimari.io/appName: Alertmanager
-            hajimari.io/group: Observability
+          hajimari.io/icon: radio-am
+          hajimari.io/appName: Alertmanager
+          hajimari.io/group: Observability
         ingressClassName: internal
         hosts: ["am.${SECRET_DOMAIN}"]
         pathType: Prefix
@@ -74,9 +74,9 @@ spec:
         enabled: true
         annotations:
 #          external-dns.alpha.kubernetes.io/target:
-            hajimari.io/icon: parking
-            hajimari.io/appName: Prometheus
-            hajimari.io/group: Observability
+          hajimari.io/icon: parking
+          hajimari.io/appName: Prometheus
+          hajimari.io/group: Observability
         ingressClassName: internal
         hosts: ["prometheus.${SECRET_DOMAIN}"]
         pathType: Prefix
