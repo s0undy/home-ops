@@ -182,6 +182,16 @@ spec:
           gnetId: 11312
           revision: 9
           datasource: Prometheus
+        unifi-usg:
+          # renovate: depName="UniFi-Poller: USG Insights - Prometheus"
+          gnetId: 11313
+          revision: 9
+          datasource: Prometheus
+        unifi-dpi:
+          # renovate: depName="UniFi-Poller: Client DPI - Prometheus"
+          gnetId: 11310
+          revision: 5
+          datasource: Prometheus
         volsync:
           # renovate: depName="VolSync Dashboard"
           gnetId: 21356
