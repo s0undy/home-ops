@@ -41,6 +41,12 @@ spec:
       defaultEnable: true
       namespaceSelector:
         any: true
+      customApps:
+      - group: Infrastructure
+        apps:
+          - name: DS412
+            url: 'https://ds412.josefssonit.se:5000'
+            icon: 'nas'
     ingress:
       main:
         enabled: true
