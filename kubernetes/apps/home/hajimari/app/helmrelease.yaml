@@ -42,11 +42,14 @@ spec:
       namespaceSelector:
         any: true
       customApps:
-      - group: Infrastructure
+      - group: External
         apps:
           - name: DS412
-            url: 'https://ds412.josefssonit.se:5000'
+            url: 'https://ds412.josefssonit.se:5001'
             icon: 'nas'
+          - name: UniFi
+            url: 'https://unifi.josefssonit.se'
+            icon: wall-fire
     ingress:
       main:
         enabled: true
