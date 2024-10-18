@@ -27,3 +27,7 @@ wiki
 # Temp
 tmp
 tmp/*
+# Terraform
+*.tfstate
+*.tfstate.backup
+*.terraform
