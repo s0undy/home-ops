@@ -95,7 +95,7 @@ Most of my infrastructure is self-hosted, however certain parts are easier and s
 ---
 
 ## 🤝 Thanks
-Big thanks to [onedr0p](https://github.com/onedr0p) for creating [cluster-template](https://github.com/onedr0p/cluster-template)which I used as a foundation when learning Kubernetes and setting up my cluster. Shout out to everyone in the [Home Operations](https://discord.gg/home-operations) Discord community for amazing conversations and always helping out.
+Big thanks to [onedr0p](https://github.com/onedr0p) for creating [cluster-template](https://github.com/onedr0p/cluster-template) which I used as a foundation when learning Kubernetes and setting up my cluster. Shout out to everyone in the [Home Operations](https://discord.gg/home-operations) Discord community for amazing conversations and always helping out.
 
 Check out [kubesearch.dev](https://kubesearch.dev/) for ideas on applications you might want to deploy to your cluster
 
