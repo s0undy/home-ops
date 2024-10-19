@@ -6,10 +6,10 @@
 Automated with [Flux](https://fluxcd.io), [Renovate](https://github.com/renovatebot/renovate) and [GitHub Actions](https://github.com/features/actions)  🤖
 </div>
 
-## 📄 Overview
+# 📄 Overview
 Monorepo for Kubernetes cluster running in my apartment. Applying Infrastructure as Code (IaC) and GitOps as much as possible using the likes of [Kubernetes](https://kubernetes.io/), [Flux](https://github.com/fluxcd/flux2), [Ansible](https://www.ansible.com/), [Terraform](https://www.terraform.io/) and many more awsome tools while learning on the fly.
 
-### ⛵ Kubernetes
+## ⛵ Kubernetes
 I run a 6 node hyper-converged (HCI) [Talos](https://www.talos.dev) cluster comprised of 3 control-plane nodes and 3 worker nodes. The only * to this that would make it semi-hypger-converged is some workloads using storage from my NAS via NFS mounts.
 
 If you find this interesting and want to get started doing something similar i can strongly recommend taking a look at [onedr0p/cluster-template](https://github.com/onedr0p/cluster-template)
@@ -49,18 +49,54 @@ Recursively searching `kubernetes/` for the most top level `kustomization.yaml` 
 
 [Renovate](https://github.com/renovatebot/renovate) watches over the repo looking for dependency updates, such as new versions of containers and when they are found a pull-request is automagically created in this repository. When I then merge these pull-requests ful will detect changes to the repository and apply the changes to the cluster. Magic! ✨
 
-### Networking
+## Network
+<details>
+  <summary>Click to view the network topology</summary>
 
-#TODO
+  <img src="https://raw.githubusercontent.com/s0undy/home-ops/main/docs/assets/networktopology.png" align="center"/>
+</details>
 
-### ☁️ Dependencies
+## 🌐 DNS
+
+### Cluster/Public
+In cluster i run [ExternalDNS](https://github.com/kubernetes-sigs/external-dns) which creates DNS records in Cloudflare to publish ingresses that has the class name of `external` and the annotation `external-dns.alpha.kubernetes.io/target`.
+
+### Home DNS
+Devices on LAN uses Pi-hole hosted on my UDM-Pro in a nspawn-container as DNS. Pi-hole then has the in-cluster external-dns as a conditional forwarder for my domain allowing me to access resources published from cluster.
+
+In the future i plan to transition to using UniFi as DNS server on my UDM-Pro and use [ExternalDNS webhook provider for UniFi](https://github.com/kashalls/external-dns-unifi-webhook) to automagically create DNS records.
+
+
+## ☁️ Dependencies
 Most of my infrastructure is self-hosted, however certain parts are easier and safer to run in the cloud.
 
 | Service                                         | Use                                                               | Cost                |
 |-------------------------------------------------|-------------------------------------------------------------------|---------------------|
-| [Cloudflare](https://www.cloudflare.com/)       | NS, Tunnle and S3                                                 | Free                |
+| [Cloudflare](https://www.cloudflare.com/)       | NS, Cloudflare tunnle and S3                                      | Free                |
 | [HOSTUP](https://www.cloudflare.com/)           | Domain                                                            | 125kr/year(12$)     |
 | [GitHub](https://github.com/)                   | Hosting this repository and continuous integration/deployments    | Free                |
 |                                                 |                                                                   | Total: ~12kr/mo(1$) |
+---
 
+## 🔧 Hardware
+| Name               | Device                   | CPU      | OS Disk      | Data Disk     | RAM  | OS    | Purpose                             |
+|------------------------|--------------------------|----------|--------------|---------------|------|-------|-------------------------------------|
+| JIT-M1                 | Lenovo ThinkCentre M910q | i5-7500T | 240GB NVMe   | -             | 16GB | Talos | control-plane                       |
+| JIT-M2                 | Lenovo ThinkCentre M910q | i7-7500T | 240GB NVMe   | -             | 16GB | Talos | control-plane                       |
+| JIT-M3                 | Lenovo ThinkCentre M900  | i5-6500T | 240GB NVMe   | -             | 16GB | Talos | control-plane                       |
+| JIT-W1                 | Lenovo ThinkCentre M920q | i5-8500T | 256GB SSD    | 1TB NVME      | 32GB | Talos | worker                              |
+| JIT-W2                 | Lenovo ThinkCentre M720q | i5-9500T | 256GB SSD    | 1TB NVME      | 32GB | Talos | worker                              |
+| JIT-W3                 | Lenovo ThinkCentre M720q | i5-9500T | 240GB SSD    | 1TB NVME      | 32GB | Talos | worker                              |
+| DS412                  | Synology DS412+          | -        | -            | 4x4TB WD-Red  | -    | DSM   | NAS, NFS for media  e.tc            |
+| Octo                   | Raspberry 4 Model B      | -        | 64GB SD-card | -             | 4GB  | Pi OS | OctoPi for my Ender 5 S1 3D-Printer |
+| UDM-1                  | UniFi Dream Machine Pro  | -        | -            | -             | -    | -     | Router, Firewall and future DNS     |
+| US-16-150W-Switch      | UniFi Switch US-16-150W  | -        | -            | -             | -    | -     | Switch+POE                          |
+| UAP-AC-LR-Acces Point  | UniFI AC Long-Range      | -        | -            | -             | -    | -     | WiFi                                |
+---
 
+## 🤝 Thanks
+Big thanks to [onedr0p](https://github.com/onedr0p) for creating [cluster-template](https://github.com/onedr0p/cluster-template) from which i based my cluster on when learning Kubernetes. Shout out to everyone in the [Home Operations](https://discord.gg/home-operations) Discord community for amazing conversations and always helping out.
+
+Check out [kubesearch.dev](https://kubesearch.dev/) for ideas on applications that you might want to depoy to your cluster.
+
+Thanks to [MacroPower](https://github.com/MacroPower) for allowing usage to anyone of the amazing k8spepega.
