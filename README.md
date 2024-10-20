@@ -30,11 +30,11 @@ If you find this interesting and want to get started doing something similar I c
 The repository should look something like this. (Subject to change)
 
 ```
-📁 .devcontainer        # Container containing(hehe) all tools needed to run the cluster
-📁 .github           # Github workflows and Renovate config
-📁 .taskfiles       # Useful taskfiles for easy administration & setup of the cluster
-📁 .vscode          # VSCode config
-📁 docs             # Documentation about the repository
+📁 .devcontainer      # Container containing(hehe) all tools needed to run the cluster
+📁 .github            # Github workflows and Renovate config
+📁 .taskfiles         # Useful taskfiles for easy administration & setup of the cluster
+📁 .vscode            # VSCode config
+📁 docs               # Documentation about the repository
 📁 kubernetes
 └── 📁 apps           # Contains all applications and resources that flux will apply
 └── 📁 bootstrap      # bootstrap procedures
