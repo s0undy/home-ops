@@ -18,3 +18,4 @@ resources:
   - ./rook-ceph.yaml
   - ./hajimari-charts.yaml
   - ./grafana.yaml
+  - ./cloudnative-pg.yaml
