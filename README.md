@@ -6,11 +6,27 @@
 Automated with [Flux](https://fluxcd.io), [Renovate](https://github.com/renovatebot/renovate) and [GitHub Actions](https://github.com/features/actions)  🤖
 </div>
 
+<div align="center">
+
+[![Talos](https://img.shields.io/endpoint?url=https%3A%2F%2Fkromgo.josefssonit.se%2Ftalos_version&style=for-the-badge&logo=talos&logoColor=white&color=blue&label=%20)](https://talos.dev)&nbsp;&nbsp;
+[![Kubernetes](https://img.shields.io/endpoint?url=https%3A%2F%2Fkromgo.josefssonit.se%2Fkubernetes_version&style=for-the-badge&logo=kubernetes&logoColor=white&color=blue&label=%20)](https://kubernetes.io)&nbsp;&nbsp;
+</div>
+
+<div align="center">
+
+[![Age-Days](https://img.shields.io/endpoint?url=https%3A%2F%2Fkromgo.josefssonit.se%2Fcluster_age_days&style=flat-square&label=Age)](https://github.com/kashalls/kromgo)&nbsp;&nbsp;
+[![Node-Count](https://img.shields.io/endpoint?url=https%3A%2F%2Fkromgo.josefssonit.se%2Fcluster_node_count&style=flat-square&label=Nodes)](https://github.com/kashalls/kromgo)&nbsp;&nbsp;
+[![Pod-Count](https://img.shields.io/endpoint?url=https%3A%2F%2Fkromgo.josefssonit.se%2Fcluster_pod_count&style=flat-square&label=Pods)](https://github.com/kashalls/kromgo)&nbsp;&nbsp;
+[![CPU-Usage](https://img.shields.io/endpoint?url=https%3A%2F%2Fkromgo.josefssonit.se%2Fcluster_cpu_usage&style=flat-square&label=CPU)](https://github.com/kashalls/kromgo)&nbsp;&nbsp;
+[![Memory-Usage](https://img.shields.io/endpoint?url=https%3A%2F%2Fkromgo.josefssonit.se%2Fcluster_memory_usage&style=flat-square&label=Memory)](https://github.com/kashalls/kromgo)&nbsp;&nbsp;
+[![Alerts](https://img.shields.io/endpoint?url=https%3A%2F%2Fkromgo.josefssonit.se%2Fcluster_alert_count&style=flat-square&label=Alerts)](https://github.com/kashalls/kromgo)
+</div>
+
 # 📄 Overview
 This is a monorepo for a Kubernetes cluster running in my apartment. Applying Infrastructure as Code (IaC) and GitOps as much as possible using the likes of [Kubernetes](https://kubernetes.io/), [Flux](https://github.com/fluxcd/flux2), [Ansible](https://www.ansible.com/), [Terraform](https://www.terraform.io/) and many more awesome tools while learning on the fly.
 
 ## ⛵ Kubernetes
-I run a 6 node hyper-converged (HCI) [Talos](https://www.talos.dev) cluster comprised of 3 control-plane nodes and 3 worker nodes. The only aspect that makes it semi-hyper-converged is that some workloads use storage from my NAS via NFS mounts.
+I run a 6 node hyper-converged (HCI) [Talos](https://www.talos.dev) cluster comprised of 3 control-plane nodes and 3 worker nodes. The only aspect that makes it semi-hyper-converged is that some workloads use storage from my NAS via NFS.
 
 If you find this interesting and want to get started doing something similar I can strongly recommend taking a look at [onedr0p/cluster-template](https://github.com/onedr0p/cluster-template)
 
