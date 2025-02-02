@@ -19,3 +19,4 @@ resources:
   - ./hajimari-charts.yaml
   - ./grafana.yaml
   - ./cloudnative-pg.yaml
+  - ./csi-driver-nfs.yaml

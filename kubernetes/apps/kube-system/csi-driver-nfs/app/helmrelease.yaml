@@ -1,0 +1,38 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: csi-driver-nfs
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: csi-driver-nfs
+      version: v4.10.0
+      sourceRef:
+        kind: HelmRepository
+        name: csi-driver-nfs
+        namespace: flux-system
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      strategy: rollback
+      retries: 3
+  values:
+    controller:
+      replicas: 1
+    storageClass:
+      create: true
+      name: nas-nfs
+      parameters:
+        server: 10.10.10.30
+        share: /volume3/Kubernetes
+      mountOptions:
+        - nfsvers=4.1
+        - hard
+      reclaimPolicy: Retain
+      volumeBindingMode: Immediate
