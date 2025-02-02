@@ -6,3 +6,4 @@ resources:
   - ./namespace.yaml
   # Flux-Kustomizations
   - ./hajimari/ks.yaml
+#  - ./nextcloud/ks.yaml
