@@ -3,6 +3,7 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-#  - ./helmrelease.yaml
-#  - ./nc-config-pvc.yaml
-#  - ./nc-secrets.sops.yaml
+  - ./helmrelease.yaml
+  - ./nc-config-pvc.yaml
+  - ./nc-secrets.sops.yaml
+  - ./nc-data-pvc.yaml

@@ -1,0 +1,195 @@
+---
+# yaml-language-server: $schema=https://github.com/fluxcd-community/flux2-schemas/raw/main/helmrelease-helm-v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: nextcloud
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: nextcloud
+      version: 6.6.3
+      sourceRef:
+        kind: HelmRepository
+        name: nextcloud
+        namespace: flux-system
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      strategy: rollback
+      retries: 3
+  values:
+    image:
+      repository: nextcloud
+      flavor: apache
+      tag: 30.0.5-apache
+      pullPolicy: IfNotPresent
+    replicaCount: 1
+    ingress:
+      enabled: true
+      className: internal
+      annotations:
+        hajimari.io/enable: "true"
+        hajimari.io/group: "Home/Web"
+        hajimari.io/icon: simple-icons:nextcloud
+        nginx.ingress.kubernetes.io/enable-cors: "true"
+        nginx.ingress.kubernetes.io/cors-allow-headers: "X-Forwarded-For"
+        nginx.ingress.kubernetes.io/affinity: cookie
+        nginx.ingress.kubernetes.io/server-snippet: |-
+          server_tokens off;
+          proxy_hide_header X-Powered-By;
+          rewrite ^/.well-known/webfinger /index.php/.well-known/webfinger last;
+          rewrite ^/.well-known/nodeinfo /index.php/.well-known/nodeinfo last;
+          rewrite ^/.well-known/host-meta /public.php?service=host-meta last;
+          rewrite ^/.well-known/host-meta.json /public.php?service=host-meta-json;
+          location = /.well-known/carddav {
+            return 301 $scheme://$host/remote.php/dav;
+          }
+          location = /.well-known/caldav {
+            return 301 $scheme://$host/remote.php/dav;
+          }
+          location = /robots.txt {
+            allow all;
+            log_not_found off;
+            access_log off;
+          }
+          location ~ ^/(?:build|tests|config|lib|3rdparty|templates|data)/ {
+            deny all;
+          }
+          location ~ ^/(?:autotest|occ|issue|indie|db_|console) {
+            deny all;
+          }
+      path: /
+      pathType: Prefix
+    nextcloud:
+      extraInitContainers:
+        - name: init-db
+          image: ghcr.io/onedr0p/postgres-init:16.6
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - secretRef:
+                name: nextcloud-secret
+      host: nc.${SECRET_DOMAIN}
+      existingSecret:
+        enabled: true
+        secretName: nextcloud-secret
+      phpConfigs:
+        uploadLimit.ini: |
+          upload_max_filesize = 16G
+          post_max_size = 16G
+          max_input_time = 3600
+          max_execution_time = 36
+      defaultConfigs:
+        .htaccess: true                         # To protect /var/www/html/config
+        apache-pretty-urls.config.php: true     # Apache configuration for rewrite urls
+        apcu.config.php: true                   # Define APCu as local cache
+        apps.config.php: true                   # Apps directory configs
+        autoconfig.php: false                   # Used for auto configure database - False cus CNPG Postgre is used instead. Configured in the chart.
+        redis.config.php: false                 # Redis default configuration - False cus DragonflyDB(Redis) is used instead. Configured in the chart.
+        reverse-proxy.config.php: true          # Reverse proxy default configuration
+        s3.config.php: false                    # S3 Object Storage as primary storage - I don't use this for now
+        smtp.config.php: false                  # SMTP default configuration via environment variables - False untill i get realy up and running
+        swift.config.php: false                 # Swift Object Storage as primary storage - I don't use this for now
+        upgrade-disable-web.config.php: true    # disables the web based updater as the default nextcloud docker image does not support it
+      mail:
+        enabled: false                          # false untill i can get relay up and running - when relay is up config this in the secret.
+      configs:
+        custom.config.php: |-
+          <?php
+          $CONFIG = array (
+            'overwriteprotocol' => 'https',
+            'overwrite.cli.url' => 'https://nc.${SECRET_DOMAIN}',
+            'filelocking.enabled' => 'true',
+            'loglevel' => '2',
+            'enable_previews' => true,
+            'trusted_domains' =>
+              [
+                'nextcloud',
+                'nc.${SECRET_DOMAIN}'
+              ],
+            'trusted_proxies' =>
+              [
+                '10.69.0.0/16',
+              ],
+            'forwarded_for_headers' =>
+              [
+                0 => 'X-Forwarded-For',
+                1 => 'HTTP_X_FORWARDED_FOR'
+              ],
+            'default_phone_region' => 'SE',
+            'allow_local_remote_servers' => true,
+            'bulkupload.enabled' => true,
+          );
+        redis.config.php: |-
+          <?php
+          $CONFIG = array (
+            'memcache.local' => '\\OC\\Memcache\\Redis',
+            'memcache.distributed' => '\OC\Memcache\Redis',
+            'memcache.locking' => '\OC\Memcache\Redis',
+            'redis' => array(
+              'host' => 'dragonfly.database.svc.cluster.local',
+              'port' => 6379,
+            )
+          );
+      strategy:
+        type: Recreate
+    internalDatabase:
+      enabled: false
+    externalDatabase:
+      enabled: true
+      type: postgresql
+      host: postgres17-rw.database.svc.cluster.local
+    cronjob:
+      enabled: true
+      failedJobsHistoryLimit: 1
+      successfulJobsHistoryLimit: 1
+    persistence:
+      enabled: true
+      existingClaim: nextcloud-config
+      nextcloudData:
+        enabled: true
+        existingClaim: nextcloud-data
+    resources:
+      requests:
+        cpu: 150m
+        memory: 512Mi
+      limits:
+        memory: 5120Mi
+    livenessProbe:
+      enabled: true
+      initialDelaySeconds: 10
+      periodSeconds: 30
+      timeoutSeconds: 10
+      failureThreshold: 3
+      successThreshold: 1
+    readinessProbe:
+      enabled: true
+      initialDelaySeconds: 60
+      periodSeconds: 60
+      timeoutSeconds: 5
+      failureThreshold: 10
+      successThreshold: 1
+    startupProbe:
+      enabled: true
+      initialDelaySeconds: 60
+      periodSeconds: 120
+      timeoutSeconds: 20
+      failureThreshold: 60
+      successThreshold: 1
+  valuesFrom:
+    - targetPath: externalDatabase.user
+      kind: Secret
+      name: nextcloud-secret
+      valuesKey: POSTGRES_USER
+    - targetPath: externalDatabase.password
+      kind: Secret
+      name: nextcloud-secret
+      valuesKey: POSTGRES_PASS
+    - targetPath: externalDatabase.database
+      kind: Secret
+      name: nextcloud-secret
+      valuesKey: POSTGRES_DB
