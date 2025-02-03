@@ -5,5 +5,5 @@ kind: Kustomization
 resources:
   - ./helmrelease.yaml
   - ./nc-config-pvc.yaml
-  - ./nc-secrets.sops.yaml
+  - ./nextcloud-secret.sops.yaml
   - ./nc-data-pvc.yaml
