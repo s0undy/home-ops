@@ -6,7 +6,12 @@ vars:
   KUBECONFORM_SCRIPT: "{{.SCRIPTS_DIR}}/kubeconform.sh"
 
 tasks:
-
+  netshoot:
+    desc: Creates a temporary netshoot container in choosen namespace. (ex. task Troubleshooting:netshoot namespace=default)
+    cmds:
+      - kubectl run tmp-shell -n {{.namespace}} --rm -it --image nicolaka/netshoot
+    vars:
+      namespace: '{{.namespace | default "default"}}'
   apply-ks:
     desc: Apply a Flux Kustomization resource for a cluster
     summary: |-
