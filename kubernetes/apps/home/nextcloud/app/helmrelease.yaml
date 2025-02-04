@@ -65,9 +65,6 @@ spec:
           }
       path: /
       pathType: Prefix
-      tls:
-        - hosts:
-            - nc.${SECRET_DOMAIN}
     nextcloud:
       extraInitContainers:
         - name: init-db
