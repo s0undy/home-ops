@@ -23,6 +23,8 @@ spec:
       strategy: rollback
       retries: 3
   values:
+    podAnnotations:
+      reloader.stakater.com/auto: "true"
     image:
       repository: nextcloud
       flavor: apache
@@ -136,6 +138,9 @@ spec:
             'redis' => array(
               'host' => 'dragonfly.database.svc.cluster.local',
               'port' => 6379,
+              'dbindex'       => 1,
+              'timeout'       => 1,
+              'read_timeout'  => 1,
             )
           );
       strategy:
@@ -163,21 +168,21 @@ spec:
       limits:
         memory: 5120Mi
     livenessProbe:
-      enabled: false
+      enabled: true
       initialDelaySeconds: 10
       periodSeconds: 30
       timeoutSeconds: 10
       failureThreshold: 3
       successThreshold: 1
     readinessProbe:
-      enabled: false
+      enabled: true
       initialDelaySeconds: 60
       periodSeconds: 60
       timeoutSeconds: 5
       failureThreshold: 10
       successThreshold: 1
     startupProbe:
-      enabled: false
+      enabled: true
       initialDelaySeconds: 60
       periodSeconds: 120
       timeoutSeconds: 20
