@@ -1,0 +1,59 @@
+# yaml-language-server: $schema=https://github.com/fluxcd-community/flux2-schemas/raw/main/helmrelease-helm-v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: pgadmin
+spec:
+  interval: 15m
+  chart:
+    spec:
+      chart: pgadmin4
+      version: 1.34.0
+      sourceRef:
+        kind: HelmRepository
+        name: runix
+        namespace: flux-system
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      strategy: rollback
+      retries: 3
+  values:
+    image:
+      registry: docker.io
+      repository: dpage/pgadmin4
+    strategy:
+      type: Recreate
+    env:
+      email: "antonjosefsson@hotmail.se"
+    existingSecret: pgadmin-secrets
+    ingress:
+      enabled: true
+      ingressClassName: internal
+      annotations:
+        hajimari.io/appName: "pgAdmin"
+        hajimari.io/icon: simple-icons:postgresql
+      hosts:
+        - host: &host "pgadmin.${SECRET_DOMAIN}"
+          paths:
+            - path: /
+              pathType: Prefix
+      tls:
+        - hosts:
+            - *host
+    persistentVolume:
+      enabled: true
+      storageClass: ceph-block
+      accessModes:
+        - ReadWriteOnce
+      size: 1Gi
+    resources:
+      requests:
+        cpu: 15m
+        memory: 183M
+      limits:
+        # cpu: 15m
+        memory: 283M
