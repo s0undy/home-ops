@@ -23,6 +23,13 @@ spec:
       retries: 3
   values:
     global:
+      initContainers:
+        init-db:
+          image: ghcr.io/onedr0p/postgres-init:16.6
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - secretRef:
+                name: authentik-secret
       deploymentAnnotations:
         secret.reloader.stakater.com/reload: &secret authentik-secret
       env:
