@@ -21,3 +21,4 @@ resources:
   - ./cloudnative-pg.yaml
   - ./csi-driver-nfs.yaml
   - ./nextcloud.yaml
+  - ./authentik.yaml

@@ -1,0 +1,78 @@
+# yaml-language-server: $schema=https://github.com/fluxcd-community/flux2-schemas/raw/main/helmrelease-helm-v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: nextcloud
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: authentik
+      version: 2024.12.3
+      sourceRef:
+        kind: HelmRepository
+        name: authentik
+        namespace: flux-system
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      strategy: rollback
+      retries: 3
+  values:
+    global:
+      deploymentAnnotations:
+        secret.reloader.stakater.com/reload: &secret authentik-secret
+      env:
+        - name: AUTHENTIK_SESSION_STORAGE
+          value: db
+      envFrom:
+        - secretRef:
+            name: *secret
+    server:
+      replicas: 1
+      initContainers:
+        init-db:
+          image: ghcr.io/onedr0p/postgres-init:16.6
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - secretRef:
+                name: authentik-secret
+      resources:
+        requests:
+          cpu: 50m
+          memory: 500Mi
+        limits:
+          memory: 800Mi
+      metrics:
+        enabled: true
+        serviceMonitor:
+          enabled: true
+    worker:
+      replicas: 1
+      resources:
+        requests:
+          cpu: 50m
+          memory: 500Mi
+        limits:
+          memory: 1200Mi
+    authentik:
+      log_level: info
+      redis:
+        host: dragonfly.database.svc.cluster.local
+      error_reporting:
+        enabled: false
+    prometheus:
+      rules:
+        enabled: true
+    ingress:
+      enabled: true
+      annotations:
+        hajimari.io/enable: "true"
+        hajimari.io/group: "Home/Web"
+        hajimari.io/icon: shield-lock
+      ingressClassName: internal
+      hosts:
+        - authentik.${SECRET_DOMAIN}
