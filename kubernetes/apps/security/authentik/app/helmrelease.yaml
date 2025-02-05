@@ -46,6 +46,15 @@ spec:
           memory: 500Mi
         limits:
           memory: 800Mi
+      ingress:
+        enabled: true
+        annotations:
+          hajimari.io/enable: "true"
+          hajimari.io/group: "Home/Web"
+          hajimari.io/icon: shield-lock
+        ingressClassName: internal
+        hosts:
+          - authentik.${SECRET_DOMAIN}
       metrics:
         enabled: true
         serviceMonitor:
@@ -67,12 +76,3 @@ spec:
     prometheus:
       rules:
         enabled: true
-    ingress:
-      enabled: true
-      annotations:
-        hajimari.io/enable: "true"
-        hajimari.io/group: "Home/Web"
-        hajimari.io/icon: shield-lock
-      ingressClassName: internal
-      hosts:
-        - authentik.${SECRET_DOMAIN}
