@@ -22,3 +22,4 @@ resources:
   - ./csi-driver-nfs.yaml
   - ./nextcloud.yaml
   - ./authentik.yaml
+  - ./runix.yaml
