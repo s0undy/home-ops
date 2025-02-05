@@ -34,9 +34,8 @@ spec:
     server:
       replicas: 1
       initContainers:
-        init-db:
+        - name: init-db
           image: ghcr.io/onedr0p/postgres-init:16.6
-          imagePullPolicy: IfNotPresent
           envFrom:
             - secretRef:
                 name: authentik-secret
