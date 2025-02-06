@@ -53,7 +53,7 @@ spec:
           hajimari.io/icon: shield-lock
         ingressClassName: internal
         hosts:
-          - authentik.${SECRET_DOMAIN}
+          - auth.${SECRET_DOMAIN}
       metrics:
         enabled: true
         serviceMonitor:
