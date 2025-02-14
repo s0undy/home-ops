@@ -33,12 +33,12 @@ spec:
     replicaCount: 1
     ingress:
       enabled: true
-      className: external
+      className: internal
       annotations:
         hajimari.io/enable: "true"
         hajimari.io/group: "Home/Web"
         hajimari.io/icon: simple-icons:nextcloud
-        external-dns.alpha.kubernetes.io/target: "external.${SECRET_DOMAIN}"
+        #external-dns.alpha.kubernetes.io/target: "external.${SECRET_DOMAIN}"
         nginx.ingress.kubernetes.io/enable-cors: "true"
         nginx.ingress.kubernetes.io/cors-allow-headers: "X-Forwarded-For"
         nginx.ingress.kubernetes.io/affinity: cookie
@@ -68,6 +68,9 @@ spec:
           }
       path: /
       pathType: Prefix
+      tls:
+      - hosts:
+        - nc.${SECRET_DOMAIN}
     nextcloud:
       extraInitContainers:
         - name: init-db
