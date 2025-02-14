@@ -4,9 +4,3 @@ kind: Kustomization
 resources:
   - ./helmrelease.yaml
   - ./authentik-secret.sops.yaml
-configMapGenerator:
-  - name: authentik-branding
-    files:
-      - ./branding/bg.jpg
-    options:
-      disableNameSuffixHash: true
