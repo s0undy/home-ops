@@ -39,7 +39,7 @@ spec:
         hajimari.io/group: "Home/Web"
         hajimari.io/icon: simple-icons:nextcloud
         external-dns.alpha.kubernetes.io/target: "external.${SECRET_DOMAIN}"
-        #nginx.ingress.kubernetes.io/enable-cors: "true"
+        nginx.ingress.kubernetes.io/enable-cors: "true"
         #nginx.ingress.kubernetes.io/cors-allow-headers: "X-Forwarded-For"
         nginx.ingress.kubernetes.io/affinity: cookie
         nginx.ingress.kubernetes.io/server-snippet: |-
