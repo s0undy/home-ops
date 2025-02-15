@@ -24,7 +24,7 @@ spec:
   values:
     global:
       deploymentAnnotations:
-        secret.reloader.stakater.com/reload: &secret authentik-secret
+        secret.reloader.stakater.com/reload: auto
       env:
         - name: AUTHENTIK_SESSION_STORAGE
           value: db
@@ -73,6 +73,14 @@ spec:
         host: dragonfly.database.svc.cluster.local
       error_reporting:
         enabled: false
+      volumes:
+        - name: custom-css
+          configMap:
+            name: authentik-custom-css
+      volumeMounts:
+        - name: custom-css
+          mountPath: /web/dist/custom.css
+          subPath: custom.css
     prometheus:
       rules:
         enabled: true
