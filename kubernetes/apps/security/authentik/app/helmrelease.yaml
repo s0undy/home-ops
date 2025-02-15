@@ -35,16 +35,10 @@ spec:
         - name: custom-css
           configMap:
             name: authentik-custom-css
-        - name: authentik-branding
-          persistentVolumeClaim:
-            claimName: authentik-branding
       volumeMounts:
         - name: custom-css
           mountPath: /web/dist/custom.css
           subPath: custom.css
-        - name: authentik-branding
-          mountPath: /static/dist/assets/images/custom
-          subPath: bg12.gif
     server:
       replicas: 1
       initContainers:
@@ -59,6 +53,14 @@ spec:
           memory: 500Mi
         limits:
           memory: 800Mi
+      volumes:
+        - name: authentik-branding
+          persistentVolumeClaim:
+            claimName: authentik-branding
+      volumeMounts:
+        - name: authentik-branding
+          mountPath: /static/dist/assets/images/custom
+          subPath: bg12.gif
       ingress:
         enabled: true
         annotations:
