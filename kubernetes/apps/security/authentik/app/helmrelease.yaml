@@ -30,7 +30,7 @@ spec:
           value: db
       envFrom:
         - secretRef:
-            name: *secret
+            name: &secret authentik-secret
     server:
       replicas: 1
       initContainers:
