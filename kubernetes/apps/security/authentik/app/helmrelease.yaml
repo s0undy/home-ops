@@ -59,8 +59,8 @@ spec:
             claimName: authentik-branding
       volumeMounts:
         - name: authentik-branding
-          mountPath: /static/dist/assets/images/custom
-          subPath: bg12.gif
+          mountPath: /static/dist/assets/images/custom/
+#          subPath: bg12.gif
       ingress:
         enabled: true
         annotations:
