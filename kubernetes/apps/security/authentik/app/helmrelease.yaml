@@ -31,6 +31,14 @@ spec:
       envFrom:
         - secretRef:
             name: &secret authentik-secret
+      volumes:
+        - name: custom-css
+          configMap:
+            name: authentik-custom-css
+      volumeMounts:
+        - name: custom-css
+          mountPath: /web/dist/custom.css
+          subPath: custom.css
     server:
       replicas: 1
       initContainers:
@@ -73,14 +81,6 @@ spec:
         host: dragonfly.database.svc.cluster.local
       error_reporting:
         enabled: false
-      volumes:
-        - name: custom-css
-          configMap:
-            name: authentik-custom-css
-      volumeMounts:
-        - name: custom-css
-          mountPath: /web/dist/custom.css
-          subPath: custom.css
     prometheus:
       rules:
         enabled: true
