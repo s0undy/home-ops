@@ -44,6 +44,7 @@ spec:
           subPath: custom.css
         - name: authentik-branding
           mountPath: /static/dist/assets/images/custom
+          subPath: bg12.gif
     server:
       replicas: 1
       initContainers:
