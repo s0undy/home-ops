@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: nextcloud-config
+  name: authentik-branding
   namespace: security
 spec:
   accessModes:
