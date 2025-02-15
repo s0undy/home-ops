@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx
+  namespace: security
+spec:
+  selector:
+    matchLabels:
+      app: nginx
+  replicas: 1
+  template: # template for the pods
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+        - name: nginx
+          image: nginx
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "100m"
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+          volumeMounts:
+            - mountPath: /usr/share/nginx/xd
+              name: authentik-branding
+      volumes:
+        - name: authentik-branding
+          persistentVolumeClaim:
+            claimName: authentik-branding
+      restartPolicy: Always

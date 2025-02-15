@@ -35,10 +35,15 @@ spec:
         - name: custom-css
           configMap:
             name: authentik-custom-css
+        - name: custom-branding
+          persistentVolumeClaim:
+            claimName: authentik-branding
       volumeMounts:
         - name: custom-css
           mountPath: /web/dist/custom.css
           subPath: custom.css
+        - name: authentik-branding
+          mountPath: /static/dist/assets/images/custom
     server:
       replicas: 1
       initContainers:
