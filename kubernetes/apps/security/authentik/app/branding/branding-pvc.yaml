@@ -6,8 +6,8 @@ metadata:
   namespace: security
 spec:
   accessModes:
-    - ReadWriteOnce
+    - ReadWriteMany
   resources:
     requests:
       storage: 150Mi
-  storageClassName: ceph-block
+  storageClassName: ceph-filesystem
