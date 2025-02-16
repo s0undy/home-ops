@@ -5,4 +5,4 @@ resources:
   - ./configmap.yaml
   - ./authentik-secret.sops.yaml
   - ./helmrelease.yaml
-#  - ./branding/branding-pvc.yaml
+  - ./branding/branding-pvc.yaml
