@@ -59,7 +59,7 @@ spec:
             claimName: authentik-branding
       volumeMounts:
         - name: authentik-branding
-          mountPath: /static/dist/assets/images/custom
+          mountPath: /media
       ingress:
         enabled: true
         annotations:
