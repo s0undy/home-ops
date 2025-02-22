@@ -1,0 +1,75 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: nextcloud-push-service
+spec:
+  interval: 15m
+  chart:
+    spec:
+      chart: app-template
+      version: 3.6.1
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  dependsOn:
+    - name: nextcloud
+  # See https://github.com/bjw-s/helm-charts/blob/main/charts/library/common/values.yaml
+  values:
+    controllers:
+      main:
+        containers:
+          app:
+            image:
+              repository: docker.io/library/nextcloud
+              tag: 30.0.5-apache
+            # How to Enable
+            # 1. Install "client push" app within nextcloud
+            # 2. sudo -u www-data php -d memory_limit=-1 /var/www/html/occ notify_push:setup https://nextcloud.mydomain.com/push
+            command:
+              - /nextcloud/custom_apps/notify_push/notify_push/bin/x86_64/notify_push
+              - /nextcloud/config/config.php
+              - --port
+              - &port "7867"
+              - --log-level
+              - warning
+            env:
+              - name: NEXTCLOUD_URL
+                value: http://nextcloud:8080
+
+    persistence:
+      config:
+        existingClaim: nextcloud-config
+        globalMounts:
+          - path: /var/www/html
+      data:
+        existingClaim: nextcloud-data
+        globalMounts:
+          - path: /var/www/html/data
+
+
+    service:
+      main:
+        controller: main
+        ports:
+          http:
+            enabled: true
+            port: *port
+
+    ingress:
+      main:
+        enabled: true
+        className: external
+        annotations:
+          hajimari.io/enable: "false"
+          external-dns.alpha.kubernetes.io/target: "external.${SECRET_DOMAIN}"
+        hosts:
+          - host: nc.${SECRET_DOMAIN}
+            paths:
+            - path: /push/
+              pathType: Prefix
+              service:
+                identifier: main
+                port: http
