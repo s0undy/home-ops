@@ -88,7 +88,7 @@ spec:
           upload_max_filesize = 16G
           post_max_size = 16G
           max_input_time = 3600
-          max_execution_time = 36
+          max_execution_time = 3600
       defaultConfigs:
         .htaccess: true                         # To protect /var/www/html/config
         apache-pretty-urls.config.php: true     # Apache configuration for rewrite urls
