@@ -82,6 +82,11 @@ spec:
           envFrom:
             - secretRef:
                 name: nextcloud-secret
+      extraEnv:
+        - name: PHP_MEMORY_LIMIT
+          value: "2G"
+        - name: APACHE_BODY_LIMIT
+          value: "0"
       host: nc.${SECRET_DOMAIN}
       existingSecret:
         enabled: true
