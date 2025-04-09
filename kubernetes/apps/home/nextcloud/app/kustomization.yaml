@@ -7,5 +7,5 @@ resources:
   - ./nc-config-pvc.yaml
   - ./nextcloud-secret.sops.yaml
   - ./nc-data-pvc.yaml
-  - ./push-helmrelease.yaml
-  - ./collabora-helmrelease.yaml
+#  - ./push-helmrelease.yaml
+#  - ./collabora-helmrelease.yaml
