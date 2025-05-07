@@ -87,6 +87,8 @@ spec:
           value: "2G"
         - name: APACHE_BODY_LIMIT
           value: "0"
+        - name: HOME
+          value: /tmp/
       host: nc.${SECRET_DOMAIN}
       existingSecret:
         enabled: true

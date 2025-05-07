@@ -6,6 +6,6 @@ resources:
   - ./nextcloud-data-pvc.yaml
   - ./nextcloud-config-pvc.yaml
   - ./nextcloud-secret.sops.yaml
-  - ./helmrelease.yaml
+#  - ./helmrelease.yaml
 #  - ./push-helmrelease.yaml
 #  - ./collabora-helmrelease.yaml
