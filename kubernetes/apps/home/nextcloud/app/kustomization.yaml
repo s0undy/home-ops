@@ -4,8 +4,8 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
 #  - ./helmrelease.yaml
-  - ./nc-config-pvc.yaml
+#  - ./nc-config-pvc.yaml
   - ./nextcloud-secret.sops.yaml
-  - ./nc-data-pvc.yaml
+#  - ./nc-data-pvc.yaml
 #  - ./push-helmrelease.yaml
 #  - ./collabora-helmrelease.yaml
