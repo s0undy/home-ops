@@ -8,4 +8,4 @@ resources:
   - ./nextcloud-secret.sops.yaml
   - ./helmrelease.yaml
   - ./push-helmrelease.yaml
-#  - ./collabora-helmrelease.yaml
+  - ./collabora-helmrelease.yaml
