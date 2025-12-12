@@ -28,7 +28,7 @@ spec:
     image:
       repository: nextcloud
       flavor: apache
-      tag: 31.0.4-apache
+      tag: 31.0.12-apache
       pullPolicy: IfNotPresent
     replicaCount: 1
     ingress:
