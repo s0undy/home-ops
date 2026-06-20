@@ -38,6 +38,12 @@ nodes:
         mtu: 1500
         vip:
           ip: "10.0.100.10"
+      - deviceSelector:
+          hardwareAddr: "a2:19:97:a0:6f:1c"
+        dhcp: false
+        addresses:
+          - "172.16.52.21/24"
+        mtu: 9000
   - hostname: "jit-talos-02"
     ipAddress: "10.0.100.12"
     installDisk: "/dev/disk/by-path/pci-0000:09:01.0-scsi-0:0:0:0"
@@ -57,6 +63,12 @@ nodes:
         mtu: 1500
         vip:
           ip: "10.0.100.10"
+      - deviceSelector:
+          hardwareAddr: "a2:19:97:04:42:f4"
+        dhcp: false
+        addresses:
+          - "172.16.52.22/24"
+        mtu: 9000
   - hostname: "jit-talos-03"
     ipAddress: "10.0.100.13"
     installDisk: "/dev/disk/by-path/pci-0000:09:01.0-scsi-0:0:0:0"
@@ -76,6 +88,12 @@ nodes:
         mtu: 1500
         vip:
           ip: "10.0.100.10"
+      - deviceSelector:
+          hardwareAddr: "a2:19:97:a5:0a:fd"
+        dhcp: false
+        addresses:
+          - "172.16.52.23/24"
+        mtu: 9000
 
 # Global patches
 patches:
