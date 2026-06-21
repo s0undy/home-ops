@@ -55,3 +55,5 @@ spec:
     # # -- A list of CephFileSystem configurations to deploy
     # # @default -- See [below](#ceph-file-systems)
     cephFileSystems: {}
+
+    cephObjectStores: {}
