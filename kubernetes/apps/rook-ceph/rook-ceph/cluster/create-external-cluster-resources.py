@@ -1,0 +1,1 @@
+https://github.com/rook/rook/blob/release-1.20/deploy/examples/create-external-cluster-resources.py
