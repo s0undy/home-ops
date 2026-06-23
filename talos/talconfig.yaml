@@ -24,7 +24,7 @@ nodes:
     installDisk: "/dev/disk/by-path/pci-0000:09:01.0-scsi-0:0:0:0"
     machineSpec:
       secureboot: false
-    talosImageURL: factory.talos.dev/installer/95d432d6bb450a67e801a6ae77c96a67e38820b62ba4159ae7e997e1695207f7
+    talosImageURL: factory.talos.dev/installer/74e275aacf4a5cf6c59cff672138e960790bc5f7e65de3f4a14c7d6e87249294
     controlPlane: true
     networkInterfaces:
       - deviceSelector:
@@ -44,12 +44,23 @@ nodes:
         addresses:
           - "172.16.52.21/24"
         mtu: 9000
+    schematic:
+      customization:
+        systemExtensions:
+          officialExtensions:
+            - siderolabs/i915
+            - siderolabs/intel-ice-firmware
+            - siderolabs/intel-ucode
+            - siderolabs/mei
+            - siderolabs/xe
+            - siderolabs/qemu-guest-agent
+
   - hostname: "jit-talos-02"
     ipAddress: "10.0.100.12"
     installDisk: "/dev/disk/by-path/pci-0000:09:01.0-scsi-0:0:0:0"
     machineSpec:
       secureboot: false
-    talosImageURL: factory.talos.dev/installer/95d432d6bb450a67e801a6ae77c96a67e38820b62ba4159ae7e997e1695207f7
+    talosImageURL: factory.talos.dev/installer/74e275aacf4a5cf6c59cff672138e960790bc5f7e65de3f4a14c7d6e87249294
     controlPlane: true
     networkInterfaces:
       - deviceSelector:
@@ -69,12 +80,22 @@ nodes:
         addresses:
           - "172.16.52.22/24"
         mtu: 9000
+    schematic:
+      customization:
+        systemExtensions:
+          officialExtensions:
+            - siderolabs/i915
+            - siderolabs/intel-ice-firmware
+            - siderolabs/intel-ucode
+            - siderolabs/mei
+            - siderolabs/xe
+            - siderolabs/qemu-guest-agent
   - hostname: "jit-talos-03"
     ipAddress: "10.0.100.13"
     installDisk: "/dev/disk/by-path/pci-0000:09:01.0-scsi-0:0:0:0"
     machineSpec:
       secureboot: false
-    talosImageURL: factory.talos.dev/installer/95d432d6bb450a67e801a6ae77c96a67e38820b62ba4159ae7e997e1695207f7
+    talosImageURL: factory.talos.dev/installer/74e275aacf4a5cf6c59cff672138e960790bc5f7e65de3f4a14c7d6e87249294
     controlPlane: true
     networkInterfaces:
       - deviceSelector:
@@ -94,7 +115,16 @@ nodes:
         addresses:
           - "172.16.52.23/24"
         mtu: 9000
-
+    schematic:
+      customization:
+        systemExtensions:
+          officialExtensions:
+            - siderolabs/i915
+            - siderolabs/intel-ice-firmware
+            - siderolabs/intel-ucode
+            - siderolabs/mei
+            - siderolabs/xe
+            - siderolabs/qemu-guest-agent
 # Global patches
 patches:
   - "@./patches/global/machine-files.yaml"
@@ -107,4 +137,3 @@ patches:
 controlPlane:
   patches:
     - "@./patches/controller/cluster.yaml"
-
