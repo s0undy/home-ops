@@ -39,9 +39,11 @@ spec:
       app.kubernetes.io/name: *app
   dependsOn:
     - name: cloudnative-pg
-    - name: barman-cloud
-    - name: rook-ceph-cluster
       namespace: *namespace
+    - name: barman-cloud
+      namespace: *namespace
+    - name: rook-ceph-cluster
+      namespace: rook-ceph
   path: ./kubernetes/apps/databases/cloudnative-pg/cluster
   prune: true
   sourceRef:
