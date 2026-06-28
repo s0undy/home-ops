@@ -72,7 +72,6 @@ spec:
             port: *port
     route:
       app:
-#        annotations:
         hostnames:
           - "{{ .Release.Name }}.${SECRET_DOMAIN}"
         parentRefs:
@@ -85,7 +84,7 @@ spec:
           - path: /config
       media:
         type: nfs
-        server: horrea-10.josefssonit.se
+        server: horrea-10.${SECRET_DOMAIN}"
         path: /mnt/tank/Media
         globalMounts:
           - path: /media
