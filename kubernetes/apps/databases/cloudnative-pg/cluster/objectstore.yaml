@@ -16,7 +16,7 @@ spec:
         memory: 128Mi
         cpu: 10m
   configuration:
-    destinationPath: s3://postgresql/
+    destinationPath: s3://cnpg/
     endpointURL: https://horrea-10.josefssonit.se:30292
     s3Credentials:
       accessKeyId:
