@@ -83,13 +83,13 @@ spec:
         existingClaim: *app
         globalMounts:
           - path: /config
-#      media:
-#        type: nfs
-#        server:
-#        path: /tank/Media
-#        globalMounts:
-#          - path: /media
-#            readOnly: true
+      media:
+        type: nfs
+        server: horrea-10.josefssonit.se
+        path: /tank/Media
+        globalMounts:
+          - path: /media
+            readOnly: true
       tmpfs:
         type: emptyDir
         medium: Memory
