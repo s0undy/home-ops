@@ -37,6 +37,11 @@ spec:
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
+  dependsOn:
+    - name: cloudnative-pg
+    - name: barman-cloud
+    - name: rook-ceph-cluster
+      namespace: *namespace
   path: ./kubernetes/apps/databases/cloudnative-pg/cluster
   prune: true
   sourceRef:
