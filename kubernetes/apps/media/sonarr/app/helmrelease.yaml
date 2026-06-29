@@ -38,6 +38,7 @@ spec:
               TZ: "${TZ}"
               SONARR__LOG__LEVEL: info
               SONARR__THEME: dark
+              SONARR__UPDATE__BRANCH: develop
             envFrom:
               - secretRef:
                   name: sonarr-secret

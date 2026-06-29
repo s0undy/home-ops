@@ -3,7 +3,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: &app radarr
+  name: &app prowlarr
 spec:
   interval: 1h
   chartRef:
@@ -18,7 +18,7 @@ spec:
       retries: 3
   values:
     controllers:
-      radarr:
+      prowlarr:
         annotations:
           reloader.stakater.com/auto: "true"
         initContainers:
@@ -28,20 +28,20 @@ spec:
               tag: "18"
             envFrom:
               - secretRef:
-                  name: radarr-secret
+                  name: prowlarr-secret
         containers:
           app:
             image:
-              repository: ghcr.io/home-operations/radarr
-              tag: 6.2.1.10461@sha256:a566e7d364b96ce8ffb1b582266e656c69f3a12dec289d72bb0daa647ed4725e
+              repository: ghcr.io/home-operations/prowlarr
+              tag: 2.5.0.5422@sha256:9c89ef21672a20f4cd4a766b5a085ae5a61de54a79e0841e136330a711b85447
             env:
               TZ: "${TZ}"
-              RADARR__LOG__LEVEL: info
-              RADARR__THEME: dark
-              RADARR__UPDATE__BRANCH: develop
+              PROWLARR__LOG__LEVEL: info
+              PROWLARR__THEME: dark
+              PROWLARR__UPDATE__BRANCH: develop
             envFrom:
               - secretRef:
-                  name: radarr-secret
+                  name: prowlarr-secret
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
@@ -58,7 +58,7 @@ spec:
         controller: *app
         ports:
           http:
-            port: 7878
+            port: 80
     route:
       app:
         hostnames:
@@ -69,11 +69,5 @@ spec:
     persistence:
       config:
         existingClaim: *app
-      media:
-        type: nfs
-        server: horrea-10.${SECRET_DOMAIN}
-        path: /mnt/tank/Media
-        globalMounts:
-          - path: /data
       tmp:
         type: emptyDir
