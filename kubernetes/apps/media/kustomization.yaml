@@ -10,3 +10,4 @@ resources:
   - ./namespace.yaml
   - ./jellyfin/ks.yaml
   - ./radarr/ks.yaml
+  - ./sonarr/ks.yaml
