@@ -50,6 +50,11 @@ nodes:
         addresses:
           - "172.16.60.21/24"
         mtu: 9000
+      - deviceSelector:
+          hardwareAddr: "a2:19:97:ff:b8:65"
+        dhcp: false
+        addresses:
+          - "169.254.100.11/32"
     schematic:
       customization:
         systemExtensions:
@@ -92,6 +97,11 @@ nodes:
         addresses:
           - "172.16.60.22/24"
         mtu: 9000
+      - deviceSelector:
+          hardwareAddr: "a2:19:97:1a:8e:88"
+        dhcp: false
+        addresses:
+          - "169.254.100.12/32"
     schematic:
       customization:
         systemExtensions:
@@ -133,6 +143,11 @@ nodes:
         addresses:
           - "172.16.60.23/24"
         mtu: 9000
+      - deviceSelector:
+          hardwareAddr: "a2:19:97:16:af:ea"
+        dhcp: false
+        addresses:
+          - "169.254.100.13/32"
     schematic:
       customization:
         systemExtensions:
