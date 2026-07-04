@@ -21,7 +21,7 @@ spec:
       enabled: true
       parentRefs:
         - name: envoy-external
-          namespace: networking
+          namespace: network
       hostnames:
         - "{{ .Release.Name }}.${SECRET_DOMAIN}"
     monitoring:
