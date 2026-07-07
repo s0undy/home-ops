@@ -1,4 +1,5 @@
 {
+    "yayamlls.path": "/home/linuxbrew/.linuxbrew/bin/yayamlls",
     "editor.bracketPairColorization.enabled": true,
     "files.associations": {
         "**/*.json5": "json5"
