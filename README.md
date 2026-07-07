@@ -74,20 +74,20 @@ Most of my infrastructure is self-hosted, however certain parts are easier and s
 ---
 
 ## 🔧 Hardware
-| Name               | Device                   | CPU      | Disks                                                   | RAM  | OS           | Purpose                             |
-|--------------------|--------------------------|----------|---------------------------------------------------------|------|--------------|-------------------------------------|
-| Arx                | Lenovo ThinkCentre M920q | i5-8500T | TBD SSD (PVE) / TBD NVMe (Ceph OSD) / TBD NVMe (Talos)  | 32GB | Proxmox      | PVE host, Ceph, VMs                 |
-| JIT-TALOS-01       | VM on Arx                | 4vCPU    | 128GB NVME Direct passthrough                           | 24GB | Talos        | Kubernetes                          |
-| Pax                | Lenovo ThinkCentre M720q | i5-9500T | TBD SSD (PVE) / TBD NVMe (Ceph OSD) / TBD NVMe (Talos)  | 32GB | Proxmox      | PVE host, Ceph, VMs                 |
-| JIT-TALOS-02       | VM on Pax                | 6vCPU    | 256GB NVME Direct passthrough                           | 24GB | Talos        | Kubernetes                          |
-| Via                | Lenovo ThinkCentre M720q | i5-9500T | TBD SSD (PVE) / TBD NVMe (Ceph OSD) / TBD NVMe (Talos)  | 32GB | Proxmox      | PVE host, Ceph, VMs                 |
-| JIT-TALOS-03       | VM on Via                | 6vCPU    | 256GB NVM Direct passthrough                            | 24GB | Talos        | Kubernetes                          |
-| JIT-Horrea         | Whitebox NAS             | G3900    | 4x2TB + 2x 3TB HDDs - 256GB NVME(OS)                    | 16GB | TrueNAS      | NAS                                 |
-| Octo               | Raspberry 4 Model B      | -        | 64GB SD-card                                            | 4GB  | OctoPi       | OctoPi for my Ender 5 S1 3D-Printer |
-| UDM-1              | UniFi Dream Machine Pro  | -        | -                                                       | -    | -            | Router, Firewall and DNS            |
-| US XG 16           | UniFi US XG 16           | -        | -                                                       | -    | -            | 10G Switch                          |
-| US-16-150W         | UniFi US-16-150W         | -        | -                                                       | -    | -            | PoE Switch                          |
-| UAP-AC-LR          | UniFI AC Long-Range      | -        | -                                                       | -    | -            | WiFi                                |
+| Name               | Device                   | CPU      | Disks                                                       | RAM  | OS           | Purpose                             |
+|--------------------|--------------------------|----------|-------------------------------------------------------------|------|--------------|-------------------------------------|
+| Arx                | Lenovo ThinkCentre M920q | i5-8500T | 256GB SSD (PVE) / 1TB NVMe (Ceph OSD) / 128GB NVMe (Talos)  | 32GB | Proxmox      | PVE host, Ceph, VMs                 |
+| JIT-TALOS-01       | VM on Arx                | 4vCPU    | 128GB NVME Direct passthrough                               | 24GB | Talos        | Kubernetes                          |
+| Pax                | Lenovo ThinkCentre M720q | i5-9500T | 256GB SSD (PVE) / 1TB NVMe (Ceph OSD) / 256GB NVMe (Talos)  | 32GB | Proxmox      | PVE host, Ceph, VMs                 |
+| JIT-TALOS-02       | VM on Pax                | 6vCPU    | 256GB NVME Direct passthrough                               | 24GB | Talos        | Kubernetes                          |
+| Via                | Lenovo ThinkCentre M720q | i5-9500T | 256GB SSD (PVE) / 1TB NVMe (Ceph OSD) / 256GB NVMe (Talos)  | 32GB | Proxmox      | PVE host, Ceph, VMs                 |
+| JIT-TALOS-03       | VM on Via                | 6vCPU    | 256GB NVM Direct passthrough                                | 24GB | Talos        | Kubernetes                          |
+| JIT-Horrea         | Whitebox NAS             | G3900    | 4x2TB + 2x 3TB HDDs - 256GB NVME(OS)                        | 16GB | TrueNAS      | NAS                                 |
+| Octo               | Raspberry 4 Model B      | -        | 64GB SD-card                                                | 4GB  | OctoPi       | OctoPi for my Ender 5 S1 3D-Printer |
+| UDM-1              | UniFi Dream Machine Pro  | -        | -                                                           | -    | -            | Router, Firewall and DNS            |
+| US XG 16           | UniFi US XG 16           | -        | -                                                           | -    | -            | 10G Switch                          |
+| US-16-150W         | UniFi US-16-150W         | -        | -                                                           | -    | -            | PoE Switch                          |
+| UAP-AC-LR          | UniFI AC Long-Range      | -        | -                                                           | -    | -            | WiFi                                |
 ---
 
 ## 🤝 Thanks
