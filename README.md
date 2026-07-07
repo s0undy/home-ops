@@ -85,7 +85,7 @@ Most of my infrastructure is self-hosted, however certain parts are easier and s
 | JIT-Horrea         | Whitebox NAS             | G3900    | 4x2TB + 2x 3TB HDDs - 256GB NVME(OS)                        | 16GB | TrueNAS      | NAS                                 |
 | Octo               | Raspberry 4 Model B      | -        | 64GB SD-card                                                | 4GB  | OctoPi       | OctoPi for my Ender 5 S1 3D-Printer |
 | UDM-1              | UniFi Dream Machine Pro  | -        | -                                                           | -    | -            | Router, Firewall and DNS            |
-| US XG 16           | UniFi US XG 16           | -        | -                                                           | -    | -            | 10G Switch                          |
+| US-XG-16           | UniFi US XG 16           | -        | -                                                           | -    | -            | 10G Switch                          |
 | US-16-150W         | UniFi US-16-150W         | -        | -                                                           | -    | -            | PoE Switch                          |
 | UAP-AC-LR          | UniFI AC Long-Range      | -        | -                                                           | -    | -            | WiFi                                |
 ---
