@@ -32,11 +32,11 @@ area/talos:
   - changed-files:
       - any-glob-to-any-file:
           - talos/**/*
-area/taskfile:
+area/just:
   - changed-files:
       - any-glob-to-any-file:
-          - .taskfiles/**/*
-          - Taskfile.yaml
+          - .justfile
+          - '**/mod.just'
 area/templates:
   - changed-files:
       - any-glob-to-any-file:
