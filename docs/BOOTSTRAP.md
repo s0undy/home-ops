@@ -25,6 +25,14 @@ A runbook for bringing this cluster up from scratch and keeping it maintained. A
     mise install
     ```
 
+4. Use [Homebrew](https://brew.sh) to install [flate](https://github.com/home-operations/flate) and [yayamlls](https://github.com/home-operations/yayamlls) for the editor tooling:
+
+    📍 _yayamlls is the YAML language server used by the VSCode setup (see `.vscode/settings.json`), and flate is the Flux renderer it uses to render `HelmRelease` and `Kustomization` resources inline (configured in `.yayamlls.yaml`)._
+
+    ```sh
+    brew install --cask home-operations/tap/flate home-operations/tap/yayamlls
+    ```
+
 ## ☁️ Cloudflare configuration
 
 > [!WARNING]
@@ -50,13 +58,13 @@ A runbook for bringing this cluster up from scratch and keeping it maintained. A
 1. Install Talos onto the nodes (generates secrets, applies config, bootstraps etcd and fetches the kubeconfig):
 
     ```sh
-    task bootstrap:talos
+    just bootstrap talos
     ```
 
 2. Install Cilium, CoreDNS, Spegel, Flux and sync the cluster to the repository state:
 
     ```sh
-    task bootstrap:apps
+    just bootstrap apps
     ```
 
 3. Watch the rollout of the cluster happen:
@@ -94,11 +102,11 @@ By default Flux will periodically check the git repository for changes. To have 
 
 ```sh
 # (Re)generate the Talos config
-task talos:generate-config
+just talos generate-config
 
-# Apply the config to a node (MODE defaults to auto)
-task talos:apply-node IP=? MODE=?
-# e.g. task talos:apply-node IP=10.0.100.11 MODE=auto
+# Apply the config to a node (mode defaults to auto)
+just talos apply-node <node> [mode]
+# e.g. just talos apply-node 10.0.100.11 auto
 ```
 
 ### ⬆️ Updating Talos and Kubernetes versions
@@ -108,13 +116,13 @@ task talos:apply-node IP=? MODE=?
 
 ```sh
 # Upgrade a single node to a newer Talos version
-task talos:upgrade-node IP=?
-# e.g. task talos:upgrade-node IP=10.0.100.11
+just talos upgrade-node <node>
+# e.g. just talos upgrade-node 10.0.100.11
 ```
 
 ```sh
 # Upgrade the cluster to a newer Kubernetes version
-task talos:upgrade-k8s
+just talos upgrade-k8s
 ```
 
 ### ➕ Adding a node to the cluster
@@ -135,9 +143,9 @@ Keep in mind it is recommended to have an **odd number** of control plane nodes 
 4. **Generate and apply the configuration**:
 
    ```sh
-   task talos:generate-config
-   task talos:apply-node IP=?
-   # e.g. task talos:apply-node IP=10.0.100.14
+   just talos generate-config
+   just talos apply-node <node>
+   # e.g. just talos apply-node 10.0.100.14
    ```
 
    The node should join the cluster automatically and workloads will be scheduled once it reports as ready.
@@ -148,7 +156,7 @@ Keep in mind it is recommended to have an **odd number** of control plane nodes 
 > This destroys the cluster and resets the nodes back to maintenance mode.
 
 ```sh
-task talos:reset
+just talos reset
 ```
 
 ## 🐛 Debugging
@@ -157,7 +165,7 @@ A general guide for debugging an issue with a resource or application — for ex
 
 1. Check if the Flux resources are up-to-date and in a ready state:
 
-   📍 _Run `task reconcile` to force Flux to sync the Git repository state._
+   📍 _Run `just kube reconcile` to force Flux to sync the Git repository state._
 
     ```sh
     flux get sources git -A

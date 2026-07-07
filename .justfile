@@ -1,0 +1,23 @@
+#!/usr/bin/env -S just --justfile
+
+set default-list
+set default-script
+set lazy
+set quiet
+set shell := ['bash', '-euo', 'pipefail', '-c']
+
+# Bootstrap Recipes
+[group: 'Bootstrap']
+mod bootstrap "bootstrap"
+
+# Kube Recipes
+[group: 'Kube']
+mod kube "kubernetes"
+
+# Talos Recipes
+[group: 'Talos']
+mod talos "talos"
+
+[private]
+log lvl msg *args:
+    gum log -t rfc3339 -s -l "{{ lvl }}" "{{ msg }}" {{ args }}

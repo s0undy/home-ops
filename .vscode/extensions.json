@@ -6,6 +6,7 @@
     "signageos.signageos-vscode-sops",
     "hverlin.mise-vscode",
     "blueglassblock.better-json5",
-    "PKief.material-icon-theme"
+    "PKief.material-icon-theme",
+    "nefrob.vscode-just-syntax"
   ]
 }
