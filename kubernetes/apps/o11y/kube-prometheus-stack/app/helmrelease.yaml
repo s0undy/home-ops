@@ -1,0 +1,91 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: kube-prometheus-stack
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: kube-prometheus-stack
+  interval: 1h
+  values:
+    cleanPrometheusOperatorObjectNames: true
+    alertmanager:
+      route:
+        main:
+          enabled: true
+          hostnames:
+            - alertmanager.${SECRET_DOMAIN}
+          parentRefs:
+            - name: envoy-internal
+              namespace: network
+              sectionName: https
+      alertmanagerSpec:
+        externalUrl: https://alertmanager.${SECRET_DOMAIN}
+        storage:
+          volumeClaimTemplate:
+            spec:
+              storageClassName: ceph-rbd
+              resources:
+                requests:
+                  storage: 1Gi
+    kubeEtcd:
+      service:
+        selector:
+          component: kube-apiserver # etcd runs on control plane nodes
+    kubeProxy:
+      enabled: false # Cilium replaces kube-proxy
+    prometheus:
+      route:
+        main:
+          enabled: true
+          hostnames:
+            - prometheus.${SECRET_DOMAIN}
+          parentRefs:
+            - name: envoy-internal
+              namespace: network
+              sectionName: https
+      prometheusSpec:
+        externalUrl: https://prometheus.${SECRET_DOMAIN}
+        podMonitorSelectorNilUsesHelmValues: false
+        probeSelectorNilUsesHelmValues: false
+        ruleSelectorNilUsesHelmValues: false
+        scrapeConfigSelectorNilUsesHelmValues: false
+        serviceMonitorSelectorNilUsesHelmValues: false
+        retention: 30d
+        retentionSize: 45GB
+        resources:
+          requests:
+            cpu: 100m
+          limits:
+            memory: 2000Mi
+        storageSpec:
+          volumeClaimTemplate:
+            spec:
+              storageClassName: ceph-rbd
+              resources:
+                requests:
+                  storage: 50Gi
+    prometheus-node-exporter:
+      fullnameOverride: node-exporter
+    kube-state-metrics:
+      fullnameOverride: kube-state-metrics
+    grafana:
+      enabled: false
+      forceDeployDashboards: true
+      operator:
+        dashboardsConfigMapRefEnabled: true
+        folder: o11y
+        matchLabels:
+          dashboards: grafana
+    additionalPrometheusRulesMap:
+      oom-rules:
+        groups:
+          - name: oom
+            rules:
+              - alert: OomKilled
+                annotations:
+                  summary: Container {{ $labels.container }} in pod {{ $labels.namespace }}/{{ $labels.pod }} has been OOMKilled {{ $value }} times in the last 10 minutes.
+                expr: (kube_pod_container_status_restarts_total - kube_pod_container_status_restarts_total offset 10m >= 1) and ignoring (reason) min_over_time(kube_pod_container_status_last_terminated_reason{reason="OOMKilled"}[10m]) == 1
+                labels:
+                  severity: critical
