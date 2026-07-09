@@ -29,3 +29,20 @@ spec:
     jsonData:
       implementation: prometheus
     url: http://alertmanager-operated.o11y.svc.cluster.local:9093
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDatasource
+metadata:
+  name: victoria-logs
+spec:
+  instanceSelector:
+    matchLabels:
+      dashboards: grafana
+  plugins:
+    - name: victoriametrics-logs-datasource
+      version: 0.29.0
+  datasource:
+    type: victoriametrics-logs-datasource
+    name: victoria-logs
+    access: proxy
+    url: http://victoria-logs.o11y.svc.cluster.local:9428
