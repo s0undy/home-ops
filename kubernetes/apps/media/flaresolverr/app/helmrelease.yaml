@@ -25,7 +25,7 @@ spec:
               repository: ghcr.io/flaresolverr/flaresolverr
               tag: v3.5.0
             env:
-              TZ: ${SECRET_TIMEZONE}
+              TZ: ${TZ}
               # writable HOME for Chrome / undetected-chromedriver when non-root
               HOME: /config
             securityContext:
