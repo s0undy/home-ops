@@ -15,7 +15,7 @@ spec:
       bucket: kopiur
       endpoint: horrea-10.${SECRET_DOMAIN}:30292
       tls:
-        disableTls: true
+        disableTls: false
   encryption:
     passwordSecretRef:
       name: kopiur-repository-secret
