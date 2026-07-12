@@ -13,8 +13,7 @@ spec:
           name: kopiur-repository-secret
           namespace: kopiur-system
       bucket: kopiur
-      endpoint: horrea-10.${SECRET_DOMAIN}:9000
-      region: us-east-1
+      endpoint: horrea-10.${SECRET_DOMAIN}:30292
       tls:
         disableTls: true
   encryption:
