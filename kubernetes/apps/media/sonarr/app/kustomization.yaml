@@ -4,5 +4,4 @@ kind: Kustomization
 resources:
   - ./ocirepository.yaml
   - ./secret.sops.yaml
-  - ./pvc.yaml
   - ./helmrelease.yaml

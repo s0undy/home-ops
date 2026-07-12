@@ -4,9 +4,16 @@ kind: Kustomization
 metadata:
   name: prowlarr
 spec:
+  components:
+    - ../../../../components/kopiur/backup
+  dependsOn:
+    - name: kopiur-repository
+      namespace: kopiur-system
   interval: 1h
   path: ./kubernetes/apps/media/prowlarr/app
   postBuild:
+    substitute:
+      APP: prowlarr
     substituteFrom:
       - name: cluster-secrets
         kind: Secret

@@ -1,0 +1,26 @@
+---
+apiVersion: kopiur.home-operations.com/v1alpha1
+kind: ClusterRepository
+metadata:
+  name: horrea
+spec:
+  allowedNamespaces:
+    all: true
+  backend:
+    s3:
+      auth:
+        secretRef:
+          name: kopiur-repository-secret
+          namespace: kopiur-system
+      bucket: kopiur
+      endpoint: horrea-10.${SECRET_DOMAIN}:9000
+      region: us-east-1
+      tls:
+        disableTls: true
+  encryption:
+    passwordSecretRef:
+      name: kopiur-repository-secret
+      namespace: kopiur-system
+      key: KOPIA_PASSWORD
+  scheduleDefaults:
+    timezone: ${TZ}

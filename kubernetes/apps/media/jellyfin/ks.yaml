@@ -4,9 +4,17 @@ kind: Kustomization
 metadata:
   name: jellyfin
 spec:
+  components:
+    - ../../../../components/kopiur/backup
+  dependsOn:
+    - name: kopiur-repository
+      namespace: kopiur-system
   interval: 1h
   path: ./kubernetes/apps/media/jellyfin/app
   postBuild:
+    substitute:
+      APP: jellyfin
+      KOPIUR_CAPACITY: 20Gi
     substituteFrom:
       - name: cluster-secrets
         kind: Secret

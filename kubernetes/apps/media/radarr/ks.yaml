@@ -4,9 +4,16 @@ kind: Kustomization
 metadata:
   name: radarr
 spec:
+  components:
+    - ../../../../components/kopiur/backup
+  dependsOn:
+    - name: kopiur-repository
+      namespace: kopiur-system
   interval: 1h
   path: ./kubernetes/apps/media/radarr/app
   postBuild:
+    substitute:
+      APP: radarr
     substituteFrom:
       - name: cluster-secrets
         kind: Secret
