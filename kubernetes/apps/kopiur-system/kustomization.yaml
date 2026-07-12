@@ -5,6 +5,7 @@ namespace: kopiur-system
 
 components:
   - ../../components/sops
+  - ../../components/kopiur/secret
 
 resources:
   - ./namespace.yaml
