@@ -10,6 +10,10 @@ set shell := ['bash', '-euo', 'pipefail', '-c']
 [group: 'Bootstrap']
 mod bootstrap "bootstrap"
 
+# Kopiur Recipes
+[group: 'Kopiur']
+mod kopiur "kopiur"
+
 # Kube Recipes
 [group: 'Kube']
 mod kube "kubernetes"
