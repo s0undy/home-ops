@@ -15,9 +15,11 @@ CLI tools are pinned and installed with [mise](https://mise.jdx.dev) (`mise trus
 Task runner is `just` (recipes in `.justfile`, modules in `*/mod.just`):
 
 - `just kube reconcile` — force Flux to pull in Git changes
-- `just talos generate-config` — regenerate Talos machine configs with talhelper after editing `talos/talconfig.yaml`
-- `just talos apply-node <ip>` — apply Talos config to a node
-- `just talos upgrade-node <ip>` / `just talos upgrade-k8s` — upgrade Talos/Kubernetes to the versions pinned in `talos/talenv.yaml`
+- `just talos diff` — show what a Talos config apply would change on the live cluster
+- `just talos render` — render machine configs to `talos/output/` (gitignored) without applying
+- `just talos apply-node <host|ip> [mode]` / `just talos apply` — apply Talos config after editing `talos/topf.yaml` or a patch
+- `just talos upgrade-node <host|ip>` / `just talos upgrade-k8s` — upgrade Talos/Kubernetes to the versions pinned in `talos/topf.yaml`
+- `just talos nodes` — list nodes with their stage, readiness, schematic and Talos version
 - `just bootstrap talos` / `just bootstrap apps` — full cluster bootstrap from scratch (see `docs/BOOTSTRAP.md`)
 
 Validate manifests locally with `kustomize build <dir>` and `kubeconform` (both installed via mise). Debugging flow: `flux get ks -A`, `flux get hr -A`, then `kubectl -n <ns> describe`/`logs` (see the Debugging section of `docs/BOOTSTRAP.md`).
@@ -55,5 +57,5 @@ SOPS + age, rules in `.sops.yaml`. Secret files are named `*.sops.yaml`; under `
 
 - Rook-Ceph runs in **external mode** — the Ceph cluster lives on the Proxmox hosts, not in Kubernetes (`kubernetes/apps/rook-ceph/`, import scripts in `scripts/`).
 - CloudNativePG provides Postgres (`kubernetes/apps/databases/`), backed up via Barman Cloud.
-- Talos node config is managed by talhelper: `talos/talconfig.yaml` (nodes/patches) and `talos/talenv.yaml` (version pins); generated output in `talos/clusterconfig/` .
+- Talos node config is managed by [topf](https://postfinance.github.io/topf/): `talos/topf.yaml` (nodes, version pins, schematic) plus strategic-merge patches in `talos/all/`, `talos/control-plane/` and `talos/node/<hostname>/`, merged in that order. See `talos/README.md`. topf assembles configs in memory and pushes them over the Talos API — nothing is generated into the repo; `just talos render` writes them to the gitignored `talos/output/` for inspection. topf v0.x supports Talos v1.13.x only.
 - `bootstrap/helmfile.d/` contains the ordered CRD + core-app installs (Cilium, CoreDNS, Spegel, flux-operator) used only during initial bootstrap.

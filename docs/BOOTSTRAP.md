@@ -98,26 +98,40 @@ By default Flux will periodically check the git repository for changes. To have 
 ### ⚙️ Updating Talos node configuration
 
 > [!TIP]
-> Ensure you have updated `talconfig.yaml` and any patches with your updated configuration. In some cases you **not only need to apply the configuration but also upgrade Talos** to apply the new configuration.
+> Ensure you have updated `topf.yaml` and any patches with your updated configuration. In some cases you **not only need to apply the configuration but also upgrade Talos** to apply the new configuration.
+
+There is no separate generate step — topf builds the machine configs and pushes them in one go.
 
 ```sh
-# (Re)generate the Talos config
-just talos generate-config
+# Review what would change on the live cluster
+just talos diff
 
 # Apply the config to a node (mode defaults to auto)
 just talos apply-node <node> [mode]
-# e.g. just talos apply-node 10.0.100.11 auto
+# e.g. just talos apply-node jit-talos-01 auto
+#      just talos apply-node 10.0.100.11 auto   (an IP works too)
+
+# Or apply to every node, one control plane at a time
+just talos apply
+```
+
+```sh
+# Render the machine configs to talos/output/ for inspection, without applying
+just talos render
 ```
 
 ### ⬆️ Updating Talos and Kubernetes versions
 
 > [!TIP]
-> Ensure the `talosVersion` and `kubernetesVersion` in `talenv.yaml` are set to the versions you wish to upgrade to.
+> Ensure the `talosVersion` and `kubernetesVersion` in `topf.yaml` are set to the versions you wish to upgrade to.
+
+> [!IMPORTANT]
+> topf v0.x supports **Talos v1.13.x only**. A Talos minor upgrade beyond that needs a topf release that supports it first.
 
 ```sh
-# Upgrade a single node to a newer Talos version
+# Upgrade a single node to a newer Talos version (cordons and drains first)
 just talos upgrade-node <node>
-# e.g. just talos upgrade-node 10.0.100.11
+# e.g. just talos upgrade-node jit-talos-01
 ```
 
 ```sh
@@ -138,14 +152,24 @@ Keep in mind it is recommended to have an **odd number** of control plane nodes 
    talosctl get links -n <ip> --insecure
    ```
 
-3. **Update the configuration**: read the [talhelper](https://budimanjojo.github.io/talhelper/latest/) documentation and extend `talconfig.yaml` with the new node information (including the disk and MAC address from step 2).
+3. **Update the configuration**: read the [topf](https://postfinance.github.io/topf/) documentation, then
 
-4. **Generate and apply the configuration**:
+   - add the node to the `nodes:` list in `talos/topf.yaml` (`host`, `ip`, `role`), and
+   - create `talos/node/<hostname>/` with a `00-hostname.yaml` (`HostnameConfig`) and a
+     `50-network.yaml` carrying the node's `LinkAliasConfig`/`LinkConfig`/`Layer2VIPConfig`
+     documents, using the disk and MAC addresses from step 2. Copy an existing node's
+     directory as a starting point.
+
+   > [!WARNING]
+   > The `00-hostname.yaml` patch is not optional. topf's `host` field is only used for display
+   > and node selection — without a `HostnameConfig` the node names itself `talos-<random>`.
+
+4. **Review and apply the configuration**:
 
    ```sh
-   just talos generate-config
+   just talos diff
    just talos apply-node <node>
-   # e.g. just talos apply-node 10.0.100.14
+   # e.g. just talos apply-node jit-talos-04
    ```
 
    The node should join the cluster automatically and workloads will be scheduled once it reports as ready.

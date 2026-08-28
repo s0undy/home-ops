@@ -1,0 +1,22 @@
+---
+clusterName: kubernetes
+clusterEndpoint: https://10.0.100.10:6443
+
+# renovate: datasource=docker depName=ghcr.io/siderolabs/installer
+talosVersion: v1.13.4
+# renovate: datasource=docker depName=ghcr.io/siderolabs/kubelet
+kubernetesVersion: v1.36.2
+
+schematicId: "@schematic.yaml"
+secretsPath: talsecret.sops.yaml
+
+nodes:
+  - host: jit-talos-01
+    ip: 10.0.100.11
+    role: control-plane
+  - host: jit-talos-02
+    ip: 10.0.100.12
+    role: control-plane
+  - host: jit-talos-03
+    ip: 10.0.100.13
+    role: control-plane
