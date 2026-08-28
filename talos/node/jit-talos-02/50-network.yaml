@@ -1,0 +1,58 @@
+---
+apiVersion: v1alpha1
+kind: LinkAliasConfig
+name: ethSel0
+selector:
+  match: glob("a2:19:97:ad:4b:fa", mac(link.hardware_addr))
+---
+apiVersion: v1alpha1
+kind: LinkAliasConfig
+name: ethSel1
+selector:
+  match: glob("a2:19:97:04:42:f4", mac(link.hardware_addr))
+---
+apiVersion: v1alpha1
+kind: LinkAliasConfig
+name: ethSel2
+selector:
+  match: glob("a2:19:97:03:40:d0", mac(link.hardware_addr))
+---
+apiVersion: v1alpha1
+kind: LinkAliasConfig
+name: ethSel3
+selector:
+  match: glob("a2:19:97:1a:8e:88", mac(link.hardware_addr))
+---
+apiVersion: v1alpha1
+kind: Layer2VIPConfig
+name: 10.0.100.10
+link: ethSel0
+---
+apiVersion: v1alpha1
+kind: LinkConfig
+name: ethSel0
+mtu: 1500
+addresses:
+  - address: 10.0.100.12/24
+routes:
+  - gateway: 10.0.100.1
+---
+apiVersion: v1alpha1
+kind: LinkConfig
+name: ethSel1
+mtu: 9000
+addresses:
+  - address: 172.16.52.22/24
+---
+apiVersion: v1alpha1
+kind: LinkConfig
+name: ethSel2
+mtu: 9000
+addresses:
+  - address: 172.16.60.22/24
+---
+apiVersion: v1alpha1
+kind: LinkConfig
+name: ethSel3
+addresses:
+  - address: 169.254.100.12/32

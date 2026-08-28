@@ -11,16 +11,21 @@ talos_dir := justfile_dir() / 'talos'
 talos:
     test -f "{{ justfile_dir() }}/.sops.yaml" || just log fatal "Missing SOPS config" file "{{ justfile_dir() }}/.sops.yaml"
     test -f "${SOPS_AGE_KEY_FILE}" || just log fatal "Missing SOPS age key" file "${SOPS_AGE_KEY_FILE}"
-    test -f "{{ talos_dir }}/talconfig.yaml" || just log fatal "Missing talconfig" file "{{ talos_dir }}/talconfig.yaml"
-    for bin in talhelper talosctl sops; do
+    test -f "{{ talos_dir }}/topf.yaml" || just log fatal "Missing topf config" file "{{ talos_dir }}/topf.yaml"
+    for bin in topf talosctl sops jq; do
         command -v "$bin" &>/dev/null || just log fatal "Binary not found" binary "$bin"
     done
     cd "{{ talos_dir }}"
-    [ -f talsecret.sops.yaml ] || talhelper gensecret | sops --filename-override talos/talsecret.sops.yaml --encrypt /dev/stdin > talsecret.sops.yaml
-    talhelper genconfig
-    talhelper gencommand apply --extra-flags="--insecure" | bash
-    until talhelper gencommand bootstrap | bash; do sleep 10; done
-    until talhelper gencommand kubeconfig --extra-flags="{{ justfile_dir() }} --force" | bash; do sleep 10; done
+    topf --confirm=false secrets >/dev/null
+    # topf falls back to writing the bundle in plaintext if `sops encrypt` fails,
+    # so fail loudly rather than leaving unencrypted secrets on disk
+    [[ "$(sops filestatus talsecret.sops.yaml | jq -r .encrypted)" == "true" ]] \
+        || just log fatal "Secrets bundle is not encrypted" file "{{ talos_dir }}/talsecret.sops.yaml"
+    topf talosconfig > "${TALOSCONFIG}"
+    chmod 600 "${TALOSCONFIG}"
+    topf --confirm=false apply --auto-bootstrap
+    # topf kubeconfig only issues a 12h credential, so use talosctl for the persistent one
+    until talosctl kubeconfig --force "{{ justfile_dir() }}"; do sleep 10; done
 
 [doc('Bootstrap apps into the Talos cluster')]
 apps:

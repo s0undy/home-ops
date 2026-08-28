@@ -13,6 +13,8 @@
 # Kubernetes
 kubeconfig
 talosconfig
+# Talos
+/talos/output/
 # Misc.
 .private/
 .task/

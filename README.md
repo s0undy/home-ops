@@ -38,7 +38,7 @@ The repository should look something like this. (Subject to change)
 └── 📁 components     # Re-usable kustomize components
 └── 📁 flux           # Core flux configuration
 📁 scripts            # Useful scripts
-📁 talos              # Talos configuration managed with talhelper
+📁 talos              # Talos configuration managed with topf
 ```
 
 ### Short workflow
