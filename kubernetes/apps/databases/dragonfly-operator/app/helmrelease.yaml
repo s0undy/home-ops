@@ -1,0 +1,23 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/helmrelease-helm-v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: dragonfly-operator
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: dragonfly-operator
+  interval: 1h
+  values:
+    manager:
+      image:
+        # Chart default is docker.dragonflydb.io (Docker Hub, rate limited)
+        repository: ghcr.io/dragonflydb/operator
+    grafanaDashboard:
+      enabled: true
+      folder: Dragonfly
+      grafanaOperator:
+        enabled: true
+        matchLabels:
+          dashboards: grafana
