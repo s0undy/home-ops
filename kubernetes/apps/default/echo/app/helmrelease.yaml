@@ -9,63 +9,25 @@ spec:
     name: echo
   interval: 1h
   values:
-    controllers:
-      echo:
-        strategy: RollingUpdate
-        containers:
-          app:
-            image:
-              repository: ghcr.io/mendhak/http-https-echo
-              tag: 41
-            env:
-              HTTP_PORT: &port 80
-              LOG_WITHOUT_NEWLINE: true
-              LOG_IGNORE_PATH: /healthz
-              PROMETHEUS_ENABLED: true
-            probes:
-              liveness: &probes
-                enabled: true
-                custom: true
-                spec:
-                  httpGet:
-                    path: /healthz
-                    port: *port
-                  initialDelaySeconds: 0
-                  periodSeconds: 10
-                  timeoutSeconds: 1
-                  failureThreshold: 3
-              readiness: *probes
-            securityContext:
-              allowPrivilegeEscalation: false
-              readOnlyRootFilesystem: true
-              capabilities: { drop: ["ALL"] }
-            resources:
-              requests:
-                cpu: 10m
-              limits:
-                memory: 64Mi
-    defaultPodOptions:
-      securityContext:
-        runAsNonRoot: true
-        runAsUser: 65534
-        runAsGroup: 65534
-    service:
-      app:
-        ports:
-          http:
-            port: *port
-    serviceMonitor:
-      app:
-        endpoints:
-          - port: http
-    route:
-      app:
-        hostnames: ["{{ .Release.Name }}.${SECRET_DOMAIN}"]
-        parentRefs:
-          - name: envoy-external
-            namespace: network
-            sectionName: https
-        rules:
-          - backendRefs:
-              - identifier: app
-                port: *port
+    config:
+      # Response shaping (echo-delay / echo-code / echo-header) is off: echo is public
+      # via the Cloudflare tunnel and echo-delay would let anyone hold connections open.
+      commandsEnabled: false
+      # X-Forwarded-For is only trusted from the pod and node networks, so the echoed
+      # client IP and protocol reflect the real caller rather than Envoy's pod IP.
+      trustedProxies: ["10.42.0.0/16", "10.0.100.0/24"]
+    httpRoute:
+      enabled: true
+      hostnames: ["echo.${SECRET_DOMAIN}"]
+      parentRefs:
+        - name: envoy-external
+          namespace: network
+          sectionName: https
+    monitoring:
+      serviceMonitor:
+        enabled: true
+    resources:
+      requests:
+        cpu: 10m
+      limits:
+        memory: 64Mi
