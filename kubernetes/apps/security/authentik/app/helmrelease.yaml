@@ -1,0 +1,82 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app authentik
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: *app
+  interval: 1h
+  values:
+    global:
+      podAnnotations:
+        reloader.stakater.com/auto: "true"
+      deploymentStrategy:
+        type: RollingUpdate
+      env:
+        - name: AUTHENTIK_POSTGRESQL__PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: authentik-secret
+              key: AUTHENTIK_POSTGRESQL__PASSWORD
+        # CNPG serves TLS with its own CA; the chart default `verify-ca` would
+        # require mounting that CA into the pods.
+        - name: AUTHENTIK_POSTGRESQL__SSLMODE
+          value: require
+      envFrom:
+        # AUTHENTIK_SECRET_KEY and the AUTHENTIK_BOOTSTRAP_* values
+        - secretRef:
+            name: authentik-secret
+    authentik:
+      log_level: info
+      postgresql:
+        host: postgres-rw.databases.svc.cluster.local
+        name: *app
+        user: *app
+        port: 5432
+    server:
+      replicas: 1
+      initContainers:
+        - name: 01-init-db
+          image: ghcr.io/home-operations/postgres-init:18
+          envFrom:
+            - secretRef:
+                name: authentik-init-db-secret
+      resources:
+        requests:
+          cpu: 100m
+          memory: 512Mi
+        limits:
+          memory: 1Gi
+      metrics:
+        enabled: true
+        serviceMonitor:
+          enabled: true
+      route:
+        main:
+          enabled: true
+          hostnames: ["auth.${SECRET_DOMAIN}"]
+          parentRefs:
+            - name: envoy-internal
+              namespace: network
+              sectionName: https
+    worker:
+      replicas: 1
+      initContainers:
+        - name: 01-init-db
+          image: ghcr.io/home-operations/postgres-init:18
+          envFrom:
+            - secretRef:
+                name: authentik-init-db-secret
+      resources:
+        requests:
+          cpu: 100m
+          memory: 512Mi
+        limits:
+          memory: 2Gi
+      metrics:
+        enabled: true
+        serviceMonitor:
+          enabled: true
