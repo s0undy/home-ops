@@ -4,6 +4,18 @@
 
 ### Home-ops with K8s and friends 👪
 Automated with [Flux](https://fluxcd.io), [Renovate](https://github.com/renovatebot/renovate) and [GitHub Actions](https://github.com/features/actions)  🤖
+
+[![Talos](https://kromgo.josefssonit.se/badges/talos_version)](https://www.talos.dev)&nbsp;
+[![Kubernetes](https://kromgo.josefssonit.se/badges/kubernetes_version)](https://kubernetes.io)
+
+![Nodes](https://kromgo.josefssonit.se/badges/cluster_node_count)&nbsp;
+![Pods](https://kromgo.josefssonit.se/badges/cluster_pod_count)&nbsp;
+![Images](https://kromgo.josefssonit.se/badges/image_count)&nbsp;
+![CPU](https://kromgo.josefssonit.se/badges/cluster_cpu_usage)&nbsp;
+![Memory](https://kromgo.josefssonit.se/badges/cluster_memory_usage)&nbsp;
+![Alerts](https://kromgo.josefssonit.se/badges/alerts_firing)&nbsp;
+![Age](https://kromgo.josefssonit.se/badges/cluster_age)
+
 </div>
 
 # 📄 Overview
@@ -25,6 +37,7 @@ If you find this interesting and want to get started doing something similar I c
 - [Multus](https://github.com/k8snetworkplumbingwg/multus-cni): Attaches a dedicated VPN network to the pods that need it.
 - [CloudNativePG](https://github.com/cloudnative-pg/cloudnative-pg): PostgreSQL for applications, with backups handled by [Barman Cloud](https://github.com/cloudnative-pg/plugin-barman-cloud).
 - [SOPS](https://github.com/getsops/sops): Managed secrets for Kubernetes which are committed to Git.
+- [Kromgo](https://github.com/home-operations/kromgo): Serves the cluster stat badges at the top of this README from Prometheus, without exposing Prometheus itself.
 - [Spegel](https://github.com/spegel-org/spegel): Stateless cluster local OCI registry mirror.
 
 ### Directory

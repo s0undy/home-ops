@@ -1,0 +1,94 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: kromgo
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: kromgo
+  interval: 1h
+  values:
+    config:
+      prometheus: http://kube-prometheus-stack-prometheus.o11y.svc.cluster.local:9090
+      gallery:
+        enabled: true
+      cache:
+        enabled: true
+        maxAge: 300
+      defaults:
+        badge:
+          style: flat
+      badges:
+        - id: cluster_node_count
+          title: Nodes
+          icon: mdi:server-outline
+          query: count(kube_node_info)
+          valueExpr: string(int(result))
+          colorExpr: '"blue"'
+        - id: cluster_pod_count
+          title: Pods
+          icon: mdi:cube-outline
+          query: sum(kubelet_running_pods)
+          valueExpr: string(int(result))
+          colorExpr: '"blue"'
+        - id: cluster_cpu_usage
+          title: CPU
+          icon: mdi:cpu-64-bit
+          query: cluster:node_cpu:ratio_rate5m * 100
+          valueExpr: humanizeFloat(math.round(result)) + "%"
+          colorExpr: colorScale(result, [50.0, 80.0], ["green", "orange", "red"])
+        - id: cluster_memory_usage
+          title: Memory
+          icon: mdi:memory
+          query: (1 - sum(node_memory_MemAvailable_bytes) / sum(node_memory_MemTotal_bytes)) * 100
+          valueExpr: humanizeFloat(math.round(result)) + "%"
+          colorExpr: colorScale(result, [50.0, 80.0], ["green", "orange", "red"])
+        - id: cluster_age
+          title: Age
+          icon: mdi:calendar-clock
+          query: time() - min(kube_node_created)
+          valueExpr: humanizeDurationDays(result)
+          colorExpr: '"blue"'
+        - id: talos_version
+          title: Talos
+          icon: mdi:server-network
+          # kube_node_info carries os_image="Talos (v1.13.9)"; max by () collapses the three
+          # nodes to a single series. The "Talos (...)" wrapper is stripped in CEL rather than
+          # with PromQL label_replace, since PromQL rejects \( inside a string literal.
+          query: max by (os_image) (kube_node_info)
+          valueExpr: labels[?"os_image"].orValue("unknown").replace("Talos (", "").replace(")", "")
+          colorExpr: '"blue"'
+        - id: kubernetes_version
+          title: Kubernetes
+          icon: si:kubernetes
+          query: max by (git_version) (kubernetes_build_info{job="apiserver"})
+          valueExpr: labels[?"git_version"].orValue("unknown")
+          colorExpr: '"blue"'
+        - id: alerts_firing
+          title: Alerts
+          icon: mdi:bell-alert-outline
+          query: count(ALERTS{alertstate="firing"}) or vector(0) # `or vector(0)` so zero alerts isn't an empty vector
+          valueExpr: string(int(result))
+          colorExpr: colorScale(result, [1.0, 5.0], ["green", "orange", "red"])
+        - id: image_count
+          title: Images
+          icon: si:docker
+          query: count(count by (image_spec) (kube_pod_container_info))
+          valueExpr: string(int(result))
+          colorExpr: '"blue"'
+    httpRoute:
+      enabled: true
+      hostnames: ["kromgo.${SECRET_DOMAIN}"]
+      parentRefs:
+        - name: envoy-external
+          namespace: network
+          sectionName: https
+    monitoring:
+      serviceMonitor:
+        enabled: true
+    resources:
+      requests:
+        cpu: 10m
+      limits:
+        memory: 128Mi
