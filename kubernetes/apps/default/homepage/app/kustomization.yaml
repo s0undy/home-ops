@@ -4,3 +4,20 @@ kind: Kustomization
 resources:
   - ./ocirepository.yaml
   - ./helmrelease.yaml
+configMapGenerator:
+  - name: homepage-configmap
+    files:
+      - ./resources/kubernetes.yaml
+      - ./resources/settings.yaml
+      - ./resources/widgets.yaml
+      - ./resources/services.yaml
+      - ./resources/bookmarks.yaml
+      # homepage initializes every skeleton config on its hot paths and exits when it
+      # cannot create one on the read-only mount, so all nine must exist even unused.
+      # A missing proxmox.yaml is what crash-looped the first deploy.
+      - ./resources/docker.yaml
+      - ./resources/proxmox.yaml
+      - ./resources/custom.css
+      - ./resources/custom.js
+generatorOptions:
+  disableNameSuffixHash: true

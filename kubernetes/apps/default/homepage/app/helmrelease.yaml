@@ -12,29 +12,19 @@ spec:
   values:
     controllers:
       homepage:
+        strategy: RollingUpdate
         annotations:
+          # The generated ConfigMap has no name suffix hash, so roll on config change.
           reloader.stakater.com/auto: "true"
-        serviceAccount:
-          identifier: homepage
         containers:
           app:
             image:
               repository: ghcr.io/gethomepage/homepage
               tag: v2.1.2
             env:
-              # Declared as a list, not a map: Kubernetes only expands $(VAR) for
-              # variables defined earlier in the list, and app-template sorts a map
-              # by key, which would put HOMEPAGE_ALLOWED_HOSTS before MY_POD_IP.
-              - name: MY_POD_IP
-                valueFrom:
-                  fieldRef:
-                    fieldPath: status.podIP
-              # The pod-IP entry is required, otherwise the kubelet probe's Host
-              # header is rejected and the container never becomes ready.
-              - name: HOMEPAGE_ALLOWED_HOSTS
-                value: "$(MY_POD_IP):3000,homepage.${SECRET_DOMAIN}"
-              - name: TZ
-                value: "${TZ}"
+              TZ: "${TZ}"
+              LOG_TARGETS: stdout
+              HOMEPAGE_ALLOWED_HOSTS: "homepage.${SECRET_DOMAIN}"
             probes:
               liveness: &probes
                 enabled: true
@@ -43,17 +33,32 @@ spec:
                   httpGet:
                     path: /api/healthcheck
                     port: &port 3000
-                  initialDelaySeconds: 5
-                  periodSeconds: 15
-                  timeoutSeconds: 3
-                  failureThreshold: 3
+                    # HOMEPAGE_ALLOWED_HOSTS rejects the kubelet's IP-based Host header,
+                    # so the probes present localhost, which homepage always allows.
+                    httpHeaders: &probeHeaders
+                      - name: Host
+                        value: localhost:3000
+                  periodSeconds: 30
+                  timeoutSeconds: 10
+                  failureThreshold: 5
               readiness: *probes
+              startup:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /api/healthcheck
+                    port: *port
+                    httpHeaders: *probeHeaders
+                  periodSeconds: 5
+                  failureThreshold: 30
             securityContext:
               allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
               capabilities: { drop: ["ALL"] }
             resources:
               requests:
-                cpu: 10m
+                cpu: 50m
                 memory: 128Mi
               limits:
                 memory: 512Mi
@@ -78,7 +83,7 @@ spec:
           rules:
             # namespaces/pods/nodes back the kubernetes and resources widgets
             - apiGroups: [""]
-              resources: [namespaces, pods, nodes]
+              resources: [namespaces, pods, nodes, services]
               verbs: [get, list]
             # gateways is required as well as httproutes: homepage reads the parent
             # Gateway's listener to decide whether a discovered link is http or https.
@@ -95,86 +100,24 @@ spec:
             identifier: homepage
           subjects:
             - identifier: homepage
-    configMaps:
-      config:
-        data:
-          kubernetes.yaml: |
-            mode: cluster
-            gateway: true
-            ingress: false
-            traefik: false
-          settings.yaml: |
-            title: home-ops
-            headerStyle: clean
-            layout:
-              Media:
-                style: row
-                columns: 3
-              Observability:
-                style: row
-                columns: 3
-              Infrastructure:
-                style: row
-                columns: 3
-          widgets.yaml: |
-            - kubernetes:
-                cluster:
-                  show: true
-                  cpu: true
-                  memory: true
-                  showLabel: true
-                  label: cluster
-                nodes:
-                  show: true
-                  cpu: true
-                  memory: true
-                  showLabel: true
-            - resources:
-                backend: resources
-                expanded: true
-                cpu: true
-                memory: true
-          # Services are discovered from annotated HTTPRoutes, so this stays empty.
-          services.yaml: ""
-          bookmarks.yaml: ""
-          docker.yaml: ""
-          custom.css: ""
-          custom.js: ""
     persistence:
+      # Mounted as a whole directory rather than per-file subPaths, so homepage sees a
+      # complete /app/config and never tries to initialize a missing skeleton file.
       config:
         type: configMap
-        identifier: config
-        # Mounted file-by-file with subPath, per upstream's reference manifest.
+        name: homepage-configmap
         globalMounts:
-          - path: /app/config/kubernetes.yaml
-            subPath: kubernetes.yaml
+          - path: /app/config
             readOnly: true
-          - path: /app/config/settings.yaml
-            subPath: settings.yaml
-            readOnly: true
-          - path: /app/config/widgets.yaml
-            subPath: widgets.yaml
-            readOnly: true
-          - path: /app/config/services.yaml
-            subPath: services.yaml
-            readOnly: true
-          - path: /app/config/bookmarks.yaml
-            subPath: bookmarks.yaml
-            readOnly: true
-          - path: /app/config/docker.yaml
-            subPath: docker.yaml
-            readOnly: true
-          - path: /app/config/custom.css
-            subPath: custom.css
-            readOnly: true
-          - path: /app/config/custom.js
-            subPath: custom.js
-            readOnly: true
-      # homepage writes its log file here, so it must be writable.
       logs:
         type: emptyDir
         globalMounts:
           - path: /app/config/logs
+      # Next.js writes its runtime cache here, which readOnlyRootFilesystem forbids.
+      cache:
+        type: emptyDir
+        globalMounts:
+          - path: /app/.next/cache
     service:
       app:
         controller: *app

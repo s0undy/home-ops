@@ -1,0 +1,13 @@
+---
+title: home-ops
+headerStyle: clean
+layout:
+  Media:
+    style: row
+    columns: 3
+  Observability:
+    style: row
+    columns: 3
+  Infrastructure:
+    style: row
+    columns: 3
