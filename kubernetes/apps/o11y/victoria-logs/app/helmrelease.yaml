@@ -25,6 +25,14 @@ spec:
       retentionPeriod: 90d
       route:
         enabled: true
+        annotations:
+          gethomepage.dev/enabled: "true"
+          gethomepage.dev/name: VictoriaLogs
+          gethomepage.dev/group: Observability
+          gethomepage.dev/icon: mdi-text-search
+          gethomepage.dev/description: Log storage and query
+          # Route is named victoria-logs but the pods are labelled victoria-logs-single
+          gethomepage.dev/pod-selector: app.kubernetes.io/name=victoria-logs-single
         hostnames:
           - "vlogs.${SECRET_DOMAIN}"
         parentRefs:

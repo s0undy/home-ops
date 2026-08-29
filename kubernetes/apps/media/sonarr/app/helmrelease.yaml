@@ -61,6 +61,12 @@ spec:
             port: 8989
     route:
       app:
+        annotations:
+          gethomepage.dev/enabled: "true"
+          gethomepage.dev/name: Sonarr
+          gethomepage.dev/group: Media
+          gethomepage.dev/icon: sonarr.png
+          gethomepage.dev/description: TV library manager
         hostnames:
           - "{{ .Release.Name }}.${SECRET_DOMAIN}"
         parentRefs:

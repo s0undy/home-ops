@@ -14,6 +14,14 @@ spec:
       route:
         main:
           enabled: true
+          annotations:
+            gethomepage.dev/enabled: "true"
+            gethomepage.dev/name: Alertmanager
+            gethomepage.dev/group: Observability
+            gethomepage.dev/icon: alertmanager.png
+            gethomepage.dev/description: Alert routing and silencing
+            # Route name is kube-prometheus-stack-alertmanager; pods are labelled alertmanager
+            gethomepage.dev/pod-selector: app.kubernetes.io/name=alertmanager
           hostnames:
             - alertmanager.${SECRET_DOMAIN}
           parentRefs:
@@ -39,6 +47,14 @@ spec:
       route:
         main:
           enabled: true
+          annotations:
+            gethomepage.dev/enabled: "true"
+            gethomepage.dev/name: Prometheus
+            gethomepage.dev/group: Observability
+            gethomepage.dev/icon: prometheus.png
+            gethomepage.dev/description: Metrics and alerting rules
+            # Route name is kube-prometheus-stack-prometheus; pods are labelled prometheus
+            gethomepage.dev/pod-selector: app.kubernetes.io/name=prometheus
           hostnames:
             - prometheus.${SECRET_DOMAIN}
           parentRefs:

@@ -57,6 +57,14 @@ spec:
       route:
         main:
           enabled: true
+          annotations:
+            gethomepage.dev/enabled: "true"
+            gethomepage.dev/name: Authentik
+            gethomepage.dev/group: Infrastructure
+            gethomepage.dev/icon: authentik.png
+            gethomepage.dev/description: Identity provider and SSO
+            # Server and worker pods share the name label, so select on component
+            gethomepage.dev/pod-selector: app.kubernetes.io/name=authentik,app.kubernetes.io/component=server
           hostnames: ["auth.${SECRET_DOMAIN}"]
           parentRefs:
             - name: envoy-internal

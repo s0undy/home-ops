@@ -61,6 +61,12 @@ spec:
             port: 7878
     route:
       app:
+        annotations:
+          gethomepage.dev/enabled: "true"
+          gethomepage.dev/name: Radarr
+          gethomepage.dev/group: Media
+          gethomepage.dev/icon: radarr.png
+          gethomepage.dev/description: Movie library manager
         hostnames:
           - "{{ .Release.Name }}.${SECRET_DOMAIN}"
         parentRefs:
