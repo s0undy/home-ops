@@ -61,6 +61,12 @@ spec:
             port: 9696
     route:
       app:
+        annotations:
+          gethomepage.dev/enabled: "true"
+          gethomepage.dev/name: Prowlarr
+          gethomepage.dev/group: Media
+          gethomepage.dev/icon: prowlarr.png
+          gethomepage.dev/description: Indexer manager
         hostnames:
           - "{{ .Release.Name }}.${SECRET_DOMAIN}"
         parentRefs:

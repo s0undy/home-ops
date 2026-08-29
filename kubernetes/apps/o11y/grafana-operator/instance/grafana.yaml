@@ -53,6 +53,15 @@ spec:
               persistentVolumeClaim:
                 claimName: grafana-pvc
   httpRoute:
+    metadata:
+      annotations:
+        gethomepage.dev/enabled: "true"
+        gethomepage.dev/name: Grafana
+        gethomepage.dev/group: Observability
+        gethomepage.dev/icon: grafana.png
+        gethomepage.dev/description: Dashboards and visualisation
+        # Route is named grafana-httproute; the pods are labelled grafana
+        gethomepage.dev/pod-selector: app.kubernetes.io/name=grafana
     spec:
       hostnames:
         - "grafana.${SECRET_DOMAIN}"

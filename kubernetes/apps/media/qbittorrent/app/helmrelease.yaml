@@ -77,6 +77,12 @@ spec:
             port: *port
     route:
       app:
+        annotations:
+          gethomepage.dev/enabled: "true"
+          gethomepage.dev/name: qBittorrent
+          gethomepage.dev/group: Media
+          gethomepage.dev/icon: qbittorrent.png
+          gethomepage.dev/description: Torrent client
         hostnames:
           - "{{ .Release.Name }}.${SECRET_DOMAIN}"
         parentRefs:

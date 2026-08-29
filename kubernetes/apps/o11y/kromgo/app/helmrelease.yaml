@@ -79,6 +79,12 @@ spec:
           colorExpr: '"blue"'
     httpRoute:
       enabled: true
+      annotations:
+        gethomepage.dev/enabled: "true"
+        gethomepage.dev/name: Kromgo
+        gethomepage.dev/group: Observability
+        gethomepage.dev/icon: mdi-chart-box
+        gethomepage.dev/description: Prometheus metrics as badges
       hostnames: ["kromgo.${SECRET_DOMAIN}"]
       parentRefs:
         - name: envoy-external
