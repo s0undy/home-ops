@@ -84,7 +84,7 @@ spec:
           - path: /config
       media:
         type: nfs
-        server: horrea-10.${SECRET_DOMAIN}"
+        server: horrea-10.${SECRET_DOMAIN}
         path: /mnt/tank/Media
         globalMounts:
           - path: /media
