@@ -46,7 +46,7 @@ kubernetes/apps/<namespace>/            # one directory per namespace
 
 - The namespace-level `kustomization.yaml` includes the `../../components/sops` component, which provides the `cluster-secrets` Secret to the namespace.
 - App `ks.yaml` files use `postBuild.substituteFrom: cluster-secrets`, so manifests can reference variables like `${SECRET_DOMAIN}`.
-- Most workloads use the bjw-s `app-template` Helm chart via an `OCIRepository`; `kubernetes/apps/default/echo` is the reference example.
+- Most workloads use the bjw-s `app-template` Helm chart via an `OCIRepository`; `kubernetes/apps/media/radarr` is the reference example.
 - HTTPRoutes attach to the Envoy Gateway parentRefs `envoy-external` or `envoy-internal` in the `network` namespace; external-dns creates DNS records accordingly (Cloudflare for external, UniFi/UDM Pro for internal).
 
 ### Secrets
