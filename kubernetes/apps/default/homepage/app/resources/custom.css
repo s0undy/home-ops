@@ -59,27 +59,6 @@ body {
   outline: none !important;
 }
 
-/* Node stats get their own full-width row below the greeting rather than crowding
-   it. kubernetes is not in rightAlignedWidgets, so it is a direct child of
-   #widgets-wrap and flex-basis wraps it cleanly. */
-.information-widget-kubernetes {
-  flex-basis: 100%;
-  order: 99;
-  margin-top: 1.5rem;
-  opacity: 0.55;
-  transition: opacity 0.15s ease;
-}
-
-.information-widget-kubernetes:hover {
-  opacity: 0.9;
-}
-
-/* Ships as justify-between, which strands three nodes across the whole width. */
-.information-widget-kubernetes > div {
-  justify-content: flex-start !important;
-  gap: 1.5rem;
-}
-
 /* -------------------------------------------------------------- groups ---- */
 #services {
   margin: 1.5rem 2rem;
