@@ -131,7 +131,7 @@ spec:
             "label": "Host",
             "datasource": {
               "type": "prometheus",
-              "uid": "${DS_PROMETHEUS}"
+              "uid": "$${DS_PROMETHEUS}"
             },
             "query": {
               "qryType": 1,
@@ -147,7 +147,7 @@ spec:
                 "All"
               ],
               "value": [
-                "$__all"
+                "$$__all"
               ]
             },
             "refresh": 2,
@@ -162,7 +162,7 @@ spec:
           "title": "Endurance used",
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "$${DS_PROMETHEUS}"
           },
           "gridPos": {
             "h": 8,
@@ -209,9 +209,9 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_PROMETHEUS}"
+                "uid": "$${DS_PROMETHEUS}"
               },
-              "expr": "nvme_percentage_used_ratio{job=\"proxmox-node\", instance=~\"$instance\"}",
+              "expr": "nvme_percentage_used_ratio{job=\"proxmox-node\", instance=~\"$$instance\"}",
               "legendFormat": "{{instance}} {{device}}",
               "refId": "A"
             }
@@ -237,7 +237,7 @@ spec:
           "title": "Available spare",
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "$${DS_PROMETHEUS}"
           },
           "gridPos": {
             "h": 8,
@@ -284,9 +284,9 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_PROMETHEUS}"
+                "uid": "$${DS_PROMETHEUS}"
               },
-              "expr": "nvme_available_spare_ratio{job=\"proxmox-node\", instance=~\"$instance\"}",
+              "expr": "nvme_available_spare_ratio{job=\"proxmox-node\", instance=~\"$$instance\"}",
               "legendFormat": "{{instance}} {{device}}",
               "refId": "A"
             }
@@ -312,7 +312,7 @@ spec:
           "title": "Temperature",
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "$${DS_PROMETHEUS}"
           },
           "gridPos": {
             "h": 8,
@@ -349,9 +349,9 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_PROMETHEUS}"
+                "uid": "$${DS_PROMETHEUS}"
               },
-              "expr": "nvme_temperature_celsius{job=\"proxmox-node\", instance=~\"$instance\"}",
+              "expr": "nvme_temperature_celsius{job=\"proxmox-node\", instance=~\"$$instance\"}",
               "legendFormat": "{{instance}} {{device}}",
               "refId": "A"
             }
@@ -378,7 +378,7 @@ spec:
           "title": "Media errors (cumulative)",
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "$${DS_PROMETHEUS}"
           },
           "gridPos": {
             "h": 8,
@@ -420,9 +420,9 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_PROMETHEUS}"
+                "uid": "$${DS_PROMETHEUS}"
               },
-              "expr": "nvme_media_errors_total{job=\"proxmox-node\", instance=~\"$instance\"}",
+              "expr": "nvme_media_errors_total{job=\"proxmox-node\", instance=~\"$$instance\"}",
               "legendFormat": "{{instance}} {{device}}",
               "refId": "A"
             }
@@ -449,7 +449,7 @@ spec:
           "title": "Data written per day",
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "$${DS_PROMETHEUS}"
           },
           "gridPos": {
             "h": 8,
@@ -486,9 +486,9 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_PROMETHEUS}"
+                "uid": "$${DS_PROMETHEUS}"
               },
-              "expr": "increase(nvme_data_units_written_total{job=\"proxmox-node\", instance=~\"$instance\"}[24h]) * 512000",
+              "expr": "increase(nvme_data_units_written_total{job=\"proxmox-node\", instance=~\"$$instance\"}[24h]) * 512000",
               "legendFormat": "{{instance}} {{device}}",
               "refId": "A"
             }
@@ -515,7 +515,7 @@ spec:
           "title": "Power-on hours",
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "$${DS_PROMETHEUS}"
           },
           "gridPos": {
             "h": 8,
@@ -553,9 +553,9 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_PROMETHEUS}"
+                "uid": "$${DS_PROMETHEUS}"
               },
-              "expr": "nvme_power_on_hours_total{job=\"proxmox-node\", instance=~\"$instance\"}",
+              "expr": "nvme_power_on_hours_total{job=\"proxmox-node\", instance=~\"$$instance\"}",
               "legendFormat": "{{instance}} {{device}}",
               "refId": "A"
             }
