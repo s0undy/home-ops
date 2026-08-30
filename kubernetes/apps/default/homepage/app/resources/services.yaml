@@ -1,1 +1,16 @@
 ---
+# Hosts outside the cluster, so nothing discovers them. A group named here merges
+# with the discovered group of the same name rather than duplicating it.
+- Infrastructure:
+    - TrueNAS:
+        href: https://horrea.${SECRET_DOMAIN}/
+        icon: truenas.png
+        description: Storage
+    - Proxmox:
+        href: https://pax.${SECRET_DOMAIN}:8006
+        icon: proxmox.png
+        description: Hypervisor
+    - UniFi:
+        href: https://unifi.${SECRET_DOMAIN}/
+        icon: unifi.png
+        description: Network controller

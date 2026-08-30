@@ -80,7 +80,8 @@ spec:
     httpRoute:
       enabled: true
       annotations:
-        gethomepage.dev/enabled: "true"
+        # Serves badges for the README rather than a page worth visiting.
+        gethomepage.dev/enabled: "false"
         gethomepage.dev/name: Kromgo
         gethomepage.dev/group: Observability
         gethomepage.dev/icon: mdi-chart-box
