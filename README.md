@@ -46,6 +46,7 @@ The repository should look something like this. (Subject to change)
 ```
 📁 .github            # Github workflows and Renovate config
 📁 bootstrap          # Contains necessary bootstrap components
+📁 docs               # Runbooks: BOOTSTRAP.md, PROXMOX-MONITORING.md
 📁 kubernetes
 └── 📁 apps           # Contains all applications and resources that flux will apply
 └── 📁 components     # Re-usable kustomize components

@@ -1,8 +1,11 @@
 ---
-# Ceph runs externally on the Proxmox hosts, so these dashboards have no in-cluster app
-# to sit next to. They read the mgr prometheus module metrics scraped via Rook's
-# externalMgrEndpoints. All three pick the datasource through a template variable, so
-# they need no `datasources` input mapping.
+# This file is the home for dashboards whose metrics come from outside the cluster, and
+# so have no in-cluster app to sit next to. Anything that picks its datasource through a
+# template variable needs no `datasources` input mapping; anything declaring `__inputs`
+# does.
+#
+# Ceph runs externally on the Proxmox hosts. These three read the mgr prometheus module
+# metrics collected by the `ceph` ScrapeConfig under kube-prometheus-stack/app.
 apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaDashboard
 metadata:
@@ -41,3 +44,537 @@ spec:
   grafanaCom:
     id: 5342
     revision: 9
+---
+# node_exporter on the physical Proxmox hosts (the `proxmox-node` ScrapeConfig).
+# Host-side install is documented in docs/PROXMOX-MONITORING.md.
+#
+# 1860 builds its `job` list from a query, so it picks up proxmox-node with no edits,
+# and it carries the hwmon temperature panels.
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: node-exporter-full
+spec:
+  instanceSelector:
+    matchLabels:
+      dashboards: grafana
+  folder: Proxmox
+  grafanaCom:
+    id: 1860
+    revision: 45
+---
+# SMART for the SATA SSDs. Matches the smartmon.sh output shipped by Debian's
+# prometheus-node-exporter-collectors exactly: per-attribute `smartmon_*_raw_value`
+# series carrying a `disk` label. Declares __inputs, so it needs the datasource mapping.
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: smart-disk
+spec:
+  instanceSelector:
+    matchLabels:
+      dashboards: grafana
+  folder: Proxmox
+  datasources:
+    - inputName: DS_PROMETHEUS
+      datasourceName: prometheus
+  grafanaCom:
+    id: 10530
+    revision: 7
+---
+# The NVMe drives are the Ceph OSDs, so their wear and error counters are the disk
+# metrics most worth watching — but nothing on grafana.com matches the output of
+# Debian's nvme_metrics.py. (Dashboard 16514 gets the NVMe half right and the SMART half
+# wrong: it expects smartmon_attr_value{name=...} from a different collector.) Hence the
+# only hand-authored dashboard in this repo; every other one is a grafanaCom reference.
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: proxmox-nvme
+spec:
+  instanceSelector:
+    matchLabels:
+      dashboards: grafana
+  folder: Proxmox
+  json: |
+    {
+      "title": "NVMe health",
+      "uid": "proxmox-nvme-health",
+      "tags": [
+        "proxmox",
+        "nvme",
+        "smart"
+      ],
+      "timezone": "browser",
+      "schemaVersion": 39,
+      "editable": true,
+      "refresh": "1m",
+      "time": {
+        "from": "now-7d",
+        "to": "now"
+      },
+      "templating": {
+        "list": [
+          {
+            "name": "DS_PROMETHEUS",
+            "type": "datasource",
+            "query": "prometheus",
+            "label": "Datasource",
+            "current": {},
+            "hide": 0,
+            "refresh": 1,
+            "regex": ""
+          },
+          {
+            "name": "instance",
+            "type": "query",
+            "label": "Host",
+            "datasource": {
+              "type": "prometheus",
+              "uid": "${DS_PROMETHEUS}"
+            },
+            "query": {
+              "qryType": 1,
+              "query": "label_values(nvme_percentage_used_ratio, instance)",
+              "refId": "var"
+            },
+            "definition": "label_values(nvme_percentage_used_ratio, instance)",
+            "includeAll": true,
+            "multi": true,
+            "allValue": ".*",
+            "current": {
+              "text": [
+                "All"
+              ],
+              "value": [
+                "$__all"
+              ]
+            },
+            "refresh": 2,
+            "sort": 1
+          }
+        ]
+      },
+      "panels": [
+        {
+          "id": 1,
+          "type": "bargauge",
+          "title": "Endurance used",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 0,
+            "y": 0
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "drawStyle": "line",
+                "lineWidth": 2,
+                "fillOpacity": 8,
+                "showPoints": "never",
+                "spanNulls": true
+              },
+              "unit": "percentunit",
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "yellow",
+                    "value": 0.6
+                  },
+                  {
+                    "color": "red",
+                    "value": 0.8
+                  }
+                ]
+              },
+              "min": 0,
+              "max": 1
+            },
+            "overrides": []
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${DS_PROMETHEUS}"
+              },
+              "expr": "nvme_percentage_used_ratio{job=\"proxmox-node\", instance=~\"$instance\"}",
+              "legendFormat": "{{instance}} {{device}}",
+              "refId": "A"
+            }
+          ],
+          "options": {
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "orientation": "horizontal",
+            "displayMode": "gradient",
+            "showUnfilled": true,
+            "minVizWidth": 8,
+            "minVizHeight": 16
+          }
+        },
+        {
+          "id": 2,
+          "type": "bargauge",
+          "title": "Available spare",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 12,
+            "y": 0
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "drawStyle": "line",
+                "lineWidth": 2,
+                "fillOpacity": 8,
+                "showPoints": "never",
+                "spanNulls": true
+              },
+              "unit": "percentunit",
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "red",
+                    "value": null
+                  },
+                  {
+                    "color": "yellow",
+                    "value": 0.1
+                  },
+                  {
+                    "color": "green",
+                    "value": 0.2
+                  }
+                ]
+              },
+              "min": 0,
+              "max": 1
+            },
+            "overrides": []
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${DS_PROMETHEUS}"
+              },
+              "expr": "nvme_available_spare_ratio{job=\"proxmox-node\", instance=~\"$instance\"}",
+              "legendFormat": "{{instance}} {{device}}",
+              "refId": "A"
+            }
+          ],
+          "options": {
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "orientation": "horizontal",
+            "displayMode": "gradient",
+            "showUnfilled": true,
+            "minVizWidth": 8,
+            "minVizHeight": 16
+          }
+        },
+        {
+          "id": 3,
+          "type": "timeseries",
+          "title": "Temperature",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 0,
+            "y": 8
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "drawStyle": "line",
+                "lineWidth": 2,
+                "fillOpacity": 8,
+                "showPoints": "never",
+                "spanNulls": true
+              },
+              "unit": "celsius",
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${DS_PROMETHEUS}"
+              },
+              "expr": "nvme_temperature_celsius{job=\"proxmox-node\", instance=~\"$instance\"}",
+              "legendFormat": "{{instance}} {{device}}",
+              "refId": "A"
+            }
+          ],
+          "options": {
+            "legend": {
+              "displayMode": "table",
+              "placement": "bottom",
+              "calcs": [
+                "lastNotNull",
+                "max"
+              ],
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
+          }
+        },
+        {
+          "id": 4,
+          "type": "timeseries",
+          "title": "Media errors (cumulative)",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 12,
+            "y": 8
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "drawStyle": "line",
+                "lineWidth": 2,
+                "fillOpacity": 8,
+                "showPoints": "never",
+                "spanNulls": true
+              },
+              "unit": "short",
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 1
+                  }
+                ]
+              },
+              "decimals": 0
+            },
+            "overrides": []
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${DS_PROMETHEUS}"
+              },
+              "expr": "nvme_media_errors_total{job=\"proxmox-node\", instance=~\"$instance\"}",
+              "legendFormat": "{{instance}} {{device}}",
+              "refId": "A"
+            }
+          ],
+          "options": {
+            "legend": {
+              "displayMode": "table",
+              "placement": "bottom",
+              "calcs": [
+                "lastNotNull",
+                "max"
+              ],
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
+          }
+        },
+        {
+          "id": 5,
+          "type": "timeseries",
+          "title": "Data written per day",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 0,
+            "y": 16
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "drawStyle": "line",
+                "lineWidth": 2,
+                "fillOpacity": 8,
+                "showPoints": "never",
+                "spanNulls": true
+              },
+              "unit": "bytes",
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${DS_PROMETHEUS}"
+              },
+              "expr": "increase(nvme_data_units_written_total{job=\"proxmox-node\", instance=~\"$instance\"}[24h]) * 512000",
+              "legendFormat": "{{instance}} {{device}}",
+              "refId": "A"
+            }
+          ],
+          "options": {
+            "legend": {
+              "displayMode": "table",
+              "placement": "bottom",
+              "calcs": [
+                "lastNotNull",
+                "max"
+              ],
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
+          }
+        },
+        {
+          "id": 6,
+          "type": "timeseries",
+          "title": "Power-on hours",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 12,
+            "y": 16
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "drawStyle": "line",
+                "lineWidth": 2,
+                "fillOpacity": 8,
+                "showPoints": "never",
+                "spanNulls": true
+              },
+              "unit": "h",
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  }
+                ]
+              },
+              "decimals": 0
+            },
+            "overrides": []
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${DS_PROMETHEUS}"
+              },
+              "expr": "nvme_power_on_hours_total{job=\"proxmox-node\", instance=~\"$instance\"}",
+              "legendFormat": "{{instance}} {{device}}",
+              "refId": "A"
+            }
+          ],
+          "options": {
+            "legend": {
+              "displayMode": "table",
+              "placement": "bottom",
+              "calcs": [
+                "lastNotNull",
+                "max"
+              ],
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
+          }
+        }
+      ]
+    }

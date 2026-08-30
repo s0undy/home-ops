@@ -1,0 +1,90 @@
+---
+# Alerts for the physical Proxmox hosts scraped by the `proxmox-node` job.
+#
+# The chart's node-exporter mixin rules all match job="node-exporter", which is the
+# Talos VMs, so these hosts would otherwise have no alert coverage at all.
+#
+# Kept as a standalone PrometheusRule rather than another entry in the HelmRelease's
+# additionalPrometheusRulesMap (where the OomKilled rule lives) because a group this
+# size is far easier to read and edit as real YAML than as an inline values blob.
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: proxmox-nodes
+spec:
+  groups:
+    - name: proxmox-nodes
+      rules:
+        - alert: ProxmoxHostDown
+          expr: up{job="proxmox-node"} == 0
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: Proxmox host {{ $labels.instance }} is not responding to scrapes.
+
+        - alert: ProxmoxFilesystemAlmostFull
+          expr: |
+            node_filesystem_avail_bytes{job="proxmox-node",fstype!=""}
+              / node_filesystem_size_bytes{job="proxmox-node",fstype!=""} * 100 < 10
+          for: 30m
+          labels:
+            severity: warning
+          annotations:
+            summary: Filesystem {{ $labels.mountpoint }} on Proxmox host {{ $labels.instance }} has {{ printf "%.1f" $value }}% space left.
+
+        # Self-calibrating: compares each sensor against the critical threshold that
+        # chip publishes, so it only covers chips that expose one and needs no
+        # per-hardware tuning.
+        - alert: ProxmoxHighTemperature
+          expr: |
+            node_hwmon_temp_celsius{job="proxmox-node"}
+              > on (instance, chip, sensor) group_left ()
+                node_hwmon_temp_crit_celsius{job="proxmox-node"} * 0.9
+          for: 10m
+          labels:
+            severity: warning
+          annotations:
+            summary: Sensor {{ $labels.sensor }} on Proxmox host {{ $labels.instance }} is at {{ printf "%.0f" $value }}°C, within 10% of its critical threshold.
+
+        - alert: ProxmoxSmartUnhealthy
+          expr: smartmon_device_smart_healthy == 0
+          for: 15m
+          labels:
+            severity: critical
+          annotations:
+            summary: Disk {{ $labels.disk }} on {{ $labels.instance }} reports SMART health FAILED.
+
+        # nvme_percentage_used_ratio is a 0-1 ratio (nvme_metrics.py divides the raw
+        # NVMe percentage by 100), not a percentage.
+        - alert: ProxmoxNvmeWearHigh
+          expr: nvme_percentage_used_ratio > 0.8
+          for: 1h
+          labels:
+            severity: warning
+          annotations:
+            summary: NVMe {{ $labels.device }} on {{ $labels.instance }} is at {{ $value | humanizePercentage }} of its rated endurance.
+
+        - alert: ProxmoxNvmeMediaErrors
+          expr: increase(nvme_media_errors_total[24h]) > 0
+          for: 15m
+          labels:
+            severity: warning
+          annotations:
+            summary: NVMe {{ $labels.device }} on {{ $labels.instance }} logged {{ $value }} media errors in the last 24h.
+
+        - alert: ProxmoxNvmeCriticalWarning
+          expr: nvme_critical_warning > 0
+          for: 15m
+          labels:
+            severity: critical
+          annotations:
+            summary: NVMe {{ $labels.device }} on {{ $labels.instance }} has raised its critical warning bitmap ({{ $value }}).
+
+        - alert: ProxmoxNvmeSpareLow
+          expr: nvme_available_spare_ratio < nvme_available_spare_threshold_ratio
+          for: 15m
+          labels:
+            severity: critical
+          annotations:
+            summary: NVMe {{ $labels.device }} on {{ $labels.instance }} has dropped below its available-spare threshold.
