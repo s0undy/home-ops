@@ -4,8 +4,8 @@
 # comment in kubernetes/apps/rook-ceph/rook-ceph/cluster/helmrelease.yaml), so the mgr
 # prometheus module is scraped directly.
 #
-# Lives here rather than in the rook-ceph namespace because the Prometheus CR leaves
-# scrapeConfigNamespaceSelector null, which restricts discovery to its own namespace.
+# It sits with kube-prometheus-stack rather than under rook-ceph because it is pure
+# Prometheus scrape config for a target that has no in-cluster workload of its own.
 #
 # Only the active mgr returns metrics — the standbys answer 200 with an empty body — so
 # listing all three follows mgr failover automatically without duplicating series.
