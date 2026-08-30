@@ -1,0 +1,27 @@
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: pve-exporter
+spec:
+  dependsOn:
+    - name: kube-prometheus-stack # provides the ScrapeConfig CRD and the Prometheus that reads it
+    - name: grafana-operator # provides the GrafanaDashboard CRD
+  healthChecks:
+    - apiVersion: helm.toolkit.fluxcd.io/v2
+      kind: HelmRelease
+      name: pve-exporter
+      namespace: o11y
+  interval: 1h
+  path: ./kubernetes/apps/o11y/pve-exporter/app
+  postBuild:
+    substituteFrom:
+      - name: cluster-secrets
+        kind: Secret
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  targetNamespace: o11y
+  wait: false

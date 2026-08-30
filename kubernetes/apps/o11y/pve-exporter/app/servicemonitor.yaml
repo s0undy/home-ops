@@ -1,0 +1,15 @@
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: pve-exporter
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: pve-exporter
+      app.kubernetes.io/service: pve-exporter
+  # The exporter's own process and collector-timing metrics. The Proxmox metrics
+  # themselves come in via the `proxmox` ScrapeConfig.
+  endpoints:
+    - port: http
+      path: /metrics

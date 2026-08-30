@@ -1,0 +1,43 @@
+---
+# Ceph runs externally on the Proxmox hosts, so these dashboards have no in-cluster app
+# to sit next to. They read the mgr prometheus module metrics scraped via Rook's
+# externalMgrEndpoints. All three pick the datasource through a template variable, so
+# they need no `datasources` input mapping.
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: ceph-cluster
+spec:
+  instanceSelector:
+    matchLabels:
+      dashboards: grafana
+  folder: Ceph
+  grafanaCom:
+    id: 2842
+    revision: 18
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: ceph-osd
+spec:
+  instanceSelector:
+    matchLabels:
+      dashboards: grafana
+  folder: Ceph
+  grafanaCom:
+    id: 5336
+    revision: 9
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: ceph-pools
+spec:
+  instanceSelector:
+    matchLabels:
+      dashboards: grafana
+  folder: Ceph
+  grafanaCom:
+    id: 5342
+    revision: 9

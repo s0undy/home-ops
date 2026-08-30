@@ -1,0 +1,27 @@
+---
+apiVersion: monitoring.coreos.com/v1alpha1
+kind: ScrapeConfig
+metadata:
+  name: proxmox
+spec:
+  jobName: proxmox
+  metricsPath: /pve
+  scrapeInterval: 1m
+  params:
+    module: ["default"]
+    cluster: ["1"]
+    node: ["1"]
+  staticConfigs:
+    - targets:
+        - 172.16.24.11
+        - 172.16.24.12
+        - 172.16.24.13
+  # The exporter is a proxy, like blackbox-exporter: the PVE host goes in as the
+  # ?target= parameter and the request is sent to the exporter Service instead.
+  relabelings:
+    - sourceLabels: ["__address__"]
+      targetLabel: __param_target
+    - sourceLabels: ["__param_target"]
+      targetLabel: instance
+    - targetLabel: __address__
+      replacement: pve-exporter.o11y.svc.cluster.local:9221

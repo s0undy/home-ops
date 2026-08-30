@@ -1,0 +1,16 @@
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: proxmox
+spec:
+  instanceSelector:
+    matchLabels:
+      dashboards: grafana
+  folder: Proxmox
+  datasources:
+    - inputName: DS_PROMETHEUS
+      datasourceName: prometheus
+  grafanaCom:
+    id: 10347
+    revision: 5

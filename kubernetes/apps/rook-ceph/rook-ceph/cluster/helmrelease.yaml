@@ -37,6 +37,16 @@ spec:
       enabled: true
       metricsDisabled: false
       createPrometheusRules: true
+      # This is an external cluster, so the mgr prometheus module runs on the Proxmox
+      # hosts. Without these endpoints Rook leaves svc/rook-ceph-mgr-external empty and
+      # nothing is scraped. Addresses are on the Ceph public network (node ens19), which
+      # the nodes are directly attached to.
+      externalMgrEndpoints:
+        - ip: 172.16.52.11
+        - ip: 172.16.52.12
+        - ip: 172.16.52.13
+      externalMgrPrometheusPort: 9283
+      interval: 30s
 
     # -- Settings for the block pool snapshot class
     # @default -- See [RBD Snapshots](../Storage-Configuration/Ceph-CSI/ceph-csi-snapshot.md#rbd-snapshots)
