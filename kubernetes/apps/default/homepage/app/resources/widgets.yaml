@@ -18,12 +18,3 @@
     format:
       timeStyle: short
       hourCycle: h23
-
-# Not in index.jsx's rightAlignedWidgets, so this renders as a direct child of
-# #widgets-wrap and custom.css can drop it onto its own row under the greeting.
-- kubernetes:
-    cluster:
-      show: false
-    nodes:
-      show: true
-      showLabel: true
