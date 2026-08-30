@@ -1,0 +1,26 @@
+---
+# Ceph runs externally on the Proxmox hosts, so it has no in-cluster app to hang a
+# ServiceMonitor off. Rook's own externalMgrEndpoints plumbing is unusable (see the
+# comment in kubernetes/apps/rook-ceph/rook-ceph/cluster/helmrelease.yaml), so the mgr
+# prometheus module is scraped directly.
+#
+# Lives here rather than in the rook-ceph namespace because the Prometheus CR leaves
+# scrapeConfigNamespaceSelector null, which restricts discovery to its own namespace.
+#
+# Only the active mgr returns metrics — the standbys answer 200 with an empty body — so
+# listing all three follows mgr failover automatically without duplicating series.
+apiVersion: monitoring.coreos.com/v1alpha1
+kind: ScrapeConfig
+metadata:
+  name: ceph
+spec:
+  jobName: ceph
+  scrapeInterval: 30s
+  honorLabels: true
+  staticConfigs:
+    - targets:
+        - 172.16.52.11:9283
+        - 172.16.52.12:9283
+        - 172.16.52.13:9283
+      labels:
+        cluster: rook-ceph
