@@ -1,0 +1,29 @@
+---
+# Vendored from grafana.com dashboard 24894 ("TrueNAS", revision 1) rather than pulled
+# with `grafanaCom:`, because the published copy needs two fixes a GrafanaDashboard CR
+# cannot express:
+#
+#   * its `host` variable is a custom variable whose only value is the literal string
+#     "host", so the instance query `hddTempValue{target=~"host"}` matches nothing and
+#     every panel renders empty;
+#   * it queries `zpoolHealth` and `zfsL2ArcCacheHitRatio`, neither of which this module
+#     emits — pool health arrives as the numeric `zpoolHealthStatus`, and the MIB has no
+#     L2ARC ratio at all, only hits and misses.
+#
+# Regenerating from upstream means re-applying those edits; the reconciliation is in
+# the repo history for this file and the JSON alongside it.
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: truenas
+spec:
+  instanceSelector:
+    matchLabels:
+      dashboards: grafana
+  folder: TrueNAS
+  datasources:
+    - inputName: DS_PROMETHEUS
+      datasourceName: prometheus
+  configMapRef:
+    name: snmp-exporter-dashboards
+    key: truenas-dashboard.json

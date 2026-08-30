@@ -1,0 +1,29 @@
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: snmp-exporter
+spec:
+  dependsOn:
+    - name: kube-prometheus-stack # provides the ScrapeConfig CRD and the Prometheus that reads it
+    - name: grafana-operator # provides the GrafanaDashboard CRD
+  healthChecks:
+    - apiVersion: helm.toolkit.fluxcd.io/v2
+      kind: HelmRelease
+      name: snmp-exporter
+      namespace: o11y
+  interval: 1h
+  path: ./kubernetes/apps/o11y/snmp-exporter/app
+  # Deliberately no postBuild.substituteFrom: nothing here needs a cluster-secret
+  # variable, and leaving it off means Flux runs no envsubst over this path. That is
+  # what lets app/config/truenas-dashboard.json carry Grafana's `$instance`/`${DS_...}`
+  # tokens verbatim instead of doubling every one of them — the failure mode that
+  # pinned the grafana-instance Kustomization in commit 73faa45f. Adding postBuild
+  # here later means escaping that file first.
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  targetNamespace: o11y
+  wait: false

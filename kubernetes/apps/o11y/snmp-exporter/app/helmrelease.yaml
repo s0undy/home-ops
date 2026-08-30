@@ -1,0 +1,86 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app snmp-exporter
+spec:
+  interval: 1h
+  chartRef:
+    kind: OCIRepository
+    name: *app
+  values:
+    controllers:
+      snmp-exporter:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        containers:
+          app:
+            image:
+              repository: quay.io/prometheus/snmp-exporter
+              tag: v0.30.1
+            args:
+              # Two config files rather than one: the modules are generated and public,
+              # the community string is not. snmp_exporter merges the `auths` and
+              # `modules` maps across every --config.file, so the credential can stay in
+              # the sops-encrypted Secret and out of the ConfigMap.
+              #
+              # These paths deliberately avoid /etc/snmp_exporter, where the image ships
+              # its own 2MB stock snmp.yml covering every vendor upstream supports.
+              - --config.file=/config/snmp.yml
+              - --config.file=/config/auth.yml
+            # No TZ here on purpose: it would have to be hardcoded (this Kustomization
+            # runs no envsubst, so ${TZ} is unavailable) and snmp_exporter logs in UTC
+            # regardless.
+            probes:
+              liveness: &probe
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /-/healthy
+                    port: 9116
+                  initialDelaySeconds: 10
+                  periodSeconds: 30
+              readiness: *probe
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: { drop: ["ALL"] }
+            resources:
+              requests:
+                cpu: 10m
+                memory: 64Mi
+              limits:
+                memory: 128Mi
+    defaultPodOptions:
+      securityContext:
+        # The image runs as root by default; pin it to nobody. Numeric because
+        # runAsNonRoot cannot verify a username.
+        runAsNonRoot: true
+        runAsUser: 65534
+        runAsGroup: 65534
+        fsGroup: 65534
+        fsGroupChangePolicy: OnRootMismatch
+        seccompProfile: { type: RuntimeDefault }
+    service:
+      app:
+        controller: *app
+        ports:
+          http:
+            port: 9116
+    persistence:
+      config:
+        type: configMap
+        name: snmp-exporter-config
+        globalMounts:
+          - path: /config/snmp.yml
+            subPath: snmp.yml
+            readOnly: true
+      auth:
+        type: secret
+        name: snmp-exporter-auth
+        globalMounts:
+          - path: /config/auth.yml
+            subPath: auth.yml
+            readOnly: true

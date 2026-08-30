@@ -1,0 +1,171 @@
+---
+# snmp_exporter generator input for the TrueNAS SCALE NAS (horrea).
+#
+# This produces kubernetes/apps/o11y/snmp-exporter/app/config/snmp.yml. Run
+# ./generate.sh after changing anything here, and commit both files together.
+#
+# The walk is deliberately narrow rather than whole-subtree: SNMP walks are slow,
+# and every OID listed here is one a panel or an alert rule actually reads.
+auths:
+  # Placeholder only. The real community string is never generated into snmp.yml —
+  # it lives in the sops-encrypted auth.yml that the exporter loads as a second
+  # --config.file. See the app's secret.sops.yaml.
+  truenas_v2:
+    community: placeholder
+    version: 2
+
+modules:
+  truenas:
+    walk:
+      # --- system ---
+      - sysDescr
+      - sysName
+      - sysUpTime
+      - hrSystemUptime
+      - hrSystemProcesses
+
+      # --- mounted filesystems (HOST-RESOURCES-MIB) ---
+      # Complements datasetTable below: hrStorage is what the Grafana dashboard's
+      # `datasets` variable reads, and it also covers physical/virtual memory.
+      - hrStorageDescr
+      - hrStorageAllocationUnits
+      - hrStorageSize
+      - hrStorageUsed
+
+      # --- CPU / memory / load (UCD-SNMP-MIB) ---
+      - ssCpuUser
+      - ssCpuSystem
+      - ssCpuIdle
+      - memTotalReal
+      - memAvailReal
+      - memBuffer
+      - memCached
+      - memShared
+      - memTotalSwap
+      - memAvailSwap
+      - laNames
+      - laLoadInt
+
+      # --- network (IF-MIB) ---
+      - ifName
+      - ifAlias
+      - ifDescr
+      - ifMtu
+      - ifSpeed
+      - ifPhysAddress
+      - ifAdminStatus
+      - ifOperStatus
+      - ifHCInOctets
+      - ifHCOutOctets
+      - ifInErrors
+      - ifOutErrors
+      - ifInDiscards
+      - ifOutDiscards
+
+      # --- pools (TRUENAS-MIB) ---
+      - zpoolName
+      - zpoolHealth
+      - zpoolReadOps
+      - zpoolWriteOps
+      - zpoolReadBytes
+      - zpoolWriteBytes
+
+      # --- datasets (TRUENAS-MIB) ---
+      # datasetTable, not zvolTable: this NAS has no zvols at all, so every zvol* OID
+      # walks empty. datasetTable arrived in 25.10.3.1 and carries the same four
+      # columns for every dataset, which is what actually holds the data here.
+      - datasetDescr
+      - datasetUsedBytes
+      - datasetAvailableBytes
+      - datasetReferencedBytes
+
+      # --- disk temperatures (TRUENAS-MIB, milli-Celsius) ---
+      - hddTempDevice
+      - hddTempValue
+
+      # --- ARC / L2ARC (TRUENAS-MIB) ---
+      - zfsArcSize
+      - zfsArcMeta
+      - zfsArcData
+      - zfsArcHits
+      - zfsArcMisses
+      - zfsArcC
+      - zfsArcCacheHitRatio
+      - zfsArcCacheMissRatio
+      - zfsL2ArcHits
+      - zfsL2ArcMisses
+      - zfsL2ArcRead
+      - zfsL2ArcWrite
+      - zfsL2ArcSize
+
+    lookups:
+      # Replace every numeric table index with the name it stands for, so series are
+      # readable and stable across reboots (indexes are not).
+      - source_indexes: [ifIndex]
+        lookup: ifName
+        drop_source_indexes: true
+      - source_indexes: [hrStorageIndex]
+        lookup: hrStorageDescr
+        drop_source_indexes: true
+      - source_indexes: [laIndex]
+        lookup: laNames
+        drop_source_indexes: true
+      - source_indexes: [zpoolIndex]
+        lookup: zpoolName
+        drop_source_indexes: true
+      - source_indexes: [datasetIndex]
+        lookup: datasetDescr
+        drop_source_indexes: true
+      - source_indexes: [hddTempIndex]
+        lookup: hddTempDevice
+        drop_source_indexes: true
+
+    overrides:
+      # zpoolHealth is a DisplayString ("ONLINE", "DEGRADED", ...), which Prometheus
+      # cannot store. Map it to a numeric zpoolHealthStatus so it is alertable.
+      # 0 is healthy; anything non-zero is not. The trailing catch-all means an
+      # unrecognised state reads as a fault rather than silently disappearing.
+      zpoolHealth:
+        regex_extracts:
+          Status:
+            - regex: "ONLINE"
+              value: "0"
+            - regex: "DEGRADED"
+              value: "1"
+            - regex: "FAULTED"
+              value: "2"
+            - regex: "OFFLINE"
+              value: "3"
+            - regex: "UNAVAIL"
+              value: "4"
+            - regex: "REMOVED"
+              value: "5"
+            - regex: ".*"
+              value: "6"
+
+      # These two are DisplayString percentages ("99.42"), same problem. The capture
+      # group reference is snmp_exporter syntax, not a shell or envsubst variable.
+      zfsArcCacheHitRatio:
+        regex_extracts:
+          Percent:
+            - regex: "([0-9.]+)"
+              value: "$1"
+      zfsArcCacheMissRatio:
+        regex_extracts:
+          Percent:
+            - regex: "([0-9.]+)"
+              value: "$1"
+
+      # Carried as a label by the lookups above; no need for a series of its own.
+      ifName:
+        ignore: true
+      hrStorageDescr:
+        ignore: true
+      laNames:
+        ignore: true
+      zpoolName:
+        ignore: true
+      datasetDescr:
+        ignore: true
+      hddTempDevice:
+        ignore: true

@@ -1,0 +1,84 @@
+---
+# Alerts for the TrueNAS NAS scraped over SNMP. These sit with the exporter rather than
+# with kube-prometheus-stack because snmp-exporter is the in-cluster workload that
+# produces them — the same split as pve-exporter.
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: truenas
+spec:
+  groups:
+    - name: truenas
+      rules:
+        - alert: TruenasDown
+          expr: up{job="truenas"} == 0
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: TrueNAS {{ $labels.instance }} is not answering SNMP scrapes.
+
+        # zpoolHealth is a DisplayString in TRUENAS-MIB; the generator maps it to this
+        # numeric metric, where 0 is ONLINE and every other value is a fault state
+        # (1 DEGRADED, 2 FAULTED, 3 OFFLINE, 4 UNAVAIL, 5 REMOVED, 6 unrecognised).
+        - alert: TruenasPoolUnhealthy
+          expr: zpoolHealthStatus{job="truenas"} != 0
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: TrueNAS pool {{ $labels.zpoolName }} is not ONLINE (state code {{ $value }}).
+
+        # Restricted to pool root datasets — those whose name has no "/" — because ZFS
+        # reports the pool's shared free space as `available` on every descendant. A
+        # filling pool would otherwise fire once per dataset (52 of them here) while
+        # saying nothing extra.
+        - alert: TruenasPoolAlmostFull
+          expr: |
+            datasetAvailableBytes{job="truenas",datasetDescr!~".+/.+"}
+              / (datasetUsedBytes{job="truenas",datasetDescr!~".+/.+"}
+                 + datasetAvailableBytes{job="truenas",datasetDescr!~".+/.+"}) * 100 < 10
+          for: 30m
+          labels:
+            severity: warning
+          annotations:
+            summary: TrueNAS pool {{ $labels.datasetDescr }} has {{ printf "%.1f" $value }}% space left.
+
+        - alert: TruenasPoolCriticallyFull
+          expr: |
+            datasetAvailableBytes{job="truenas",datasetDescr!~".+/.+"}
+              / (datasetUsedBytes{job="truenas",datasetDescr!~".+/.+"}
+                 + datasetAvailableBytes{job="truenas",datasetDescr!~".+/.+"}) * 100 < 5
+          for: 15m
+          labels:
+            severity: critical
+          annotations:
+            summary: TrueNAS pool {{ $labels.datasetDescr }} has {{ printf "%.1f" $value }}% space left.
+
+        # hddTempValue is milli-Celsius. Spinning disks and NVMe get different
+        # thresholds: the HDDs idle around 30 °C and lose life expectancy past 50, while
+        # the NVMe boot drive sits at ~48 °C normally and is only worth flagging near
+        # its throttling point.
+        - alert: TruenasDiskHot
+          expr: hddTempValue{job="truenas",hddTempDevice!~"nvme.*"} / 1000 > 50
+          for: 15m
+          labels:
+            severity: warning
+          annotations:
+            summary: TrueNAS disk {{ $labels.hddTempDevice }} is at {{ printf "%.0f" $value }} °C.
+
+        - alert: TruenasDiskCriticallyHot
+          expr: hddTempValue{job="truenas",hddTempDevice!~"nvme.*"} / 1000 > 60
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: TrueNAS disk {{ $labels.hddTempDevice }} is at {{ printf "%.0f" $value }} °C.
+
+        - alert: TruenasNvmeHot
+          expr: hddTempValue{job="truenas",hddTempDevice=~"nvme.*"} / 1000 > 70
+          for: 15m
+          labels:
+            severity: warning
+          annotations:
+            summary: TrueNAS NVMe {{ $labels.hddTempDevice }} is at {{ printf "%.0f" $value }} °C.
