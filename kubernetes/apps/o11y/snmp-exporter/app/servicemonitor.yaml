@@ -1,0 +1,15 @@
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: snmp-exporter
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: snmp-exporter
+      app.kubernetes.io/service: snmp-exporter
+  # The exporter's own process and scrape-duration metrics. The NAS metrics themselves
+  # come in via the `truenas` ScrapeConfig.
+  endpoints:
+    - port: http
+      path: /metrics

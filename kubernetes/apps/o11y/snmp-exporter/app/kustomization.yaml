@@ -1,0 +1,23 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ./ocirepository.yaml
+  - ./secret.sops.yaml
+  - ./helmrelease.yaml
+  - ./scrapeconfig.yaml
+  - ./servicemonitor.yaml
+  - ./prometheusrule.yaml
+  - ./grafanadashboard.yaml
+configMapGenerator:
+  # snmp.yml is generated — see scripts/truenas-snmp/generate.sh.
+  - name: snmp-exporter-config
+    files:
+      - ./config/snmp.yml
+  - name: snmp-exporter-dashboards
+    files:
+      - ./config/truenas-dashboard.json
+generatorOptions:
+  # The GrafanaDashboard CR and the HelmRelease both reference these by a fixed name.
+  # Stakater Reloader restarts the exporter when the config content changes.
+  disableNameSuffixHash: true

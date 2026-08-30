@@ -1,0 +1,37 @@
+---
+# The TrueNAS NAS (horrea) runs outside the cluster and has no Prometheus endpoint of
+# its own — TrueNAS exports only to Graphite, and its bundled netdata is bound to
+# localhost with the web server disabled. SNMP is the one supported pull interface,
+# so the NAS is scraped through snmp-exporter.
+#
+# Host-side setup is a single toggle in the TrueNAS UI, documented in
+# docs/TRUENAS-MONITORING.md.
+apiVersion: monitoring.coreos.com/v1alpha1
+kind: ScrapeConfig
+metadata:
+  name: truenas
+spec:
+  jobName: truenas
+  metricsPath: /snmp
+  params:
+    module: ["truenas"]
+    auth: ["truenas_v2"]
+  # An SNMP walk of this many OIDs takes several seconds, and none of these metrics
+  # move fast enough to want a tighter interval.
+  scrapeInterval: 1m
+  scrapeTimeout: 30s
+  staticConfigs:
+    - targets:
+        - 172.16.32.10
+  # The exporter is a proxy, like blackbox-exporter: the NAS goes in as the ?target=
+  # parameter and the request is sent to the exporter Service instead.
+  relabelings:
+    - sourceLabels: ["__address__"]
+      targetLabel: __param_target
+    - sourceLabels: ["__param_target"]
+      targetLabel: instance
+    # The Grafana dashboard's host picker filters on `target`, so keep both labels.
+    - sourceLabels: ["__param_target"]
+      targetLabel: target
+    - targetLabel: __address__
+      replacement: snmp-exporter.o11y.svc.cluster.local:9116

@@ -12,4 +12,5 @@ resources:
   - ./kromgo/ks.yaml
   - ./kube-prometheus-stack/ks.yaml
   - ./pve-exporter/ks.yaml
+  - ./snmp-exporter/ks.yaml
   - ./victoria-logs/ks.yaml
