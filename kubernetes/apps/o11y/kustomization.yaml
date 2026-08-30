@@ -11,4 +11,5 @@ resources:
   - ./grafana-operator/ks.yaml
   - ./kromgo/ks.yaml
   - ./kube-prometheus-stack/ks.yaml
+  - ./pve-exporter/ks.yaml
   - ./victoria-logs/ks.yaml
