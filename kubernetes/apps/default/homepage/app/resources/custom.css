@@ -59,6 +59,27 @@ body {
   outline: none !important;
 }
 
+/* Node stats get their own full-width row below the greeting rather than crowding
+   it. kubernetes is not in rightAlignedWidgets, so it is a direct child of
+   #widgets-wrap and flex-basis wraps it cleanly. */
+.information-widget-kubernetes {
+  flex-basis: 100%;
+  order: 99;
+  margin-top: 1.5rem;
+  opacity: 0.55;
+  transition: opacity 0.15s ease;
+}
+
+.information-widget-kubernetes:hover {
+  opacity: 0.9;
+}
+
+/* Ships as justify-between, which strands three nodes across the whole width. */
+.information-widget-kubernetes > div {
+  justify-content: flex-start !important;
+  gap: 1.5rem;
+}
+
 /* -------------------------------------------------------------- groups ---- */
 #services {
   margin: 1.5rem 2rem;
@@ -129,6 +150,26 @@ body {
   font-weight: 300 !important;
   padding-right: 0.5rem;
   opacity: 0.35;
+}
+
+/* Service widget blocks (the Alertmanager counts): hairline pair, no fill. */
+.service-block {
+  background: transparent !important;
+  border: 1px solid rgb(255 255 255 / 0.06);
+  border-radius: 4px !important;
+  margin: 0.125rem !important;
+  padding: 0.25rem 0.5rem !important;
+}
+
+.service-block .font-bold {
+  font-weight: 500 !important;
+  letter-spacing: 0.08em;
+  opacity: 0.3;
+}
+
+.service-block .font-thin {
+  font-variant-numeric: tabular-nums;
+  opacity: 0.75;
 }
 
 /* statusStyle: dot — shrink it to a whisper. */

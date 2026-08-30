@@ -1,6 +1,33 @@
 ---
-# Hosts outside the cluster, so nothing discovers them. A group named here merges
-# with the discovered group of the same name rather than duplicating it.
+# A group named here merges with the discovered group of the same name rather than
+# duplicating it, so these sit alongside the annotation-discovered services.
+
+- Observability:
+    # Discovery is off for this one (see kube-prometheus-stack); the prometheusmetric
+    # widget needs a nested metrics array, which flat annotations cannot express.
+    - Alertmanager:
+        href: https://alertmanager.${SECRET_DOMAIN}
+        icon: alertmanager.png
+        description: Alert routing and silencing
+        # Replaces the pod status the discovered tile used to get.
+        siteMonitor: http://kube-prometheus-stack-alertmanager.o11y.svc.cluster.local:9093/-/healthy
+        widget:
+          type: prometheusmetric
+          url: http://kube-prometheus-stack-prometheus.o11y.svc.cluster.local:9090
+          refreshInterval: 30000
+          metrics:
+            # Alertmanager exports one series per replica; max() keeps the number
+            # right whether or not the statefulset is scaled up.
+            - label: Firing
+              query: max(alertmanager_alerts{state="active"})
+              format:
+                type: number
+            - label: Silenced
+              query: max(alertmanager_alerts{state="suppressed"})
+              format:
+                type: number
+
+# Hosts outside the cluster, so nothing discovers them.
 - Infrastructure:
     - TrueNAS:
         href: https://horrea.${SECRET_DOMAIN}/

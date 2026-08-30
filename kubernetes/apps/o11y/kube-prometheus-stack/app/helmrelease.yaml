@@ -15,7 +15,10 @@ spec:
         main:
           enabled: true
           annotations:
-            gethomepage.dev/enabled: "true"
+            # Defined statically in homepage's services.yaml instead, because the
+            # prometheusmetric widget needs a nested metrics array and annotations
+            # are flat strings fed through shvl.set.
+            gethomepage.dev/enabled: "false"
             gethomepage.dev/name: Alertmanager
             gethomepage.dev/group: Observability
             gethomepage.dev/icon: alertmanager.png
