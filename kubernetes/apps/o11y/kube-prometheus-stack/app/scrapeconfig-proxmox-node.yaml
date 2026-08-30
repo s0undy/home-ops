@@ -1,0 +1,31 @@
+---
+# node_exporter running on the physical Proxmox hosts (arx/pax/via), giving the
+# bare-metal view the in-cluster node-exporter cannot: CPU temperature via hwmon,
+# host filesystems, and SMART/NVMe disk health via the Debian textfile collectors.
+#
+# Host-side install is manual and documented in docs/PROXMOX-MONITORING.md.
+#
+# Same placement rationale as scrapeconfig-ceph.yaml: an external target with no
+# in-cluster workload to hang a ServiceMonitor off.
+apiVersion: monitoring.coreos.com/v1alpha1
+kind: ScrapeConfig
+metadata:
+  name: proxmox-node
+spec:
+  # NOT "node-exporter" — that job belongs to the Talos VMs, and every expression in
+  # the stock node-exporter mixin PrometheusRule matches job="node-exporter". Reusing
+  # the name would silently point those alerts at the hypervisors too.
+  jobName: proxmox-node
+  scrapeInterval: 30s
+  staticConfigs:
+    - targets:
+        - 172.16.24.11:9100
+        - 172.16.24.12:9100
+        - 172.16.24.13:9100
+  # Strip the port so `instance` matches the `proxmox` job's bare-IP labels, which lets
+  # a panel join pve_* and node_* series for the same host.
+  relabelings:
+    - sourceLabels: ["__address__"]
+      regex: "([^:]+):.*"
+      targetLabel: instance
+      replacement: "$1"

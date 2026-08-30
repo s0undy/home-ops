@@ -4,4 +4,6 @@ kind: Kustomization
 resources:
   - ./helmrelease.yaml
   - ./ocirepository.yaml
+  - ./prometheusrule-proxmox.yaml
   - ./scrapeconfig-ceph.yaml
+  - ./scrapeconfig-proxmox-node.yaml
