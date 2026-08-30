@@ -1,18 +1,20 @@
 ---
-- kubernetes:
-    cluster:
-      show: true
-      cpu: true
-      memory: true
-      showLabel: true
-      label: cluster
-    nodes:
-      show: true
-      cpu: true
-      memory: true
-      showLabel: true
-- resources:
-    backend: resources
-    expanded: true
-    cpu: true
-    memory: true
+- greeting:
+    text_size: 4xl
+    # Rewritten at runtime by custom.js; this is the no-JS fallback. The widget
+    # renders nothing at all when text is empty, so it cannot be blank.
+    text: Hello.
+
+- search:
+    provider: duckduckgo
+    showSearchSuggestions: true
+    target: _blank
+    # Left false so a keypress opens quicklaunch, which searches discovered
+    # services too, instead of being swallowed by the web-search box.
+    focus: false
+
+- datetime:
+    text_size: sm
+    format:
+      timeStyle: short
+      hourCycle: h23

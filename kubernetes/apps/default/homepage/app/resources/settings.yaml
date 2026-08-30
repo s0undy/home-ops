@@ -1,13 +1,25 @@
 ---
 title: home-ops
+description: home-ops
+theme: dark
+color: slate
 headerStyle: clean
+hideVersion: true
+disableUpdateCheck: true
+disableCollapse: true
+statusStyle: dot
+target: _blank
+quicklaunch:
+  searchDescriptions: true
+  showSearchSuggestions: true
+  hideVisitURL: true
+  provider: duckduckgo
+# No `style: row` on purpose: the default column style lays each group out side by
+# side with its services stacked vertically, which is the launcher arrangement.
 layout:
   Media:
-    style: row
-    columns: 3
+    header: true
   Observability:
-    style: row
-    columns: 3
+    header: true
   Infrastructure:
-    style: row
-    columns: 3
+    header: true
