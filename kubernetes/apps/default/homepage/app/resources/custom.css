@@ -1,0 +1,154 @@
+/* Minimal launcher theme: flat ground, no cards, quiet typography. Dark only.
+   Selectors verified against gethomepage/homepage v2.1.2. */
+
+/* ---------------------------------------------------------------- base ---- */
+html,
+body {
+  /* globals.css paints html/body/#__next with rgb(var(--bg-color)). */
+  --bg-color: 14 16 20 !important;
+  font-family:
+    ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Nothing here is translucent, so the blur layers only cost paint time. */
+.service-card,
+.widget-container,
+#inner_wrapper {
+  backdrop-filter: none !important;
+}
+
+/* -------------------------------------------------------------- header ---- */
+#information-widgets {
+  margin: 0 2rem;
+  padding: 4rem 0 1.5rem;
+  border-bottom: 1px solid rgb(255 255 255 / 0.06);
+  align-items: baseline;
+}
+
+.information-widget-greeting span {
+  font-size: 2.25rem !important;
+  font-weight: 300;
+  letter-spacing: -0.025em;
+  color: rgb(226 232 240);
+}
+
+.information-widget-datetime span {
+  font-variant-numeric: tabular-nums;
+  font-weight: 300;
+  opacity: 0.4;
+}
+
+.information-widget-search {
+  max-width: 22rem;
+}
+
+.information-widget-search input {
+  background: rgb(255 255 255 / 0.04) !important;
+  border: 1px solid rgb(255 255 255 / 0.07) !important;
+  border-radius: 8px !important;
+  padding: 0.5rem 0.75rem !important;
+  font-size: 0.8125rem !important;
+  box-shadow: none !important;
+}
+
+.information-widget-search input:focus {
+  border-color: rgb(255 255 255 / 0.18) !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+/* -------------------------------------------------------------- groups ---- */
+#services {
+  margin: 1.5rem 2rem;
+  gap: 0 3rem;
+}
+
+.services-group {
+  margin-bottom: 2.5rem;
+}
+
+/* Ships as text-xl font-medium; demote it to a quiet section label. */
+.service-group-name {
+  font-size: 0.6875rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  opacity: 0.35;
+}
+
+.services-list {
+  gap: 0 !important;
+  margin-top: 0.75rem !important;
+}
+
+/* ---------------------------------------------------------------- rows ---- */
+.service {
+  margin: 0 !important;
+}
+
+.service-card {
+  background: transparent !important;
+  box-shadow: none !important;
+  border-radius: 6px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  transition: background-color 0.12s ease;
+}
+
+.service-card:hover {
+  background: rgb(255 255 255 / 0.045) !important;
+}
+
+.service-icon {
+  width: 2.25rem !important;
+}
+
+.service-icon img,
+.service-icon svg {
+  width: 20px !important;
+  height: 20px !important;
+  opacity: 0.85;
+}
+
+.service-card:hover .service-icon img,
+.service-card:hover .service-icon svg {
+  opacity: 1;
+}
+
+.service-name {
+  font-size: 0.875rem !important;
+  font-weight: 400 !important;
+  padding: 0.5rem !important;
+  color: rgb(203 213 225);
+}
+
+.service-description {
+  font-size: 0.75rem !important;
+  font-weight: 300 !important;
+  padding-right: 0.5rem;
+  opacity: 0.35;
+}
+
+/* statusStyle: dot — shrink it to a whisper. */
+.service-tags {
+  margin-right: 0.5rem !important;
+}
+
+.service-ping .rounded-full,
+.service-tag .rounded-full {
+  width: 5px !important;
+  height: 5px !important;
+}
+
+/* -------------------------------------------------------------- footer ---- */
+#footer {
+  padding: 2rem;
+}
+
+/* Dark only, and hideVersion is set — neither control has anything to offer. */
+#style,
+#version {
+  display: none !important;
+}
