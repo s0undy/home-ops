@@ -8,3 +8,4 @@ resources:
   - ./github-app-secret.sops.yaml
   - ./home-ops
   - ./shareviewer
+  - ./shareviewer-dind

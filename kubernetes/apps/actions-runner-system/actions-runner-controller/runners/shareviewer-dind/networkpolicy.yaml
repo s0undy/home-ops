@@ -1,0 +1,31 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: &app shareviewer-runner-dind
+spec:
+  # Same LAN lockdown as the other runners, and it matters more here: this pod is
+  # privileged. No reaching the Talos API, Proxmox or TrueNAS on 10.0.100.0/24.
+  #
+  # Docker's own bridge (172.17.0.0/16) falls inside the 172.16.0.0/12 deny below, but
+  # that is not a problem: dockerd and the containers it starts share this pod's network
+  # namespace, so bridge traffic never crosses the Cilium-managed veth. Containers
+  # reaching the internet are SNAT'd to the pod IP first and are matched on the real
+  # destination. If dind networking ever does misbehave, add 172.17.0.0/16 as an
+  # `except` here before suspecting anything else.
+  endpointSelector:
+    matchLabels:
+      runner: *app
+  enableDefaultDeny:
+    egress: false
+  egressDeny:
+    - toCIDRSet:
+        - cidr: 10.0.0.0/8
+          except:
+            - 10.42.0.0/16 # podSubnets
+            - 10.43.0.0/16 # serviceSubnets
+    - toCIDR:
+        - 172.16.0.0/12
+    - toCIDR:
+        - 192.168.0.0/16

@@ -1,0 +1,91 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app shareviewer-runner-dind
+spec:
+  interval: 1h
+  chartRef:
+    kind: OCIRepository
+    name: *app
+  values:
+    # Companion to shareviewer-runner. Use `runs-on: shareviewer-runner-dind` ONLY for
+    # jobs that genuinely need a Docker daemon — Dockerfile-based container actions
+    # (`runs.using: docker` with `image: Dockerfile`), `docker build`, `docker run`.
+    # Everything else belongs on the unprivileged kubernetes-mode set.
+    githubConfigUrl: https://github.com/s0undy/ShareViewer
+    # Shared with the other scale sets: one GitHub App installation covers both repos.
+    githubConfigSecret: github-app-secret
+    minRunners: 0
+    # Deliberately lower than the kubernetes-mode sets: this runner is privileged and a
+    # Docker build is far heavier than a lint job. Raising it raises the number of
+    # concurrent privileged containers on the cluster.
+    maxRunners: 1
+    containerMode:
+      type: dind
+    controllerServiceAccount:
+      name: actions-runner-controller
+      namespace: actions-runner-system
+    template:
+      metadata:
+        labels:
+          runner: *app
+      spec:
+        # No initContainers here on purpose. In dind mode the chart generates both
+        # `init-dind-externals` and `dind` itself and *appends* anything declared here,
+        # which would produce duplicate container names and an invalid pod. The
+        # externals init container already inherits the runner image below; the dind
+        # container is pinned via postRenderers instead.
+        containers:
+          - name: runner
+            # Ships docker + buildx, and its `docker` group is gid 123, matching the
+            # DOCKER_GROUP_GID the chart passes to dockerd.
+            image: ghcr.io/home-operations/actions-runner:2.337.0@sha256:8b8e8326b5a08e658a0a41cfd2867afab69ca4194a152f986aa6fcd5430d09e7
+            command: ["/home/runner/run.sh"]
+            env:
+              - name: DOCKER_HOST
+                value: unix:///var/run/docker.sock
+              - name: RUNNER_WAIT_FOR_DOCKER_IN_SECONDS
+                value: "120"
+            resources:
+              requests:
+                cpu: 100m
+                memory: 512Mi
+              limits:
+                memory: 4Gi
+                ephemeral-storage: 10Gi
+  # The chart hardcodes `image: docker:dind` with no values knob, so pin it here and
+  # give the privileged container resource bounds at the same time.
+  postRenderers:
+    - kustomize:
+        patches:
+          - target:
+              group: actions.github.com
+              version: v1alpha1
+              kind: AutoscalingRunnerSet
+              name: *app
+            # The `test` op is a guard, not decoration: the path is index-based because
+            # kustomize has no schema for this CRD and would treat a strategic-merge
+            # patch on initContainers as a whole-list replace, dropping the externals
+            # init container. If a future chart version reorders them, this fails the
+            # render loudly instead of silently rewriting the wrong container's image.
+            patch: |
+              - op: test
+                path: /spec/template/spec/initContainers/1/name
+                value: dind
+              - op: replace
+                path: /spec/template/spec/initContainers/1/image
+                value: docker:29.7.2-dind@sha256:3ef33f2e220b79ed3ef3b99d81746f06f306cd6340e2cb7331d17ae996e74cb6
+              - op: add
+                path: /spec/template/spec/initContainers/1/resources
+                value:
+                  requests:
+                    cpu: 100m
+                    memory: 512Mi
+                  limits:
+                    memory: 4Gi
+                    # /var/lib/docker is the container's writable layer, not a volume, so
+                    # image pulls and build layers land on node ephemeral storage. This
+                    # bounds a runaway build to an evicted pod rather than a full node.
+                    ephemeral-storage: 20Gi

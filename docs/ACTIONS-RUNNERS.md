@@ -10,9 +10,10 @@ One scale set per repo; workflows opt in with `runs-on:`.
 | --- | --- | --- |
 | `s0undy/home-ops` | `home-ops-runner` | `runners/home-ops/` |
 | `s0undy/ShareViewer` | `shareviewer-runner` | `runners/shareviewer/` |
+| `s0undy/ShareViewer` | `shareviewer-runner-dind` | `runners/shareviewer-dind/` |
 
-Both authenticate as the **same GitHub App**, whose one installation on the `s0undy` account covers
-both repos — so they share a single `github-app-secret`, defined once at `runners/` level.
+All three authenticate as the **same GitHub App**, whose one installation on the `s0undy` account
+covers both repos — so they share a single `github-app-secret`, defined once at `runners/` level.
 
 ## 📋 Table of Contents
 
@@ -21,6 +22,7 @@ both repos — so they share a single `github-app-secret`, defined once at `runn
 - [Fill in the secret](#-fill-in-the-secret)
 - [Verify](#-verify)
 - [Add another scale set](#-add-another-scale-set)
+- [Docker builds](#-docker-builds)
 - [Constraints](#-constraints)
 - [Troubleshooting](#-troubleshooting)
 
@@ -139,16 +141,55 @@ Adding a repo takes one GitHub click and one directory.
 Keep `githubConfigSecret: github-app-secret` as-is — it is shared deliberately. And re-read the
 `maxRunners` note below: each scale set raises the cluster-wide ceiling.
 
+## 🐳 Docker builds
+
+`shareviewer-runner-dind` exists for the jobs the kubernetes-mode sets cannot run. Target it
+explicitly:
+
+```yaml
+jobs:
+  build:
+    runs-on: shareviewer-runner-dind
+```
+
+Reach for it only when a job genuinely needs a Docker daemon — a Dockerfile-based container action,
+`docker build`, `docker run`. Everything else belongs on `shareviewer-runner`, which is
+unprivileged. How to tell a container action apart: its `action.yml` says `runs.using: docker` with
+`image: 'Dockerfile'`. If it instead says `image: 'docker://…'` the image is prebuilt and the
+kubernetes-mode set handles it fine.
+
+How it differs from the other sets:
+
+- A **privileged** `dind` sidecar runs `dockerd`. This is the one privileged pod in the cluster, and
+  the reason `maxRunners` is 1 and the network policy still applies.
+- The runner gets the chart's `…-no-permission` ServiceAccount — no Kubernetes API access at all,
+  unlike kubernetes mode which needs pod-create rights.
+- The work volume is an `emptyDir`, not a cephfs PVC: the job runs inside the runner pod, so nothing
+  needs to share the volume across pods.
+- `/var/lib/docker` is the dind container's writable layer, so image pulls and build layers consume
+  **node** ephemeral storage. An `ephemeral-storage: 20Gi` limit bounds a runaway build to an
+  evicted pod rather than a full node.
+
+The chart hardcodes `image: docker:dind` with no values knob, so the HelmRelease pins it through
+`spec.postRenderers`. That patch is index-based — kustomize has no schema for the
+`AutoscalingRunnerSet` CRD and would treat a strategic-merge patch on `initContainers` as a
+whole-list replace — so it opens with a JSON-patch `test` on the container's name. If a future chart
+version reorders the init containers, the render fails loudly instead of rewriting the wrong image.
+Do **not** add `initContainers` to `values.template.spec`: in dind mode the chart generates its own
+and appends yours, producing duplicate container names and an invalid pod.
+
 ## ⚠️ Constraints
 
-- **No Docker.** `containerMode: kubernetes` runs each step as its own pod, with no Docker daemon,
-  so `docker build`/`docker run` and container-based actions will not work. Adding a second,
-  dind-mode scale set alongside this one is the fix if that is ever needed.
-- **`maxRunners: 2` per scale set**, with modest resource requests. With two scale sets that is a
-  ceiling of 4 concurrent runners across three 6 CPU / ~15Gi nodes. Requests are small (100m/512Mi
-  each, so 4 runners reserve 400m/2Gi) but the 4Gi memory *limit* each means a busy moment can lean
-  hard on nodes that are already fairly committed. Check headroom before raising either number, and
-  remember a third scale set raises the ceiling again.
+- **The kubernetes-mode sets cannot build containers.** They run each step as its own pod with no
+  Docker daemon, so `docker build`, `docker run` and **Dockerfile-based container actions** fail with
+  `Building container actions is not currently supported`. They *can* run container actions that
+  reference a prebuilt image (`image: docker://…`) and job-level `container:`. For anything that
+  needs a real daemon, use `runs-on: shareviewer-runner-dind` — see [Docker builds](#-docker-builds).
+- **`maxRunners` is 2 for the kubernetes-mode sets and 1 for dind**, so the cluster-wide ceiling is
+  5 concurrent runners across three 6 CPU / ~15Gi nodes. Requests are small (100m/512Mi per
+  container) but the 4Gi memory *limit* each means a busy moment can lean hard on nodes that are
+  already fairly committed. Check headroom before raising any of them, and remember each new scale
+  set raises the ceiling again.
 - **The work volume is `cephfs` (RWX), not `ceph-rbd`.** In kubernetes mode the runner pod and every
   workflow job pod mount the same volume, and nothing pins the job pod to the runner's node — RWO
   `ceph-rbd` would fail to multi-attach.
