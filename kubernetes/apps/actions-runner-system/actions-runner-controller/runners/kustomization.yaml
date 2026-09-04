@@ -2,4 +2,9 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
+  # Shared by every scale set below: the credentials belong to one GitHub App
+  # installation covering both repos, so app id, installation id and private key
+  # are identical. One secret, one thing to rotate.
+  - ./github-app-secret.sops.yaml
   - ./home-ops
+  - ./shareviewer

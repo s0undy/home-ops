@@ -1,10 +1,18 @@
 # 🏃 Self-hosted GitHub Actions runners
 
-Ephemeral, autoscaling GitHub Actions runners for **s0undy/home-ops**, running on the cluster via
+Ephemeral, autoscaling GitHub Actions runners running on the cluster via
 [actions-runner-controller](https://github.com/actions/actions-runner-controller) (ARC).
 
 Manifests live in [`kubernetes/apps/actions-runner-system/`](../kubernetes/apps/actions-runner-system).
-Workflows opt in with `runs-on: home-ops-runner`.
+One scale set per repo; workflows opt in with `runs-on:`.
+
+| Repo | Scale set / `runs-on` | Manifests |
+| --- | --- | --- |
+| `s0undy/home-ops` | `home-ops-runner` | `runners/home-ops/` |
+| `s0undy/ShareViewer` | `shareviewer-runner` | `runners/shareviewer/` |
+
+Both authenticate as the **same GitHub App**, whose one installation on the `s0undy` account covers
+both repos — so they share a single `github-app-secret`, defined once at `runners/` level.
 
 ## 📋 Table of Contents
 
@@ -12,6 +20,7 @@ Workflows opt in with `runs-on: home-ops-runner`.
 - [Create the GitHub App](#-create-the-github-app)
 - [Fill in the secret](#-fill-in-the-secret)
 - [Verify](#-verify)
+- [Add another scale set](#-add-another-scale-set)
 - [Constraints](#-constraints)
 - [Troubleshooting](#-troubleshooting)
 
@@ -45,16 +54,20 @@ ARC authenticates as a GitHub App rather than a PAT, so credentials are scoped a
    - **Metadata**: Read-only
    - **Actions**: Read-only
 3. Create the App and note the **App ID**, then **Generate a private key** (downloads a `.pem`).
-4. **Install App** → select **Only select repositories** → `s0undy/home-ops`. The resulting URL ends
-   in `/settings/installations/<installation_id>` — note that number.
+4. **Install App** → select **Only select repositories** → pick every repo that should get runners
+   (currently `s0undy/home-ops` and `s0undy/ShareViewer`). The resulting URL ends in
+   `/settings/installations/<installation_id>` — note that number.
+
+Adding a repo later is just editing that repository list. It stays **one** installation, so the app
+id, installation id and private key never change and no new secret is needed.
 
 ## 🔑 Fill in the secret
 
-[`runners/home-ops/secret.sops.yaml`](../kubernetes/apps/actions-runner-system/actions-runner-controller/runners/home-ops/secret.sops.yaml)
-ships with placeholder values. Replace them from the repo root:
+[`runners/github-app-secret.sops.yaml`](../kubernetes/apps/actions-runner-system/actions-runner-controller/runners/github-app-secret.sops.yaml)
+holds the credentials shared by every scale set. Edit it from the repo root:
 
 ```sh
-sops edit kubernetes/apps/actions-runner-system/actions-runner-controller/runners/home-ops/secret.sops.yaml
+sops edit kubernetes/apps/actions-runner-system/actions-runner-controller/runners/github-app-secret.sops.yaml
 ```
 
 The three key names are mandated by the chart — do not rename them:
@@ -88,11 +101,12 @@ flux get ks -A | grep actions-runner
 kubectl -n actions-runner-system get pods
 ```
 
-Expect `actions-runner-controller-…` and `home-ops-runner-…-listener` both `Running`. A healthy
-listener is proof the GitHub App credentials work. Confirm from GitHub's side:
+Expect `actions-runner-controller-…` plus one `…-listener` per scale set, all `Running`. A healthy
+listener is proof the GitHub App credentials work for that repo. Confirm from GitHub's side:
 
 ```sh
 gh api repos/s0undy/home-ops/actions/runners --jq '.runners[].name'
+gh api repos/s0undy/ShareViewer/actions/runners --jq '.runners[].name'
 ```
 
 End to end, using the bundled smoke test:
@@ -103,13 +117,38 @@ kubectl -n actions-runner-system get pods -w   # a runner appears, then disappea
 gh run watch
 ```
 
+## ➕ Add another scale set
+
+Adding a repo takes one GitHub click and one directory.
+
+1. On the GitHub App's installation, add the repo to **Only select repositories**. Credentials do
+   not change, so there is no new secret.
+2. Copy an existing runner directory and adjust three things — the resource names, the
+   `githubConfigUrl`, and the `runner:` label the NetworkPolicy selects on:
+
+   ```sh
+   R=kubernetes/apps/actions-runner-system/actions-runner-controller/runners
+   cp -r $R/shareviewer $R/<newrepo>
+   sed -i 's/shareviewer-runner/<newrepo>-runner/g' $R/<newrepo>/*.yaml
+   # then edit githubConfigUrl in $R/<newrepo>/helmrelease.yaml
+   ```
+
+3. Add `- ./<newrepo>` to [`runners/kustomization.yaml`](../kubernetes/apps/actions-runner-system/actions-runner-controller/runners/kustomization.yaml).
+4. Workflows in that repo then use `runs-on: <newrepo>-runner`.
+
+Keep `githubConfigSecret: github-app-secret` as-is — it is shared deliberately. And re-read the
+`maxRunners` note below: each scale set raises the cluster-wide ceiling.
+
 ## ⚠️ Constraints
 
 - **No Docker.** `containerMode: kubernetes` runs each step as its own pod, with no Docker daemon,
   so `docker build`/`docker run` and container-based actions will not work. Adding a second,
   dind-mode scale set alongside this one is the fix if that is ever needed.
-- **`maxRunners: 2`**, with modest resource requests. The three nodes are 6 CPU / ~15Gi and already
-  fairly committed; raising this means checking headroom first.
+- **`maxRunners: 2` per scale set**, with modest resource requests. With two scale sets that is a
+  ceiling of 4 concurrent runners across three 6 CPU / ~15Gi nodes. Requests are small (100m/512Mi
+  each, so 4 runners reserve 400m/2Gi) but the 4Gi memory *limit* each means a busy moment can lean
+  hard on nodes that are already fairly committed. Check headroom before raising either number, and
+  remember a third scale set raises the ceiling again.
 - **The work volume is `cephfs` (RWX), not `ceph-rbd`.** In kubernetes mode the runner pod and every
   workflow job pod mount the same volume, and nothing pins the job pod to the runner's node — RWO
   `ceph-rbd` would fail to multi-attach.

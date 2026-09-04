@@ -3,7 +3,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: &app home-ops-runner
+  name: &app shareviewer-runner
 spec:
   interval: 1h
   chartRef:
@@ -11,16 +11,17 @@ spec:
     name: *app
   values:
     # The scale set name workflows target with `runs-on:` defaults to the release name.
-    githubConfigUrl: https://github.com/s0undy/home-ops
+    githubConfigUrl: https://github.com/s0undy/ShareViewer
+    # Shared with home-ops-runner: same GitHub App installation covers both repos.
     githubConfigSecret: github-app-secret
     minRunners: 0
     maxRunners: 2
     containerMode:
       type: kubernetes
       kubernetesModeWorkVolumeClaim:
-        # RWX/cephfs rather than RWO/ceph-rbd: in kubernetes mode the runner pod and
-        # every workflow job pod mount this same volume, and nothing guarantees the
-        # job lands on the runner's node. RWO ceph-rbd would fail to multi-attach.
+        # RWX/cephfs rather than RWO: in kubernetes mode the runner pod and every
+        # workflow job pod mount this same volume, and nothing pins the job pod to
+        # the runner's node.
         accessModes: ["ReadWriteMany"]
         storageClassName: cephfs
         resources:
@@ -52,7 +53,7 @@ spec:
             command: ["/home/runner/run.sh"]
             env:
               # Without this, kubernetes mode refuses any job that does not declare
-              # its own `container:` — which is every workflow in this repo.
+              # its own `container:`.
               - name: ACTIONS_RUNNER_REQUIRE_JOB_CONTAINER
                 value: "false"
             resources:

@@ -1,0 +1,25 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: &app shareviewer-runner
+spec:
+  # Runners execute workflow code, so keep them off the LAN: no reaching the Talos
+  # API, Proxmox or TrueNAS on 10.0.100.0/24. Egress to the internet (GitHub) and to
+  # the pod/service CIDRs stays open.
+  endpointSelector:
+    matchLabels:
+      runner: *app
+  enableDefaultDeny:
+    egress: false
+  egressDeny:
+    - toCIDRSet:
+        - cidr: 10.0.0.0/8
+          except:
+            - 10.42.0.0/16 # podSubnets
+            - 10.43.0.0/16 # serviceSubnets
+    - toCIDR:
+        - 172.16.0.0/12
+    - toCIDR:
+        - 192.168.0.0/16
