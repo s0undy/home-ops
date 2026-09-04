@@ -29,6 +29,16 @@ spec:
         # otherwise default to plain `cephfs.csi.ceph.com` and never claim its PVCs.
         name: rook-ceph.cephfs.csi.ceph.com
         snapshotPolicy: volumeSnapshot
+        kernelMountOptions:
+          # The external cluster was imported with --v2-port-enable, so the mons
+          # are msgr v2 only, on 3300. The new-style `mon_addr=` mount syntax drops
+          # the v2 marker, so without this the kernel opens a v1 banner against a
+          # v2-only port and the mon just closes the socket:
+          #   libceph: mon0 (1)172.16.52.11:3300 socket closed (con state V1_BANNER)
+          # The client never authenticates and never gets an mdsmap, which mount.ceph
+          # then reports as the misleading "no mds (Metadata Server) is up".
+          # prefer-crc negotiates v2 and still upgrades to secure if Ceph requires it.
+          ms_mode: prefer-crc
       nfs:
         enabled: false
       nvmeof:
