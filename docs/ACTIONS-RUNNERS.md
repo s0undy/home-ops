@@ -69,6 +69,14 @@ stringData:
     -----END RSA PRIVATE KEY-----
 ```
 
+**Keep the quotes on both IDs.** Unquoted, sops encrypts them as `type:int`, and Flux then hands
+integers to a `stringData` field that only takes strings — server-side apply fails the whole
+Kustomization with `expected string, got 4832057`. To repair one without an editor:
+
+```sh
+sops set <file> '["stringData"]["github_app_id"]' '"4832057"'
+```
+
 Delete the downloaded `.pem` afterwards. Until this is filled in, the listener pod will CrashLoop —
 the rest of the deployment is unaffected.
 
