@@ -23,7 +23,12 @@ spec:
   values:
     drivers:
       cephfs:
-        enabled: false
+        enabled: true
+        # Must match the `provisioner` on the pre-existing `cephfs` StorageClass,
+        # which the external-cluster import script created. The chart would
+        # otherwise default to plain `cephfs.csi.ceph.com` and never claim its PVCs.
+        name: rook-ceph.cephfs.csi.ceph.com
+        snapshotPolicy: volumeSnapshot
       nfs:
         enabled: false
       nvmeof:
