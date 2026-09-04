@@ -1,0 +1,20 @@
+---
+name: "Runner Smoke Test"
+
+on:
+  workflow_dispatch:
+
+jobs:
+  smoke-test:
+    name: Smoke Test
+    runs-on: home-ops-runner
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Show runner environment
+        run: |
+          uname -a
+          echo "runner: ${RUNNER_NAME} (${RUNNER_OS}/${RUNNER_ARCH})"
+          gh --version
+          yq --version
