@@ -15,7 +15,9 @@ releases:
   - name: coredns
     namespace: kube-system
     chart: oci://ghcr.io/coredns/charts/coredns
-    version: 1.47.0
+    # Keep in sync with kubernetes/apps/kube-system/coredns/app/ocirepository.yaml —
+    # held back off CoreDNS 1.14.3+ (coredns/coredns#8390).
+    version: 1.46.2
     values: ['./templates/values.yaml.gotmpl']
     needs: ['kube-system/cilium']
 

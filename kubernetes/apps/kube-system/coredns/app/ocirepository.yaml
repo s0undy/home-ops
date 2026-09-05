@@ -10,4 +10,6 @@ spec:
     operation: copy
   url: oci://ghcr.io/coredns/charts/coredns
   ref:
-    tag: 1.47.0
+    # Held back: CoreDNS 1.14.3+ prefetch poisons autopath answers (coredns/coredns#8390).
+    # Chart 1.47.0 ships CoreDNS 1.14.6; 1.46.2 ships 1.13.1, the newest unaffected build.
+    tag: 1.46.2
