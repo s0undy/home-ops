@@ -1,0 +1,10 @@
+---
+apiVersion: v1alpha1
+kind: TimeSyncConfig
+ntp:
+  # NTS defaults to true in v1.14, but it validates a TLS certificate against a
+  # hostname — it cannot work with the Cloudflare NTP servers addressed by IP.
+  useNTS: false
+  servers:
+    - 162.159.200.1
+    - 162.159.200.123

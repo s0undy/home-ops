@@ -1,0 +1,11 @@
+---
+apiVersion: v1alpha1
+kind: KubeNetworkConfig
+podSubnets: ["10.42.0.0/16"]
+serviceSubnets: ["10.43.0.0/16"]
+---
+# Cilium is the CNI. Talos v1.14 generates a KubeFlannelCNIConfig by default, so
+# omitting it is not enough — it has to be deleted or flanneld starts alongside Cilium.
+apiVersion: v1alpha1
+kind: KubeFlannelCNIConfig
+$patch: delete

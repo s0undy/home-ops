@@ -47,6 +47,7 @@ talosconfig:
     chmod 600 "${TALOSCONFIG}"
     just log info "Wrote talosconfig" file "${TALOSCONFIG}"
 
+# Talos v1.14 dropped `reboot` as an apply mode; use auto, no-reboot, staged or try.
 [confirm('Apply Talos config to node? [y|N]')]
 [doc('Apply Talos config to a node')]
 apply-node node mode="auto":

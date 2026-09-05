@@ -1,0 +1,7 @@
+# cluster.etcd is not deprecated in v1.14 and has no multi-doc equivalent.
+cluster:
+  etcd:
+    extraArgs:
+      listen-metrics-urls: http://0.0.0.0:2381
+    advertisedSubnets:
+      - 10.0.100.0/24

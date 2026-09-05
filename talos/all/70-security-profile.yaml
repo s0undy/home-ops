@@ -1,0 +1,7 @@
+---
+apiVersion: v1alpha1
+kind: SecurityProfileConfig
+# Talos v1.14 defaults this to true, which moves containerd, the kubelet and pods
+# into the sandboxd PID/mount namespace. Pinned off so the 1.14 migration does not
+# also change the runtime under the Rook-Ceph CSI kernel mounts. Revisit separately.
+workloadIsolation: false

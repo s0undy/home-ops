@@ -1,0 +1,7 @@
+---
+apiVersion: v1alpha1
+kind: KubeAPIServerConfig
+certExtraSANs:
+  - "127.0.0.1"
+  - "10.0.100.10"
+  - "talos.josefssonit.se"

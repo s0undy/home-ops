@@ -1,0 +1,6 @@
+---
+apiVersion: v1alpha1
+kind: UnattendedInstallConfig
+provisioning:
+  diskSelector:
+    match: '"/dev/disk/by-path/pci-0000:09:01.0-scsi-0:0:0:0" in disk.symlinks'

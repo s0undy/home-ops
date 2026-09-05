@@ -1,0 +1,10 @@
+---
+apiVersion: v1alpha1
+kind: KubeNodeConfig
+labels:
+  node.kubernetes.io/exclude-from-external-load-balancers: ""
+taints:
+  # Every node is a control plane, so workloads have to be schedulable on them
+  # (was cluster.allowSchedulingOnControlPlanes).
+  node-role.kubernetes.io/control-plane:
+    $patch: delete
