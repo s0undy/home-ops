@@ -21,7 +21,7 @@ spec:
     # Deliberately lower than the kubernetes-mode sets: this runner is privileged and a
     # Docker build is far heavier than a lint job. Raising it raises the number of
     # concurrent privileged containers on the cluster.
-    maxRunners: 1
+    maxRunners: 2
     containerMode:
       type: dind
     controllerServiceAccount:

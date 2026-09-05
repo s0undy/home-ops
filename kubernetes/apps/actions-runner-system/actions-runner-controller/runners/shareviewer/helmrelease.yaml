@@ -15,7 +15,7 @@ spec:
     # Shared with home-ops-runner: same GitHub App installation covers both repos.
     githubConfigSecret: github-app-secret
     minRunners: 0
-    maxRunners: 2
+    maxRunners: 4
     containerMode:
       type: kubernetes
       kubernetesModeWorkVolumeClaim:
