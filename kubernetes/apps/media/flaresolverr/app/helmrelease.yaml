@@ -23,7 +23,7 @@ spec:
           app:
             image:
               repository: ghcr.io/flaresolverr/flaresolverr
-              tag: v3.5.0
+              tag: v3.5.2
             env:
               TZ: ${TZ}
               # writable HOME for Chrome / undetected-chromedriver when non-root
