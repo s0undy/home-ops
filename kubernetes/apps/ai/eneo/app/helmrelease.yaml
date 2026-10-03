@@ -211,6 +211,8 @@ spec:
           gethomepage.dev/group: AI
           gethomepage.dev/icon: mdi-robot-outline
           gethomepage.dev/description: AI assistant platform
+          # Homepage otherwise links to the first rule's path (/api)
+          gethomepage.dev/href: "https://eneo.${SECRET_DOMAIN}"
         hostnames:
           - "{{ .Release.Name }}.${SECRET_DOMAIN}"
         parentRefs:
