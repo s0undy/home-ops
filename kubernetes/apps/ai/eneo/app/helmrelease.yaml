@@ -1,0 +1,291 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app eneo
+spec:
+  interval: 1h
+  chartRef:
+    kind: OCIRepository
+    name: *app
+  install:
+    remediation:
+      retries: -1
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  values:
+    controllers:
+      # API server + general ARQ worker share a pod so audit log exports
+      # written by the worker to /tmp/exports can be served by the backend
+      backend:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        initContainers:
+          # Creates the role + database; on first creation it also runs
+          # /initdb/eneo.sql as superuser, since pgvector is not a trusted extension
+          01-init-db:
+            image:
+              repository: ghcr.io/home-operations/postgres-init
+              tag: "18"
+            envFrom:
+              - secretRef:
+                  name: eneo-secret
+          # Alembic migrations, default tenant/user and CORS origin seeding (idempotent)
+          02-init-eneo:
+            image: &backendImage
+              repository: ghcr.io/eneo-ai/eneo-backend
+              tag: 2.1.2@sha256:7beae6eaf4bb20c859fb3d62030d2fa6fd235e176f68c6c73df4ee37f15eb291
+            command: ["python", "init_db.py"]
+            env: &backendEnv
+              TZ: "${TZ}"
+              POSTGRES_HOST: postgres-rw.databases.svc.cluster.local
+              POSTGRES_PORT: "5432"
+              POSTGRES_DB: eneo
+              REDIS_HOST: eneo-dragonfly
+              REDIS_PORT: "6379"
+              PUBLIC_ORIGIN: "https://eneo.${SECRET_DOMAIN}"
+              API_PREFIX: /api/v1
+              API_KEY_LENGTH: "64"
+              API_KEY_HEADER_NAME: X-API-Key
+              JWT_AUDIENCE: "*"
+              JWT_ISSUER: ENEO
+              JWT_EXPIRY_TIME: "1440"
+              JWT_ALGORITHM: HS256
+              JWT_TOKEN_PREFIX: Bearer
+              TENANT_CREDENTIALS_ENABLED: "true"
+              USING_ACCESS_MANAGEMENT: "true"
+              DEFAULT_TENANT_NAME: Home
+              DEFAULT_USER_NAME: admin
+              DEFAULT_USER_EMAIL: "admin@${SECRET_DOMAIN}"
+              LOGLEVEL: INFO
+              JSON_LOGS: "true"
+            envFrom: &backendEnvFrom
+              - secretRef:
+                  name: eneo-secret
+            securityContext: &securityContext
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: { drop: ["ALL"] }
+        containers:
+          app:
+            image: *backendImage
+            env:
+              <<: *backendEnv
+              NUM_WORKERS: "2"
+            envFrom: *backendEnvFrom
+            probes:
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /api/livez
+                    port: &backendPort 8000
+                  periodSeconds: 30
+                  timeoutSeconds: 10
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /api/healthz
+                    port: *backendPort
+                  periodSeconds: 15
+                  timeoutSeconds: 10
+              startup:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /api/livez
+                    port: *backendPort
+                  periodSeconds: 5
+                  failureThreshold: 60
+            securityContext: *securityContext
+            resources:
+              requests:
+                cpu: 50m
+                memory: 512Mi
+              limits:
+                memory: 2Gi
+          worker:
+            image: *backendImage
+            env:
+              <<: *backendEnv
+              RUN_AS_WORKER: "true"
+              WORKER_ROLE: general
+            envFrom: *backendEnvFrom
+            securityContext: *securityContext
+            resources:
+              requests:
+                cpu: 25m
+                memory: 256Mi
+              limits:
+                memory: 2Gi
+      # Long-running website crawls; needs a private /tmp for startup recovery
+      crawler:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        containers:
+          app:
+            image: *backendImage
+            env:
+              <<: *backendEnv
+              RUN_AS_WORKER: "true"
+              WORKER_ROLE: crawler
+            envFrom: *backendEnvFrom
+            probes:
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  exec:
+                    command: ["arq", "--check", "src.eneo.worker.arq.CrawlerWorkerSettings"]
+                  initialDelaySeconds: 30
+                  periodSeconds: 30
+                  timeoutSeconds: 10
+                  failureThreshold: 3
+            securityContext: *securityContext
+            resources:
+              requests:
+                cpu: 25m
+                memory: 256Mi
+              limits:
+                memory: 2Gi
+        pod:
+          terminationGracePeriodSeconds: 70
+      frontend:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        containers:
+          app:
+            image:
+              repository: ghcr.io/eneo-ai/eneo-frontend
+              tag: 2.1.2@sha256:11da322c6c2fd2d0b3f02830f07ec7ce77d456446c9e6fd1ff3571a4a4d9ca1b
+            env:
+              TZ: "${TZ}"
+              NODE_ENV: production
+              ORIGIN: &origin "https://eneo.${SECRET_DOMAIN}"
+              PUBLIC_ORIGIN: *origin
+              ENEO_BACKEND_URL: *origin
+              PUBLIC_ENEO_BACKEND_URL: *origin
+              ENEO_BACKEND_SERVER_URL: http://eneo-backend.ai.svc.cluster.local:8000
+              FEDERATION_PER_TENANT_ENABLED: "false"
+              SHOW_WEB_SEARCH: "true"
+              LOGLEVEL: INFO
+              JWT_SECRET:
+                valueFrom:
+                  secretKeyRef:
+                    name: eneo-secret
+                    key: JWT_SECRET
+            probes:
+              liveness: &frontendProbe
+                enabled: true
+                custom: true
+                spec:
+                  tcpSocket:
+                    port: &frontendPort 3000
+                  periodSeconds: 30
+              readiness: *frontendProbe
+            securityContext: *securityContext
+            resources:
+              requests:
+                cpu: 10m
+                memory: 128Mi
+              limits:
+                memory: 512Mi
+    defaultPodOptions:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+    service:
+      backend:
+        controller: backend
+        ports:
+          http:
+            port: *backendPort
+      frontend:
+        controller: frontend
+        ports:
+          http:
+            port: *frontendPort
+    route:
+      app:
+        annotations:
+          gethomepage.dev/enabled: "true"
+          gethomepage.dev/name: Eneo
+          gethomepage.dev/group: AI
+          gethomepage.dev/icon: mdi-robot-outline
+          gethomepage.dev/description: AI assistant platform
+        hostnames:
+          - "{{ .Release.Name }}.${SECRET_DOMAIN}"
+        parentRefs:
+          - name: envoy-internal
+            namespace: network
+            sectionName: https
+        rules:
+          # Mirrors the backend router in Eneo's reference docker-compose
+          - matches:
+              - path: { type: PathPrefix, value: /api }
+              - path: { type: PathPrefix, value: /scim }
+              - path: { type: PathPrefix, value: /docs }
+              - path: { type: PathPrefix, value: /openapi.json }
+              - path: { type: PathPrefix, value: /version }
+            backendRefs:
+              - identifier: backend
+                port: *backendPort
+          - backendRefs:
+              - identifier: frontend
+                port: *frontendPort
+    configMaps:
+      initdb:
+        data:
+          # postgres-init runs /initdb/<dbname>.sql only when it creates the database
+          eneo.sql: |
+            CREATE EXTENSION IF NOT EXISTS vector;
+    persistence:
+      initdb:
+        type: configMap
+        identifier: initdb
+        advancedMounts:
+          backend:
+            01-init-db:
+              - path: /initdb
+      # Shared by API + general worker (uploads staging, /tmp/exports)
+      tmp:
+        type: emptyDir
+        advancedMounts:
+          backend:
+            02-init-eneo:
+              - path: /tmp
+            app:
+              - path: /tmp
+            worker:
+              - path: /tmp
+          frontend:
+            app:
+              - path: /tmp
+      crawler-tmp:
+        type: emptyDir
+        advancedMounts:
+          crawler:
+            app:
+              - path: /tmp
+      # Only holds runtime debug flags (/app/data/debug_flags), nothing persistent
+      data:
+        type: emptyDir
+        advancedMounts:
+          backend:
+            app:
+              - path: /app/data
+            worker:
+              - path: /app/data
+          crawler:
+            app:
+              - path: /app/data
