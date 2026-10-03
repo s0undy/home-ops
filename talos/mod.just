@@ -94,7 +94,10 @@ upgrade-k8s:
     cd "{{ source_directory() }}"
     # topf has no upgrade-k8s equivalent, so this stays on talosctl
     KUBERNETES_VERSION=$(yq -r '.kubernetesVersion' topf.yaml)
-    talosctl upgrade-k8s --to "${KUBERNETES_VERSION#v}"
+    # upgrade-k8s drives the whole cluster from a single control plane node, but
+    # the talosconfig context lists every node, so pin it to the first one
+    NODE=$(yq -r '[.nodes[] | select(.role == "control-plane")][0].ip' topf.yaml)
+    talosctl --nodes "${NODE}" upgrade-k8s --to "${KUBERNETES_VERSION#v}"
 
 [confirm('This will destroy your cluster and reset the nodes back to maintenance mode... continue? [y|N]')]
 [doc('Resets nodes back to maintenance mode (full=true wipes the entire disk)')]
