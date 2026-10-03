@@ -55,6 +55,11 @@ spec:
               JWT_EXPIRY_TIME: "1440"
               JWT_ALGORITHM: HS256
               JWT_TOKEN_PREFIX: Bearer
+              # Required in bytes, no defaults upstream; values from backend/.env.template
+              UPLOAD_FILE_TO_SESSION_MAX_SIZE: "10485760"
+              UPLOAD_IMAGE_TO_SESSION_MAX_SIZE: "10485760"
+              UPLOAD_MAX_FILE_SIZE: "10485760"
+              TRANSCRIPTION_MAX_FILE_SIZE: "209715200"
               TENANT_CREDENTIALS_ENABLED: "true"
               USING_ACCESS_MANAGEMENT: "true"
               DEFAULT_TENANT_NAME: Home
