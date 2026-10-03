@@ -10,6 +10,12 @@ spec:
   interval: 30m
   values:
     fullnameOverride: victoria-logs-collector
+    # Otherwise the collector skips the tainted GPU node and its logs are lost.
+    tolerations:
+      - key: gpu.intel.com/i915
+        operator: Equal
+        value: "true"
+        effect: NoSchedule
     global:
       image:
         registry: quay.io

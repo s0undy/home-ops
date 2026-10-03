@@ -18,7 +18,23 @@ would change on the live cluster.
 | `control-plane/` | Patches applied to control plane nodes |
 | `node/${hostname}/` | Patches applied to a single node |
 
-A `worker/` directory would hold worker-only patches; there are no worker nodes in this cluster.
+A `worker/` directory would hold patches for every worker node. There is one worker,
+`jit-talos-04`, and everything specific to it lives in `node/jit-talos-04/` instead — it is the
+dedicated GPU node (see below), so its settings are properties of that node rather than of workers
+in general.
+
+## The GPU node
+
+`jit-talos-04` is a small (8 GB / 4 vCPU) worker that owns the Intel iGPU. Passing a PCI device to
+a Proxmox VM forces Proxmox to pin the VM's entire assigned RAM, so keeping the iGPU on a 16 GB
+control plane node reserved 16 GB on the host to serve one Jellyfin transcoder.
+
+It carries the taint `gpu.intel.com/i915=true:NoSchedule` (`node/jit-talos-04/10-kube-node.yaml`)
+so nothing but GPU work lands on it. Anything that legitimately has to run there needs a matching
+toleration — today that is Jellyfin, the ceph-csi rbd/cephfs node plugins, the Intel GPU device
+plugin, the node-feature-discovery worker and the VictoriaLogs collector. `cilium`, `spegel` and
+`node-exporter` already tolerate everything. `multus` does not run there: its chart exposes no
+tolerations value, and nothing on that node uses a NetworkAttachmentDefinition.
 
 ## Patch merge order
 
@@ -46,7 +62,7 @@ both forms at once is a hard validation error, so a field moves wholesale or not
 Talos v1.14 injects some documents at generation time that no patch asks for. Two of them are
 explicitly overridden here — `KubeFlannelCNIConfig` and the `PodSecurity`
 `KubeAdmissionControlConfig` are deleted with `$patch: delete`, and `SecurityProfileConfig` is
-pinned to `workloadIsolation: false`. Omitting a patch is *not* the same as disabling the
+pinned to `workloadIsolation: true`. Omitting a patch is *not* the same as disabling the
 feature; check `just talos render` output after changing anything here.
 
 Two constraints worth remembering:
@@ -69,3 +85,31 @@ curl -s https://factory.talos.dev/schematics/<id>
 
 If you add an extension, run `topf --submit-to-factory schematic-ids` once so the factory
 learns the new schematic before upgrading any node.
+
+## Building an ISO
+
+Needed when adding a node, or reinstalling one from scratch. There is no `just` recipe — the ISO
+is built by the Image Factory from the same schematic ID the installer image uses, so a new node
+never needs a schematic change.
+
+```sh
+cd talos
+mise exec -- topf schematic-ids                      # e.g. 74e275aa…9294
+curl -s https://factory.talos.dev/schematics/<id>    # 404 → --submit-to-factory first
+```
+
+Then, on the Proxmox host as root — the version must match `talosVersion` in `topf.yaml`:
+
+```sh
+cd /var/lib/vz/template/iso
+wget -O talos-v1.14.0-metal-amd64.iso \
+  https://factory.talos.dev/image/<id>/v1.14.0/metal-amd64.iso
+```
+
+Boot the new VM from it; it comes up in maintenance mode at its DHCP/static address, ready for
+`just talos apply-node <host>`. Check the install disk's PCI path matches the selector in
+`all/00-unattended-install.yaml` first:
+
+```sh
+mise exec -- talosctl -n <ip> --insecure get disks
+```

@@ -14,6 +14,14 @@ spec:
     master:
       replicaCount: 1
     worker:
+      # The worker has to run on the tainted GPU node jit-talos-04 — the PCI label
+      # it produces there is what the Intel GPU device plugin's NodeFeatureRule
+      # selects on.
+      tolerations:
+        - key: gpu.intel.com/i915
+          operator: Equal
+          value: "true"
+          effect: NoSchedule
       config:
         core:
           labelSources: ["pci", "system", "usb"]

@@ -1,0 +1,16 @@
+---
+apiVersion: v1alpha1
+kind: KubeNodeConfig
+# Dedicates this node to GPU workloads. It is deliberately small (8 GB), so ordinary
+# pods must not land here just because the scheduler has room. Everything that has to
+# run here carries a matching toleration: Jellyfin, the ceph-csi node plugins, the
+# Intel GPU device plugin, the node-feature-discovery worker and the log collector.
+#
+# `taints` is map[string]string in the form "value:effect", not a nested object.
+#
+# NodeRestriction forbids a worker from *modifying* its own taints; registration-time
+# taints are permitted, so this applies on a fresh join. If `kubectl get node
+# jit-talos-04 -o jsonpath='{.spec.taints}'` is empty after the node comes up, apply it
+# once by hand with `kubectl taint node jit-talos-04 gpu.intel.com/i915=true:NoSchedule`.
+taints:
+  gpu.intel.com/i915: "true:NoSchedule"

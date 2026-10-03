@@ -39,6 +39,14 @@ spec:
           # then reports as the misleading "no mds (Metadata Server) is up".
           # prefer-crc negotiates v2 and still upgrades to secure if Ceph requires it.
           ms_mode: prefer-crc
+        nodePlugin:
+          tolerations: &gpuNodeToleration
+            # The node plugins are DaemonSets and must reach the tainted GPU node
+            # jit-talos-04, or a pod scheduled there can never mount a Ceph volume.
+            - key: gpu.intel.com/i915
+              operator: Equal
+              value: "true"
+              effect: NoSchedule
       nfs:
         enabled: false
       nvmeof:
@@ -47,3 +55,5 @@ spec:
         enabled: true
         name: rook-ceph.rbd.csi.ceph.com
         snapshotPolicy: volumeSnapshot
+        nodePlugin:
+          tolerations: *gpuNodeToleration
