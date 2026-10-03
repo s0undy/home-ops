@@ -82,12 +82,14 @@ spec:
               NUM_WORKERS: "2"
             envFrom: *backendEnvFrom
             probes:
+              # 2.1.2 has no /api/livez; /version is dependency-free, while
+              # /api/healthz also fails when the general worker is unhealthy
               liveness:
                 enabled: true
                 custom: true
                 spec:
                   httpGet:
-                    path: /api/livez
+                    path: /version
                     port: &backendPort 8000
                   periodSeconds: 30
                   timeoutSeconds: 10
@@ -105,7 +107,7 @@ spec:
                 custom: true
                 spec:
                   httpGet:
-                    path: /api/livez
+                    path: /version
                     port: *backendPort
                   periodSeconds: 5
                   failureThreshold: 60
@@ -121,34 +123,15 @@ spec:
             env:
               <<: *backendEnv
               RUN_AS_WORKER: "true"
-              WORKER_ROLE: general
-            envFrom: *backendEnvFrom
-            securityContext: *securityContext
-            resources:
-              requests:
-                cpu: 25m
-                memory: 256Mi
-              limits:
-                memory: 2Gi
-      # Long-running website crawls; needs a private /tmp for startup recovery
-      crawler:
-        annotations:
-          reloader.stakater.com/auto: "true"
-        containers:
-          app:
-            image: *backendImage
-            env:
-              <<: *backendEnv
-              RUN_AS_WORKER: "true"
-              WORKER_ROLE: crawler
             envFrom: *backendEnvFrom
             probes:
+              # Verifies the ARQ heartbeat in Redis (refreshed every 60s)
               liveness:
                 enabled: true
                 custom: true
                 spec:
                   exec:
-                    command: ["arq", "--check", "src.eneo.worker.arq.CrawlerWorkerSettings"]
+                    command: ["arq", "--check", "src.intric.worker.arq.WorkerSettings"]
                   initialDelaySeconds: 30
                   periodSeconds: 30
                   timeoutSeconds: 10
@@ -160,8 +143,8 @@ spec:
                 memory: 256Mi
               limits:
                 memory: 2Gi
-        pod:
-          terminationGracePeriodSeconds: 70
+      # 2.1.2 runs crawls on the general worker; a dedicated crawler worker
+      # (WORKER_ROLE=crawler, eneo.* package, /api/livez) arrives with 2.2.0
       frontend:
         annotations:
           reloader.stakater.com/auto: "true"
@@ -276,12 +259,6 @@ spec:
           frontend:
             app:
               - path: /tmp
-      crawler-tmp:
-        type: emptyDir
-        advancedMounts:
-          crawler:
-            app:
-              - path: /tmp
       # Only holds runtime debug flags (/app/data/debug_flags), nothing persistent
       data:
         type: emptyDir
@@ -290,7 +267,4 @@ spec:
             app:
               - path: /app/data
             worker:
-              - path: /app/data
-          crawler:
-            app:
               - path: /app/data
