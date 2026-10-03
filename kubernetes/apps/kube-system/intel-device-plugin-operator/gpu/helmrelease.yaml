@@ -20,3 +20,11 @@ spec:
     name: i915
     nodeFeatureRule: true
     sharedDevNum: 99
+    # jit-talos-04 owns the only iGPU and is tainted; this plugin is what advertises
+    # gpu.intel.com/i915, so without the toleration the resource never appears at all
+    # (and the ks healthCheckExpr on desiredNumberScheduled == numberReady never passes).
+    tolerations:
+      - key: gpu.intel.com/i915
+        operator: Equal
+        value: "true"
+        effect: NoSchedule

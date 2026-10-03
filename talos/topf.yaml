@@ -20,3 +20,9 @@ nodes:
   - host: jit-talos-03
     ip: 10.0.100.13
     role: control-plane
+  # Dedicated GPU node: a deliberately small VM that owns the Intel iGPU, so the
+  # 16 GB control plane VMs no longer have to have their RAM pinned by Proxmox
+  # for PCI passthrough. Only Jellyfin runs here — see node/jit-talos-04/10-kube-node.yaml.
+  - host: jit-talos-04
+    ip: 10.0.100.14
+    role: worker

@@ -1,0 +1,45 @@
+---
+# Three NICs, unlike the control plane nodes' four: management, the Ceph public
+# network (the mons live on 172.16.52.0/24 — required for the ceph-rbd config PVC)
+# and the NFS network to horrea (the media library). There is no Layer2VIPConfig
+# here; the 10.0.100.10 VIP belongs to the control plane nodes only.
+apiVersion: v1alpha1
+kind: LinkAliasConfig
+name: ethSel0
+selector:
+  match: glob("a2:19:97:bf:44:11", mac(link.hardware_addr))
+---
+apiVersion: v1alpha1
+kind: LinkAliasConfig
+name: ethSel1
+selector:
+  match: glob("a2:19:97:30:48:03", mac(link.hardware_addr))
+---
+apiVersion: v1alpha1
+kind: LinkAliasConfig
+name: ethSel2
+selector:
+  match: glob("a2:19:97:9b:9a:47", mac(link.hardware_addr))
+---
+apiVersion: v1alpha1
+kind: LinkConfig
+name: ethSel0
+mtu: 1500
+addresses:
+  - address: 10.0.100.14/24
+routes:
+  - gateway: 10.0.100.1
+---
+apiVersion: v1alpha1
+kind: LinkConfig
+name: ethSel1
+mtu: 9000
+addresses:
+  - address: 172.16.52.24/24
+---
+apiVersion: v1alpha1
+kind: LinkConfig
+name: ethSel2
+mtu: 9000
+addresses:
+  - address: 172.16.60.24/24

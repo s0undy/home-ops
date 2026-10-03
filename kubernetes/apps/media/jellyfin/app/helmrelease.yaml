@@ -55,6 +55,14 @@ spec:
               readOnlyRootFilesystem: true
               capabilities: { drop: ["ALL"] }
     defaultPodOptions:
+      # jit-talos-04 is the only node with an Intel iGPU and is tainted so nothing
+      # else lands on it. The gpu.intel.com/i915 limit above already pins the pod
+      # there, so no nodeSelector is needed — only permission to schedule.
+      tolerations:
+        - key: gpu.intel.com/i915
+          operator: Equal
+          value: "true"
+          effect: NoSchedule
       securityContext:
         runAsNonRoot: true
         runAsUser: 568
