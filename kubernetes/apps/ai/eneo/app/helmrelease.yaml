@@ -37,7 +37,7 @@ spec:
           02-init-eneo:
             image: &backendImage
               repository: ghcr.io/eneo-ai/eneo-backend
-              tag: 2.1.2@sha256:7beae6eaf4bb20c859fb3d62030d2fa6fd235e176f68c6c73df4ee37f15eb291
+              tag: 2.2.0@sha256:bfb5a5c5e911b1ecb7a45aed7e969163d994453c3366141b1707748e00877103
             command: ["python", "init_db.py"]
             env: &backendEnv
               TZ: "${TZ}"
@@ -84,14 +84,14 @@ spec:
               NUM_WORKERS: "2"
             envFrom: *backendEnvFrom
             probes:
-              # 2.1.2 has no /api/livez; /version is dependency-free, while
-              # /api/healthz also fails when the general worker is unhealthy
+              # /api/livez is dependency-free, while /api/readyz also fails
+              # when the worker or object content storage is unhealthy
               liveness:
                 enabled: true
                 custom: true
                 spec:
                   httpGet:
-                    path: /version
+                    path: /api/livez
                     port: &backendPort 8000
                   periodSeconds: 30
                   timeoutSeconds: 10
@@ -100,7 +100,7 @@ spec:
                 custom: true
                 spec:
                   httpGet:
-                    path: /api/healthz
+                    path: /api/readyz
                     port: *backendPort
                   periodSeconds: 15
                   timeoutSeconds: 10
@@ -109,7 +109,7 @@ spec:
                 custom: true
                 spec:
                   httpGet:
-                    path: /version
+                    path: /api/livez
                     port: *backendPort
                   periodSeconds: 5
                   failureThreshold: 60
@@ -133,7 +133,7 @@ spec:
                 custom: true
                 spec:
                   exec:
-                    command: ["arq", "--check", "src.intric.worker.arq.WorkerSettings"]
+                    command: ["arq", "--check", "src.eneo.worker.arq.WorkerSettings"]
                   initialDelaySeconds: 30
                   periodSeconds: 30
                   timeoutSeconds: 10
@@ -145,8 +145,6 @@ spec:
                 memory: 256Mi
               limits:
                 memory: 2Gi
-      # 2.1.2 runs crawls on the general worker; a dedicated crawler worker
-      # (WORKER_ROLE=crawler, eneo.* package, /api/livez) arrives with 2.2.0
       frontend:
         annotations:
           reloader.stakater.com/auto: "true"
@@ -154,7 +152,7 @@ spec:
           app:
             image:
               repository: ghcr.io/eneo-ai/eneo-frontend
-              tag: 2.1.2@sha256:11da322c6c2fd2d0b3f02830f07ec7ce77d456446c9e6fd1ff3571a4a4d9ca1b
+              tag: 2.2.0@sha256:148346cb8399e8c34de89cde5caae3d1328f1605aa6f25692789702d9c948f58
             env:
               TZ: "${TZ}"
               NODE_ENV: production
