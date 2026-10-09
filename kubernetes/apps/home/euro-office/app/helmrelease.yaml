@@ -80,6 +80,13 @@ spec:
                 memory: 1Gi
               limits:
                 memory: 4Gi
+    defaultPodOptions:
+      securityContext:
+        # gid of `ds`, which runs docservice/converter and writes App_Data on the
+        # PVC. The v9.3.4 entrypoint doesn't repair the volume's ownership
+        # (upstream 275a7eb0 adds that later), so a fresh PVC is root-only.
+        fsGroup: 107
+        fsGroupChangePolicy: OnRootMismatch
     service:
       app:
         controller: *app
