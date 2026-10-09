@@ -10,3 +10,4 @@ components:
 resources:
   - ./namespace.yaml
   - ./nextcloud/ks.yaml
+  - ./euro-office/ks.yaml

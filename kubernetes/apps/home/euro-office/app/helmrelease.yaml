@@ -1,0 +1,101 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app euro-office
+spec:
+  interval: 1h
+  chartRef:
+    kind: OCIRepository
+    name: *app
+  install:
+    remediation:
+      retries: -1
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  values:
+    controllers:
+      euro-office:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        initContainers:
+          01-init-db:
+            image:
+              repository: ghcr.io/home-operations/postgres-init
+              tag: "18"
+            envFrom:
+              - secretRef:
+                  name: euro-office-secret
+        containers:
+          # The standalone image must run as root: its entrypoint rewrites config
+          # under /etc, chowns state and starts supervisord, which drops the
+          # services to the `ds` user. It also starts a bundled RabbitMQ, and a
+          # bundled redis-server that sits idle, since this build keeps editor
+          # state in memory and never connects to Redis.
+          app:
+            image:
+              repository: ghcr.io/euro-office/documentserver
+              tag: v9.3.4-hotfix.1@sha256:889e681923d2dcc8bdfb92fe128d10e185fcff880d302b6a0c0c7bf339499290
+            env:
+              TZ: "${TZ}"
+              # The entrypoint applies the schema itself, as DB_USER
+              DB_HOST: postgres-rw.databases.svc.cluster.local
+              DB_NAME: eurooffice
+              DB_USER: eurooffice
+              # Documents are fetched from https://cloud.${SECRET_DOMAIN}, which
+              # resolves to the envoy-internal address
+              ALLOW_PRIVATE_IP_ADDRESS: "true"
+            envFrom:
+              # JWT_SECRET, SECURE_LINK_SECRET and DB_PWD. Setting both secrets
+              # means nothing under /var/www/euro-office/Data needs to persist.
+              - secretRef:
+                  name: euro-office-secret
+            probes:
+              liveness: &probe
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /healthcheck
+                    port: &port 80
+                  periodSeconds: 30
+                  timeoutSeconds: 10
+              readiness: *probe
+              # Font cache generation and RabbitMQ start on every boot
+              startup:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /healthcheck
+                    port: *port
+                  periodSeconds: 10
+                  failureThreshold: 60
+            resources:
+              requests:
+                cpu: 100m
+                memory: 1Gi
+              limits:
+                memory: 4Gi
+    service:
+      app:
+        controller: *app
+        ports:
+          http:
+            port: *port
+    route:
+      app:
+        hostnames:
+          - "office.${SECRET_DOMAIN}"
+        parentRefs:
+          - name: envoy-internal
+            namespace: network
+            sectionName: https
+    persistence:
+      data:
+        existingClaim: *app
+        globalMounts:
+          - path: /var/lib/euro-office/documentserver

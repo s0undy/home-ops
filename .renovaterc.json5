@@ -77,6 +77,12 @@
       allowedVersions: "<35",
     },
     {
+      description: "Euro-Office tags hotfixes as vX.Y.Z-hotfix.N, which docker versioning would treat as a separate compatibility line",
+      matchDatasources: ["docker"],
+      matchPackageNames: ["ghcr.io/euro-office/documentserver"],
+      versioning: "regex:^v(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)(?:-hotfix\\.(?<build>\\d+))?$",
+    },
+    {
       matchUpdateTypes: ["major"],
       semanticCommitType: "feat",
       commitMessagePrefix: "{{semanticCommitType}}({{semanticCommitScope}})!:",

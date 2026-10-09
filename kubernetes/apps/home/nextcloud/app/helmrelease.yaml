@@ -68,6 +68,12 @@ spec:
               # Snowflake ID node, 1-511 and never change it. Values < 1 fall back
               # to a hash of the hostname, which is the pod name here
               NC_serverid: "1"
+              # Read by config/eurooffice.config.php
+              EUROOFFICE_JWT_SECRET:
+                valueFrom:
+                  secretKeyRef:
+                    name: euro-office-secret
+                    key: JWT_SECRET
               PHP_MEMORY_LIMIT: 1G
               # Must match client_max_body_size in nginx.conf
               PHP_UPLOAD_LIMIT: 10G
@@ -275,6 +281,12 @@ spec:
               - path: /usr/local/etc/php-fpm.d/zz-tuning.conf
                 subPath: zz-tuning.conf
                 readOnly: true
+              - &eurooffice
+                path: /var/www/html/config/eurooffice.config.php
+                subPath: eurooffice.config.php
+                readOnly: true
+            cron:
+              - *eurooffice
             nginx:
               - path: /etc/nginx/nginx.conf
                 subPath: nginx.conf

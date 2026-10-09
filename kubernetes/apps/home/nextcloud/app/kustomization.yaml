@@ -10,5 +10,6 @@ configMapGenerator:
     files:
       - ./resources/nginx.conf
       - ./resources/zz-tuning.conf
+      - ./resources/eurooffice.config.php
 generatorOptions:
   disableNameSuffixHash: true

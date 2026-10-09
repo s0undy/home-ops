@@ -1,0 +1,14 @@
+---
+# Open-document cache and conversion temp files. Not backed up: saved
+# documents live in Nextcloud, this only keeps in-flight edits across restarts.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: euro-office
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+  storageClassName: ceph-rbd
