@@ -46,7 +46,7 @@ spec:
           # /var/www/html and runs the unattended install, later starts upgrade it
           app:
             image: *image
-            env:
+            env: &env
               TZ: "${TZ}"
               POSTGRES_HOST: postgres-rw.databases.svc.cluster.local
               POSTGRES_DB: nextcloud
@@ -59,10 +59,18 @@ spec:
               OVERWRITECLIURL: "https://cloud.${SECRET_DOMAIN}"
               # Envoy pods, so client IPs come from X-Forwarded-For
               TRUSTED_PROXIES: 10.42.0.0/16
+              # NC_<key> env vars override config.php system values
+              NC_default_phone_region: SE
+              # UTC hour, heavy daily jobs run in the 4h after it (02:00/03:00
+              # Stockholm). Only enforced for CLI cron, i.e. the cron container
+              NC_maintenance_window_start: "1"
+              # Snowflake ID node, 1-511 and never change it. Values < 1 fall back
+              # to a hash of the hostname, which is the pod name here
+              NC_serverid: "1"
               PHP_MEMORY_LIMIT: 1G
               # Must match client_max_body_size in nginx.conf
               PHP_UPLOAD_LIMIT: 10G
-            envFrom:
+            envFrom: &envFrom
               - secretRef:
                   name: nextcloud-secret
             probes:
@@ -92,6 +100,33 @@ spec:
                 memory: 512Mi
               limits:
                 memory: 4Gi
+          # Background jobs every 5 minutes. busybox crond (the image's cron.sh)
+          # can't switch to the crontab user without root, so loop instead. The
+          # trap plus backgrounded sleep makes SIGTERM end the loop between runs.
+          cron:
+            image: *image
+            command:
+              - sh
+              - -c
+              - |
+                trap 'exit 0' TERM INT
+                # php-fpm only listens once the entrypoint finished installing/upgrading
+                until php -r 'exit(@fsockopen("127.0.0.1", 9000) ? 0 : 1);'; do
+                  sleep 10 & wait $!
+                done
+                while true; do
+                  php -f /var/www/html/cron.php
+                  sleep 300 & wait $!
+                done
+            env: *env
+            envFrom: *envFrom
+            securityContext: *securityContext
+            resources:
+              requests:
+                cpu: 10m
+                memory: 128Mi
+              limits:
+                memory: 2Gi
           nginx:
             image:
               repository: ghcr.io/nginx/nginx-unprivileged
@@ -161,6 +196,8 @@ spec:
           nextcloud:
             app:
               - path: /var/www/html
+            cron:
+              - path: /var/www/html
             nginx:
               - path: /var/www/html
                 readOnly: true
@@ -171,6 +208,8 @@ spec:
         advancedMounts:
           nextcloud:
             app:
+              - path: /var/www/data
+            cron:
               - path: /var/www/data
       php-conf:
         type: emptyDir
@@ -199,6 +238,8 @@ spec:
         advancedMounts:
           nextcloud:
             app:
+              - path: /tmp
+            cron:
               - path: /tmp
             nginx:
               - path: /tmp
