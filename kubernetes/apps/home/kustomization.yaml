@@ -11,3 +11,4 @@ resources:
   - ./namespace.yaml
   - ./nextcloud/ks.yaml
   - ./euro-office/ks.yaml
+  - ./whiteboard/ks.yaml

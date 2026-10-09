@@ -11,5 +11,6 @@ configMapGenerator:
       - ./resources/nginx.conf
       - ./resources/zz-tuning.conf
       - ./resources/eurooffice.config.php
+      - ./resources/whiteboard.sh
 generatorOptions:
   disableNameSuffixHash: true

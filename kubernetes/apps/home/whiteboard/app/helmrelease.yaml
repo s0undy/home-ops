@@ -1,0 +1,95 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app whiteboard
+spec:
+  interval: 1h
+  chartRef:
+    kind: OCIRepository
+    name: *app
+  install:
+    remediation:
+      retries: -1
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  values:
+    controllers:
+      whiteboard:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        containers:
+          # Real-time collaboration server for the Nextcloud whiteboard app
+          app:
+            image:
+              repository: ghcr.io/nextcloud-releases/whiteboard
+              tag: v2.0.0@sha256:059596633333d009890c64858f89f133ccd973a2e0823ad960a0cc05cf8657f1
+            # The image's `npm run server:start` writes npm state under $HOME
+            # (/app), so run node directly. /tmp is an emptyDir, which hides the
+            # Chromium dirs the image pre-creates for board recordings.
+            command:
+              - sh
+              - -c
+              - |
+                mkdir -p -m 0700 "$XDG_RUNTIME_DIR" "$CRASHPAD_DATABASE" "$RECORDINGS_DIR"
+                exec node websocket_server/main.js
+            env:
+              TZ: "${TZ}"
+              # Also the only origin allowed by its CORS policy, so it must be
+              # the URL browsers load Nextcloud from
+              NEXTCLOUD_URL: "https://cloud.${SECRET_DOMAIN}"
+              # In-memory session state; Redis is only needed for several replicas
+              STORAGE_STRATEGY: lru
+            envFrom:
+              # JWT_SECRET_KEY, shared with Nextcloud
+              - secretRef:
+                  name: whiteboard-secret
+            probes:
+              liveness: &probe
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /
+                    port: &port 3002
+                  periodSeconds: 30
+                  timeoutSeconds: 3
+              readiness: *probe
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: { drop: ["ALL"] }
+            resources:
+              requests:
+                cpu: 10m
+                memory: 128Mi
+              limits:
+                memory: 1Gi
+    defaultPodOptions:
+      securityContext:
+        # `nobody`, the image's user
+        runAsNonRoot: true
+        runAsUser: 65534
+        runAsGroup: 65534
+    service:
+      app:
+        controller: *app
+        ports:
+          http:
+            port: *port
+    route:
+      app:
+        hostnames:
+          - "{{ .Release.Name }}.${SECRET_DOMAIN}"
+        parentRefs:
+          - name: envoy-internal
+            namespace: network
+            sectionName: https
+    persistence:
+      tmp:
+        type: emptyDir
+        globalMounts:
+          - path: /tmp

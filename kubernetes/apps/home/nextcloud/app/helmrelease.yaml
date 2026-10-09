@@ -74,6 +74,13 @@ spec:
                   secretKeyRef:
                     name: euro-office-secret
                     key: JWT_SECRET
+              # Read by the whiteboard.sh before-starting hook
+              WHITEBOARD_URL: "https://whiteboard.${SECRET_DOMAIN}"
+              WHITEBOARD_JWT_SECRET:
+                valueFrom:
+                  secretKeyRef:
+                    name: whiteboard-secret
+                    key: JWT_SECRET_KEY
               PHP_MEMORY_LIMIT: 1G
               # Must match client_max_body_size in nginx.conf
               PHP_UPLOAD_LIMIT: 10G
@@ -290,6 +297,17 @@ spec:
             nginx:
               - path: /etc/nginx/nginx.conf
                 subPath: nginx.conf
+                readOnly: true
+      # Entrypoint hooks must be executable, hence a separate mount
+      hooks:
+        type: configMap
+        name: nextcloud-configmap
+        defaultMode: 493 # 0755
+        advancedMounts:
+          nextcloud:
+            app:
+              - path: /docker-entrypoint-hooks.d/before-starting/whiteboard.sh
+                subPath: whiteboard.sh
                 readOnly: true
       # PHP upload staging, nginx body buffering and temp paths
       tmp:
