@@ -57,8 +57,9 @@ spec:
               NEXTCLOUD_TRUSTED_DOMAINS: &host "cloud.${SECRET_DOMAIN}"
               OVERWRITEPROTOCOL: https
               OVERWRITECLIURL: "https://cloud.${SECRET_DOMAIN}"
-              # Envoy pods, so client IPs come from X-Forwarded-For
-              TRUSTED_PROXIES: 10.42.0.0/16
+              # Envoy pods, so client IPs come from X-Forwarded-For, and the push
+              # sidecar, which reaches Nextcloud through nginx on 127.0.0.1
+              TRUSTED_PROXIES: 10.42.0.0/16 127.0.0.1
               # NC_<key> env vars override config.php system values
               NC_default_phone_region: SE
               # UTC hour, heavy daily jobs run in the 4h after it (02:00/03:00
@@ -127,6 +128,49 @@ spec:
                 memory: 128Mi
               limits:
                 memory: 2Gi
+          # Client Push (notify_push). Runs the binary shipped inside the app so it
+          # always matches the installed app version, which `occ notify_push:setup`
+          # requires. Database settings come from config.php.
+          push:
+            image: *image
+            command:
+              - sh
+              - -c
+              - |
+                trap 'kill -TERM $pid 2>/dev/null; exit 0' TERM INT
+                bin=/var/www/html/custom_apps/notify_push/bin/x86_64/notify_push
+                # Only exists once the app is installed from the app store
+                until [ -x "$bin" ]; do
+                  sleep 30 & wait $!
+                done
+                sum=$(md5sum "$bin")
+                "$bin" /var/www/html/config/config.php & pid=$!
+                # App updates replace the binary, so exit to restart on the new one
+                while kill -0 "$pid" 2>/dev/null; do
+                  sleep 60 & wait $!
+                  if [ "$(md5sum "$bin" 2>/dev/null)" != "$sum" ]; then
+                    echo "notify_push binary changed, restarting"
+                    kill -TERM "$pid"
+                    wait "$pid"
+                    exit 0
+                  fi
+                done
+                wait "$pid"
+            env:
+              TZ: "${TZ}"
+              # Only reachable through nginx's /push/ location
+              BIND: 127.0.0.1
+              PORT: "7867"
+              NEXTCLOUD_URL: http://127.0.0.1:8080
+              REDIS_URL: redis://nextcloud-dragonfly:6379
+              NO_ANSI: "true"
+            securityContext: *securityContext
+            resources:
+              requests:
+                cpu: 10m
+                memory: 32Mi
+              limits:
+                memory: 256Mi
           nginx:
             image:
               repository: ghcr.io/nginx/nginx-unprivileged
@@ -198,6 +242,9 @@ spec:
               - path: /var/www/html
             cron:
               - path: /var/www/html
+            push:
+              - path: /var/www/html
+                readOnly: true
             nginx:
               - path: /var/www/html
                 readOnly: true
