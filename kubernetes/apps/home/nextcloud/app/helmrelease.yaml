@@ -1,0 +1,204 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app nextcloud
+spec:
+  interval: 1h
+  chartRef:
+    kind: OCIRepository
+    name: *app
+  install:
+    remediation:
+      retries: -1
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  values:
+    controllers:
+      nextcloud:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        initContainers:
+          01-init-db:
+            image:
+              repository: ghcr.io/home-operations/postgres-init
+              tag: "18"
+            envFrom:
+              - secretRef:
+                  name: nextcloud-secret
+          # The entrypoint writes redis-session.ini into conf.d whenever REDIS_HOST
+          # is set, which fails as non-root on a read-only root filesystem. Seed a
+          # writable copy of the image's conf.d for the app container to mount.
+          02-php-conf:
+            image: &image
+              repository: docker.io/library/nextcloud
+              tag: 34.0.4-fpm-alpine@sha256:9f75da92261d0993a98098573e0f2d5ca01cfbbbb236f90ad521c388568de94c
+            command: ["sh", "-c", "cp -R /usr/local/etc/php/conf.d/. /conf.d/"]
+            securityContext: &securityContext
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: { drop: ["ALL"] }
+        containers:
+          # php-fpm; on first start the entrypoint copies the release into
+          # /var/www/html and runs the unattended install, later starts upgrade it
+          app:
+            image: *image
+            env:
+              TZ: "${TZ}"
+              POSTGRES_HOST: postgres-rw.databases.svc.cluster.local
+              POSTGRES_DB: nextcloud
+              REDIS_HOST: nextcloud-dragonfly
+              REDIS_HOST_PORT: "6379"
+              NEXTCLOUD_DATA_DIR: /var/www/data
+              # Only applied by the initial install, managed in config.php afterwards
+              NEXTCLOUD_TRUSTED_DOMAINS: &host "cloud.${SECRET_DOMAIN}"
+              OVERWRITEPROTOCOL: https
+              OVERWRITECLIURL: "https://cloud.${SECRET_DOMAIN}"
+              # Envoy pods, so client IPs come from X-Forwarded-For
+              TRUSTED_PROXIES: 10.42.0.0/16
+              PHP_MEMORY_LIMIT: 1G
+              # Must match client_max_body_size in nginx.conf
+              PHP_UPLOAD_LIMIT: 10G
+            envFrom:
+              - secretRef:
+                  name: nextcloud-secret
+            probes:
+              liveness: &fpmProbe
+                enabled: true
+                custom: true
+                spec:
+                  tcpSocket:
+                    port: 9000
+                  periodSeconds: 30
+                  timeoutSeconds: 5
+              readiness: *fpmProbe
+              # php-fpm only listens once the entrypoint has synced and installed
+              # or upgraded Nextcloud, which can take several minutes
+              startup:
+                enabled: true
+                custom: true
+                spec:
+                  tcpSocket:
+                    port: 9000
+                  periodSeconds: 10
+                  failureThreshold: 90
+            securityContext: *securityContext
+            resources:
+              requests:
+                cpu: 100m
+                memory: 512Mi
+              limits:
+                memory: 4Gi
+          nginx:
+            image:
+              repository: ghcr.io/nginx/nginx-unprivileged
+              tag: 1.30.5-alpine@sha256:15c994d10d6d78658721c3bcafff14cb281fba2a4bdf9d5ba92c416a472516e3
+            env:
+              NGINX_ENTRYPOINT_QUIET_LOGS: "1"
+            probes:
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  tcpSocket:
+                    port: &port 8080
+                  periodSeconds: 30
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /status.php
+                    port: *port
+                    httpHeaders:
+                      - name: Host
+                        value: *host
+                  periodSeconds: 15
+                  timeoutSeconds: 5
+            securityContext: *securityContext
+            resources:
+              requests:
+                cpu: 10m
+                memory: 32Mi
+              limits:
+                memory: 256Mi
+    defaultPodOptions:
+      securityContext:
+        # www-data on the alpine image
+        runAsNonRoot: true
+        runAsUser: 82
+        runAsGroup: 82
+        fsGroup: 82
+        fsGroupChangePolicy: OnRootMismatch
+    service:
+      app:
+        controller: *app
+        ports:
+          http:
+            port: *port
+    route:
+      app:
+        annotations:
+          gethomepage.dev/enabled: "true"
+          gethomepage.dev/name: Nextcloud
+          gethomepage.dev/group: Home
+          gethomepage.dev/icon: nextcloud.png
+          gethomepage.dev/description: File sync and share
+        hostnames:
+          - *host
+        parentRefs:
+          - name: envoy-internal
+            namespace: network
+            sectionName: https
+    persistence:
+      # Code, config.php and custom_apps
+      html:
+        existingClaim: *app
+        advancedMounts:
+          nextcloud:
+            app:
+              - path: /var/www/html
+            nginx:
+              - path: /var/www/html
+                readOnly: true
+      data:
+        type: nfs
+        server: horrea-10.${SECRET_DOMAIN}
+        path: /mnt/tank/Nextcloud
+        advancedMounts:
+          nextcloud:
+            app:
+              - path: /var/www/data
+      php-conf:
+        type: emptyDir
+        advancedMounts:
+          nextcloud:
+            02-php-conf:
+              - path: /conf.d
+            app:
+              - path: /usr/local/etc/php/conf.d
+      config:
+        type: configMap
+        name: nextcloud-configmap
+        advancedMounts:
+          nextcloud:
+            app:
+              - path: /usr/local/etc/php-fpm.d/zz-tuning.conf
+                subPath: zz-tuning.conf
+                readOnly: true
+            nginx:
+              - path: /etc/nginx/nginx.conf
+                subPath: nginx.conf
+                readOnly: true
+      # PHP upload staging, nginx body buffering and temp paths
+      tmp:
+        type: emptyDir
+        advancedMounts:
+          nextcloud:
+            app:
+              - path: /tmp
+            nginx:
+              - path: /tmp

@@ -1,0 +1,36 @@
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: nextcloud
+spec:
+  components:
+    - ../../../../components/dragonfly
+    - ../../../../components/kopiur/backup
+  dependsOn:
+    - name: dragonfly-operator
+      namespace: databases
+    - name: postgres
+      namespace: databases
+    - name: kopiur-repository
+      namespace: kopiur-system
+  interval: 1h
+  path: ./kubernetes/apps/home/nextcloud/app
+  postBuild:
+    substitute:
+      APP: nextcloud
+      # Nextcloud code, config and custom_apps; user files live on NFS
+      KOPIUR_CAPACITY: 10Gi
+      # www-data on the alpine image
+      KOPIUR_PUID: "82"
+      KOPIUR_PGID: "82"
+    substituteFrom:
+      - name: cluster-secrets
+        kind: Secret
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  targetNamespace: home
+  wait: false

@@ -71,6 +71,12 @@
       enabled: false,
     },
     {
+      description: "Nextcloud 35 is still too buggy, hold on 34.x until it stabilises",
+      matchDatasources: ["docker"],
+      matchPackageNames: ["docker.io/library/nextcloud"],
+      allowedVersions: "<35",
+    },
+    {
       matchUpdateTypes: ["major"],
       semanticCommitType: "feat",
       commitMessagePrefix: "{{semanticCommitType}}({{semanticCommitScope}})!:",
