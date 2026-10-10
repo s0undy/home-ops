@@ -1,0 +1,14 @@
+---
+# Uploaded media (backgrounds, icons). authentik only enables file uploads when
+# /data is a mount point. RWX so server and worker share it across nodes.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: authentik-data
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: cephfs

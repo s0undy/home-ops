@@ -29,6 +29,17 @@ spec:
         # AUTHENTIK_SECRET_KEY and the AUTHENTIK_BOOTSTRAP_* values
         - secretRef:
             name: authentik-secret
+      # Make the CephFS volume writable for the authentik user (1000)
+      securityContext:
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: authentik-data
+      volumeMounts:
+        - name: data
+          mountPath: /data
     authentik:
       log_level: info
       postgresql:

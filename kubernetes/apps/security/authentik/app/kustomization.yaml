@@ -5,4 +5,5 @@ resources:
   - ./ocirepository.yaml
   - ./secret.sops.yaml
   - ./secret-init-db.sops.yaml
+  - ./pvc.yaml
   - ./helmrelease.yaml
