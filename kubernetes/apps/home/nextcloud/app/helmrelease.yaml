@@ -72,6 +72,9 @@ spec:
               # which Nextcloud's HTTP client blocks as a local address by
               # default, breaking user_oidc discovery against Authentik
               NC_allow_local_remote_servers: "true"
+              # Clients must use app tokens (from the browser login flow), never
+              # an account password via basic auth, so nothing bypasses Authentik
+              NC_token_auth_enforced: "true"
               # Read by config/eurooffice.config.php
               EUROOFFICE_JWT_SECRET:
                 valueFrom:
