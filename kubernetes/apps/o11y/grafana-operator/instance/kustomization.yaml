@@ -6,4 +6,5 @@ resources:
   - ./grafanadashboard.yaml
   - ./grafanadatasource.yaml
   - ./secret.sops.yaml
+  - ./secret-oidc.sops.yaml
   - ./servicemonitor.yaml

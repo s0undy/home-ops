@@ -13,7 +13,29 @@ spec:
       feedback_links_enabled: "false"
       reporting_enabled: "false"
     auth:
+      # Keep the local form: grafana-operator manages the instance through
+      # the local admin over basic auth. Auto-login hides it; break-glass via
+      # /login?disableAutoLogin=true
       disable_login_form: "false"
+      signout_redirect_url: https://auth.${SECRET_DOMAIN}/application/o/grafana/end-session/
+    auth.generic_oauth:
+      enabled: "true"
+      name: authentik
+      # client_id and client_secret come from the grafana-oidc Secret
+      scopes: openid profile email entitlements
+      auth_url: https://auth.${SECRET_DOMAIN}/application/o/authorize/
+      token_url: https://auth.${SECRET_DOMAIN}/application/o/token/
+      api_url: https://auth.${SECRET_DOMAIN}/application/o/userinfo/
+      use_pkce: "true"
+      auto_login: "true"
+      # Roles come from Authentik application entitlements; users without
+      # one are refused login
+      allow_assign_grafana_admin: "true"
+      role_attribute_strict: "true"
+      role_attribute_path: >-
+        contains(entitlements[*], 'Grafana Admins') && 'GrafanaAdmin' ||
+        contains(entitlements[*], 'Grafana Editors') && 'Editor' ||
+        contains(entitlements[*], 'Grafana Viewers') && 'Viewer'
     log:
       mode: console
     metrics:
@@ -24,7 +46,11 @@ spec:
       plugin_admin_enabled: "false"
     server:
       enable_gzip: "true"
+      root_url: https://grafana.${SECRET_DOMAIN}
   deployment:
+    metadata:
+      annotations:
+        reloader.stakater.com/auto: "true"
     spec:
       strategy:
         type: Recreate
@@ -38,6 +64,16 @@ spec:
                     secretKeyRef:
                       name: grafana-admin
                       key: GF_SECURITY_ADMIN_PASSWORD
+                - name: GF_AUTH_GENERIC_OAUTH_CLIENT_ID
+                  valueFrom:
+                    secretKeyRef:
+                      name: grafana-oidc
+                      key: GF_AUTH_GENERIC_OAUTH_CLIENT_ID
+                - name: GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET
+                  valueFrom:
+                    secretKeyRef:
+                      name: grafana-oidc
+                      key: GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET
               securityContext:
                 allowPrivilegeEscalation: false
                 readOnlyRootFilesystem: true
