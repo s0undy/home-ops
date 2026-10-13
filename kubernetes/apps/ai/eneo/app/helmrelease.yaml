@@ -37,7 +37,7 @@ spec:
           02-init-eneo:
             image: &backendImage
               repository: ghcr.io/eneo-ai/eneo-backend
-              tag: 2.2.1@sha256:3c1f346cc812ddfdbed26dfa510cc458df1e5ac27a0af6e5479cb92147e85c6e
+              tag: 2.2.2@sha256:2a332becf682875da6dbf3c7482176c6cb3971bac44cf897f9a58620e7c8d22a
             command: ["python", "init_db.py"]
             env: &backendEnv
               TZ: "${TZ}"
@@ -152,7 +152,7 @@ spec:
           app:
             image:
               repository: ghcr.io/eneo-ai/eneo-frontend
-              tag: 2.2.1@sha256:d1250f36ceca38a5ed51ee0262c9bf28637d52efd9d2969b765a4383dffdc6e0
+              tag: 2.2.2@sha256:97b833c54b937635054e60c1f67c955efff8684df76dd71e1ceb78fbc630d005
             env:
               TZ: "${TZ}"
               NODE_ENV: production
