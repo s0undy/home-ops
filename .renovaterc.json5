@@ -83,6 +83,12 @@
       versioning: "regex:^v(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)(?:-hotfix\\.(?<build>\\d+))?$",
     },
     {
+      description: "SearXNG tags are YYYY.M.D-<commit>, which docker versioning would treat as a separate compatibility line per commit",
+      matchDatasources: ["docker"],
+      matchPackageNames: ["ghcr.io/searxng/searxng"],
+      versioning: "regex:^(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)-[0-9a-f]+$",
+    },
+    {
       matchUpdateTypes: ["major"],
       semanticCommitType: "feat",
       commitMessagePrefix: "{{semanticCommitType}}({{semanticCommitScope}})!:",

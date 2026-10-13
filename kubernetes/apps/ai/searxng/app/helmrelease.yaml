@@ -1,0 +1,207 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app searxng
+spec:
+  interval: 1h
+  chartRef:
+    kind: OCIRepository
+    name: *app
+  install:
+    remediation:
+      retries: -1
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  values:
+    controllers:
+      searxng:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        containers:
+          app:
+            image:
+              # Same images as Docker Hub, without its pull rate limits
+              repository: ghcr.io/searxng/searxng
+              tag: 2026.10.13-22c64b8d3@sha256:9b61996edcc679fb6665290f95fda15389a14eda6060e41a25c63ab2758f2436
+            env:
+              TZ: "${TZ}"
+              SEARXNG_BASE_URL: "https://{{ .Release.Name }}.${SECRET_DOMAIN}/"
+            envFrom:
+              - secretRef:
+                  name: searxng-secret
+            probes:
+              liveness: &searxngProbe
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /healthz
+                    port: &searxngPort 8080
+                  periodSeconds: 30
+                  timeoutSeconds: 5
+              readiness: *searxngProbe
+            securityContext: &securityContext
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: { drop: ["ALL"] }
+            resources:
+              requests:
+                cpu: 25m
+                memory: 256Mi
+              limits:
+                memory: 1Gi
+        pod:
+          # Image files are owned by searxng (977); the entrypoint only warns
+          # about mismatched ownership, but match it anyway
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 977
+            runAsGroup: 977
+            fsGroup: 977
+            fsGroupChangePolicy: OnRootMismatch
+      # Streamable HTTP MCP server Eneo uses as its web search provider
+      mcp:
+        containers:
+          app:
+            image:
+              repository: docker.io/isokoliuk/mcp-searxng
+              tag: 2.6.0@sha256:9389eed474a62bc35aafbf4d819b77ee54ecc25b5a1d1310ad0d45db2a056e0f
+            env:
+              TZ: "${TZ}"
+              SEARXNG_URL: "http://searxng.ai.svc.cluster.local:8080"
+              MCP_HTTP_PORT: "3000"
+              MCP_HTTP_HOST: "0.0.0.0"
+              # Every Eneo completion opens a fresh MCP connection from the
+              # same pod IP; the default of 20 inits/min is easily exhausted
+              MCP_RATE_INIT_MAX: "120"
+              # web_url_read renders pages through FlareSolverr first (e.g.
+              # Cloudflare challenges), falling back to one direct fetch
+              FLARESOLVERR_URL: "http://flaresolverr.media.svc.cluster.local:8191"
+            probes:
+              # /health has its own 60 req/min limit and never calls SearXNG
+              liveness: &mcpProbe
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /health
+                    port: 3000
+                  periodSeconds: 30
+                  timeoutSeconds: 5
+              readiness: *mcpProbe
+            securityContext: *securityContext
+            resources:
+              requests:
+                cpu: 10m
+                memory: 128Mi
+              limits:
+                memory: 512Mi
+    defaultPodOptions:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+    service:
+      searxng:
+        controller: searxng
+        ports:
+          http:
+            port: *searxngPort
+      # Cluster-internal only: runs without auth (non-hardened mode)
+      mcp:
+        controller: mcp
+        ports:
+          http:
+            port: 3000
+    route:
+      app:
+        annotations:
+          gethomepage.dev/enabled: "true"
+          gethomepage.dev/name: SearXNG
+          gethomepage.dev/group: AI
+          gethomepage.dev/icon: searxng.svg
+          gethomepage.dev/description: Metasearch engine
+        hostnames:
+          - "{{ .Release.Name }}.${SECRET_DOMAIN}"
+        parentRefs:
+          - name: envoy-internal
+            namespace: network
+            sectionName: https
+        rules:
+          - backendRefs:
+              - identifier: searxng
+                port: *searxngPort
+    configMaps:
+      settings:
+        data:
+          # Secret key comes from SEARXNG_SECRET, base URL from SEARXNG_BASE_URL
+          settings.yml: |
+            use_default_settings: true
+            general:
+              instance_name: SearXNG
+            search:
+              safe_search: 0
+              autocomplete: ""
+              # mcp-searxng queries the JSON API
+              formats:
+                - html
+                - json
+            server:
+              # The limiter needs Valkey and only matters for public instances
+              limiter: false
+              public_instance: false
+              image_proxy: true
+            # Tuning borrowed from joryirving/home-ops: favour sources that
+            # give LLMs useful answers
+            hostnames:
+              high_priority:
+                - (.*\.)?wikipedia\.org$
+                - (.*\.)?github\.com$
+                - (.*\.)?stackoverflow\.com$
+                - (.*\.)?askubuntu\.com$
+                - (.*\.)?superuser\.com$
+                - (.*\.)?archlinux\.org$
+                - (.*\.)?reddit\.com$
+            # Merged by name into the defaults
+            engines:
+              # The legacy html.duckduckgo.com engine gets captcha'd quickly;
+              # its duckduckgo.com replacement ships disabled
+              - name: duckduckgo
+                disabled: true
+              - name: duckduckgo web
+                disabled: false
+              # The HTML scraper is rate-limited from the first query; the
+              # API-backed braveapi engine would need an API key
+              - name: brave
+                disabled: true
+              # Tor-only engines fail to load without a Tor proxy
+              - name: ahmia
+                inactive: true
+              - name: torch
+                inactive: true
+    persistence:
+      settings:
+        type: configMap
+        identifier: settings
+        advancedMounts:
+          searxng:
+            app:
+              - path: /etc/searxng/settings.yml
+                subPath: settings.yml
+                readOnly: true
+      cache:
+        type: emptyDir
+        advancedMounts:
+          searxng:
+            app:
+              - path: /var/cache/searxng
+      tmp:
+        type: emptyDir
+        globalMounts:
+          - path: /tmp

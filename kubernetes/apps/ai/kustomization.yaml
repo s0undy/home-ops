@@ -9,3 +9,4 @@ components:
 resources:
   - ./namespace.yaml
   - ./eneo/ks.yaml
+  - ./searxng/ks.yaml
