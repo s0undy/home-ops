@@ -28,7 +28,7 @@ Validate manifests locally with `kustomize build <dir>` and `kubeconform` (both 
 
 ### Flux structure
 
-The entry point is `kubernetes/flux/cluster/ks.yaml`: a `cluster-apps` Flux Kustomization that applies `kubernetes/apps/` and patches **defaults into every child Kustomization** — SOPS decryption, and HelmRelease install/upgrade remediation settings. Don't repeat those settings in per-app manifests.
+The entry point is `kubernetes/flux/cluster/ks.yaml`: a `cluster-apps` Flux Kustomization that applies `kubernetes/apps/` and patches **defaults into every child Kustomization** — SOPS decryption, HelmRelease install/upgrade remediation settings, and `retryInterval`/`timeout`. Don't repeat those settings in per-app manifests.
 
 Every app follows the same three-level pattern:
 

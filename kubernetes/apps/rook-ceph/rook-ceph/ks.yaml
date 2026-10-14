@@ -4,16 +4,14 @@ kind: Kustomization
 metadata:
   name: rook-ceph
 spec:
-  interval: 30m
+  interval: 1h
   path: ./kubernetes/apps/rook-ceph/rook-ceph/operator
   prune: false
-  retryInterval: 1m
   sourceRef:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
   targetNamespace: rook-ceph
-  timeout: 5m
   wait: true
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
@@ -28,16 +26,14 @@ spec:
       kind: HelmRelease
       name: ceph-csi-drivers
       namespace: rook-ceph
-  interval: 30m
+  interval: 1h
   path: ./kubernetes/apps/rook-ceph/rook-ceph/csi-drivers
   prune: false
-  retryInterval: 1m
   sourceRef:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
   targetNamespace: rook-ceph
-  timeout: 5m
   wait: false
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
@@ -63,16 +59,14 @@ spec:
       kind: CephCluster
       failed: status.ceph.health == 'HEALTH_ERR'
       current: status.ceph.health in ['HEALTH_OK', 'HEALTH_WARN']
-  interval: 30m
+  interval: 1h
   path: ./kubernetes/apps/rook-ceph/rook-ceph/cluster
   prune: false
-  retryInterval: 1m
   sourceRef:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
   targetNamespace: rook-ceph
-  timeout: 15m
   # wait: false despite being a dependency — the CephCluster is created by
   # the HelmRelease rather than applied here, and wait: true would ignore
   # the healthChecks above that gate on its health

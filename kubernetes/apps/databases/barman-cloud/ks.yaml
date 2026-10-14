@@ -4,14 +4,12 @@ kind: Kustomization
 metadata:
   name: barman-cloud
 spec:
-  interval: 30m
+  interval: 1h
   path: ./kubernetes/apps/databases/barman-cloud/app
   prune: true
-  retryInterval: 1m
   sourceRef:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
   targetNamespace: databases
-  timeout: 5m
   wait: true

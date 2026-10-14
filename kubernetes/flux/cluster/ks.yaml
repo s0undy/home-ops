@@ -52,6 +52,9 @@ spec:
               target:
                 group: helm.toolkit.fluxcd.io
                 kind: HelmRelease
+          retryInterval: 2m
+          # covers the 15m Helm timeout of the rook-ceph releases
+          timeout: 15m
       target:
         group: kustomize.toolkit.fluxcd.io
         kind: Kustomization
