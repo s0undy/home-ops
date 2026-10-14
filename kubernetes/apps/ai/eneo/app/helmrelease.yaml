@@ -69,6 +69,11 @@ spec:
               DEFAULT_USER_EMAIL: "admin@${SECRET_DOMAIN}"
               LOGLEVEL: INFO
               JSON_LOGS: "true"
+              # Single-tenant SSO via Authentik; the login page switches to it
+              # once OIDC_CLIENT_ID/OIDC_CLIENT_SECRET exist in eneo-secret.
+              # Users are matched by email and must already exist in Eneo.
+              # Password login: /login?showUsernameAndPassword=true
+              OIDC_DISCOVERY_ENDPOINT: "https://auth.${SECRET_DOMAIN}/application/o/eneo/.well-known/openid-configuration"
             envFrom: &backendEnvFrom
               - secretRef:
                   name: eneo-secret
