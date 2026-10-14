@@ -35,6 +35,36 @@ spec:
             envFrom:
               - secretRef:
                   name: prowlarr-secret
+            probes:
+              liveness: &probes
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /ping
+                    port: &port 9696
+                  initialDelaySeconds: 0
+                  periodSeconds: 10
+                  timeoutSeconds: 5
+                  failureThreshold: 3
+              readiness: *probes
+              # database migrations after an upgrade can hold off the
+              # web server; give it 5 minutes before liveness applies
+              startup:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /ping
+                    port: *port
+                  periodSeconds: 10
+                  failureThreshold: 30
+            resources:
+              requests:
+                cpu: 50m
+                memory: 384Mi
+              limits:
+                memory: 2Gi
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
@@ -51,7 +81,7 @@ spec:
         controller: *app
         ports:
           http:
-            port: 9696
+            port: *port
     route:
       app:
         annotations:

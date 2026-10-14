@@ -21,6 +21,19 @@ spec:
               TZ: ${TZ}
               # writable HOME for Chrome / undetected-chromedriver when non-root
               HOME: /config
+            probes:
+              liveness: &probes
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /health
+                    port: &port 8191
+                  initialDelaySeconds: 0
+                  periodSeconds: 10
+                  timeoutSeconds: 5
+                  failureThreshold: 3
+              readiness: *probes
             securityContext:
               allowPrivilegeEscalation: false
               capabilities: { drop: ['ALL'] }
@@ -41,7 +54,7 @@ spec:
       app:
         ports:
           http:
-            port: 8191
+            port: *port
     persistence:
       config:
         type: emptyDir
