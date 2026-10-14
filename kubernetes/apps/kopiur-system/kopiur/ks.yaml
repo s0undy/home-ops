@@ -26,6 +26,10 @@ metadata:
 spec:
   dependsOn:
     - name: kopiur
+    # backed-up apps restore into ceph-rbd PVCs via ceph-rbd-snapshot, and
+    # they all depend on this Kustomization
+    - name: rook-ceph-cluster
+      namespace: rook-ceph
   interval: 1h
   path: ./kubernetes/apps/kopiur-system/kopiur/repository
   postBuild:
