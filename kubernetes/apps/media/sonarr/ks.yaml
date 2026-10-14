@@ -9,6 +9,11 @@ spec:
   dependsOn:
     - name: kopiur-repository
       namespace: kopiur-system
+  healthChecks:
+    - apiVersion: helm.toolkit.fluxcd.io/v2
+      kind: HelmRelease
+      name: sonarr
+      namespace: media
   interval: 1h
   path: ./kubernetes/apps/media/sonarr/app
   postBuild:

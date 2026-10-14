@@ -11,6 +11,11 @@ spec:
       namespace: databases
     - name: postgres
       namespace: databases
+  healthChecks:
+    - apiVersion: helm.toolkit.fluxcd.io/v2
+      kind: HelmRelease
+      name: eneo
+      namespace: ai
   interval: 1h
   path: ./kubernetes/apps/ai/eneo/app
   postBuild:

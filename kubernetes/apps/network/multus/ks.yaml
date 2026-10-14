@@ -4,14 +4,6 @@ kind: Kustomization
 metadata:
   name: multus
 spec:
-  healthChecks:
-    - apiVersion: helm.toolkit.fluxcd.io/v2
-      kind: HelmRelease
-      name: multus
-      namespace: network
-    - apiVersion: apiextensions.k8s.io/v1
-      kind: CustomResourceDefinition
-      name: network-attachment-definitions.k8s.cni.cncf.io
   interval: 1h
   path: ./kubernetes/apps/network/multus/app
   prune: true
@@ -20,6 +12,7 @@ spec:
     name: flux-system
     namespace: flux-system
   targetNamespace: network
+  wait: true
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
@@ -36,4 +29,4 @@ spec:
     name: flux-system
     namespace: flux-system
   targetNamespace: network
-  wait: true
+  wait: false

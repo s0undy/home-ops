@@ -9,6 +9,11 @@ spec:
       namespace: databases
     - name: rook-ceph-cluster # provides the cephfs StorageClass
       namespace: rook-ceph
+  healthChecks:
+    - apiVersion: helm.toolkit.fluxcd.io/v2
+      kind: HelmRelease
+      name: authentik
+      namespace: security
   interval: 1h
   path: ./kubernetes/apps/security/authentik/app
   postBuild:

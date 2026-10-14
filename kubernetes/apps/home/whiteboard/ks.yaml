@@ -4,6 +4,11 @@ kind: Kustomization
 metadata:
   name: whiteboard
 spec:
+  healthChecks:
+    - apiVersion: helm.toolkit.fluxcd.io/v2
+      kind: HelmRelease
+      name: whiteboard
+      namespace: home
   interval: 1h
   path: ./kubernetes/apps/home/whiteboard/app
   postBuild:

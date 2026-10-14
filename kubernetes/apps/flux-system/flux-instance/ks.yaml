@@ -6,6 +6,11 @@ metadata:
 spec:
   dependsOn:
     - name: flux-operator
+  healthChecks:
+    - apiVersion: helm.toolkit.fluxcd.io/v2
+      kind: HelmRelease
+      name: flux-instance
+      namespace: flux-system
   interval: 1h
   path: ./kubernetes/apps/flux-system/flux-instance/app
   postBuild:

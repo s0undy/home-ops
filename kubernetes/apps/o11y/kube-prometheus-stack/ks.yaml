@@ -8,11 +8,6 @@ spec:
     - name: grafana-operator # provides the GrafanaDashboard CRD
     - name: rook-ceph-cluster
       namespace: rook-ceph
-  healthChecks:
-    - apiVersion: helm.toolkit.fluxcd.io/v2
-      kind: HelmRelease
-      name: kube-prometheus-stack
-      namespace: o11y
   interval: 1h
   path: ./kubernetes/apps/o11y/kube-prometheus-stack/app
   postBuild:
@@ -25,4 +20,4 @@ spec:
     name: flux-system
     namespace: flux-system
   targetNamespace: o11y
-  wait: false
+  wait: true

@@ -4,6 +4,11 @@ kind: Kustomization
 metadata:
   name: flaresolverr
 spec:
+  healthChecks:
+    - apiVersion: helm.toolkit.fluxcd.io/v2
+      kind: HelmRelease
+      name: flaresolverr
+      namespace: media
   interval: 1h
   path: ./kubernetes/apps/media/flaresolverr/app
   postBuild:

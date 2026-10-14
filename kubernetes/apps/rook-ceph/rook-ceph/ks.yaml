@@ -4,11 +4,6 @@ kind: Kustomization
 metadata:
   name: rook-ceph
 spec:
-  healthChecks:
-    - apiVersion: helm.toolkit.fluxcd.io/v2
-      kind: HelmRelease
-      name: rook-ceph-operator
-      namespace: rook-ceph
   interval: 30m
   path: ./kubernetes/apps/rook-ceph/rook-ceph/operator
   prune: false
@@ -43,7 +38,7 @@ spec:
     namespace: flux-system
   targetNamespace: rook-ceph
   timeout: 5m
-  wait: true
+  wait: false
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
@@ -78,4 +73,7 @@ spec:
     namespace: flux-system
   targetNamespace: rook-ceph
   timeout: 15m
+  # wait: false despite being a dependency — the CephCluster is created by
+  # the HelmRelease rather than applied here, and wait: true would ignore
+  # the healthChecks above that gate on its health
   wait: false

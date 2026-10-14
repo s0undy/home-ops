@@ -19,4 +19,4 @@ spec:
     namespace: flux-system
   targetNamespace: kube-system
   timeout: 5m
-  wait: true
+  wait: false
