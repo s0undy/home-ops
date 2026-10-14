@@ -114,12 +114,15 @@ spec:
                   periodSeconds: 5
                   failureThreshold: 60
             securityContext: *securityContext
+            # Each gunicorn worker idles at ~500Mi and keeps its peak after
+            # long-context chats (100k+ tokens); 2Gi was OOMKilled with two
+            # concurrent chats
             resources:
               requests:
                 cpu: 50m
-                memory: 512Mi
+                memory: 1Gi
               limits:
-                memory: 2Gi
+                memory: 4Gi
           worker:
             image: *backendImage
             env:
