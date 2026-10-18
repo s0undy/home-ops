@@ -81,12 +81,6 @@
       enabled: false,
     },
     {
-      description: "Nextcloud 35 is still too buggy, hold on 34.x until it stabilises",
-      matchDatasources: ["docker"],
-      matchPackageNames: ["docker.io/library/nextcloud"],
-      allowedVersions: "<35",
-    },
-    {
       description: "Euro-Office tags hotfixes as vX.Y.Z-hotfix.N, which docker versioning would treat as a separate compatibility line",
       matchDatasources: ["docker"],
       matchPackageNames: ["ghcr.io/euro-office/documentserver"],

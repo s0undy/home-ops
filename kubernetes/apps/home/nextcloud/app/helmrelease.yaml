@@ -28,7 +28,7 @@ spec:
           02-php-conf:
             image: &image
               repository: docker.io/library/nextcloud
-              tag: 34.0.4-fpm-alpine@sha256:9f75da92261d0993a98098573e0f2d5ca01cfbbbb236f90ad521c388568de94c
+              tag: 35.0.2-fpm-alpine@sha256:83a9c44d3f738527258cd9bec0da768d78f381176e7d822ee48c2654db5e3179
             command: ["sh", "-c", "cp -R /usr/local/etc/php/conf.d/. /conf.d/"]
             securityContext: &securityContext
               allowPrivilegeEscalation: false
