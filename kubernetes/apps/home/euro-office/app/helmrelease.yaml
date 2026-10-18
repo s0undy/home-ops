@@ -39,7 +39,7 @@ spec:
               DB_NAME: eurooffice
               DB_USER: eurooffice
               # Documents are fetched from https://cloud.${SECRET_DOMAIN}, which
-              # resolves to the envoy-internal address
+              # resolves internally to the envoy-external address (10.0.100.22)
               ALLOW_PRIVATE_IP_ADDRESS: "true"
             envFrom:
               # JWT_SECRET, SECURE_LINK_SECRET and DB_PWD. Setting both secrets
@@ -91,7 +91,7 @@ spec:
         hostnames:
           - "office.${SECRET_DOMAIN}"
         parentRefs:
-          - name: envoy-internal
+          - name: envoy-external
             namespace: network
             sectionName: https
     persistence:

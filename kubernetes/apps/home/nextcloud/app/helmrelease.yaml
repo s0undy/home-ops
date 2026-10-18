@@ -61,7 +61,7 @@ spec:
               # Snowflake ID node, 1-511 and never change it. Values < 1 fall back
               # to a hash of the hostname, which is the pod name here
               NC_serverid: "1"
-              # auth.${SECRET_DOMAIN} resolves to envoy-internal (10.0.100.21),
+              # auth.${SECRET_DOMAIN} resolves to envoy-external (10.0.100.22),
               # which Nextcloud's HTTP client blocks as a local address by
               # default, breaking user_oidc discovery against Authentik
               NC_allow_local_remote_servers: "true"
@@ -242,7 +242,7 @@ spec:
         hostnames:
           - *host
         parentRefs:
-          - name: envoy-internal
+          - name: envoy-external
             namespace: network
             sectionName: https
     persistence:

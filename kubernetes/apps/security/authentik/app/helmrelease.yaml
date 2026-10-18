@@ -78,7 +78,7 @@ spec:
             gethomepage.dev/pod-selector: app.kubernetes.io/name=authentik,app.kubernetes.io/component=server
           hostnames: ["auth.${SECRET_DOMAIN}"]
           parentRefs:
-            - name: envoy-internal
+            - name: envoy-external
               namespace: network
               sectionName: https
     worker:
