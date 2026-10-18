@@ -12,5 +12,6 @@ configMapGenerator:
       - ./resources/zz-tuning.conf
       - ./resources/eurooffice.config.php
       - ./resources/whiteboard.sh
+      - ./resources/post-upgrade.sh
 generatorOptions:
   disableNameSuffixHash: true

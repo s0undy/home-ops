@@ -309,6 +309,9 @@ spec:
               - path: /docker-entrypoint-hooks.d/before-starting/whiteboard.sh
                 subPath: whiteboard.sh
                 readOnly: true
+              - path: /docker-entrypoint-hooks.d/post-upgrade/post-upgrade.sh
+                subPath: post-upgrade.sh
+                readOnly: true
       # PHP upload staging, nginx body buffering and temp paths
       tmp:
         type: emptyDir
