@@ -19,7 +19,7 @@ spec:
           app:
             image:
               repository: ghcr.io/nextcloud-releases/whiteboard
-              tag: v2.0.0@sha256:059596633333d009890c64858f89f133ccd973a2e0823ad960a0cc05cf8657f1
+              tag: v2.1.2@sha256:fd714528ae29beb9e9ad56589c031f7c6c688979b5e0cfbba7bb546cf75a0e43
             # The image's `npm run server:start` writes npm state under $HOME
             # (/app), so run node directly. /tmp is an emptyDir, which hides the
             # Chromium dirs the image pre-creates for board recordings.
