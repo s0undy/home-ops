@@ -24,6 +24,12 @@ selector:
   match: glob("a2:19:97:ff:b8:65", mac(link.hardware_addr))
 ---
 apiVersion: v1alpha1
+kind: LinkAliasConfig
+name: ethSel4
+selector:
+  match: glob("a2:19:97:71:4c:7b", mac(link.hardware_addr))
+---
+apiVersion: v1alpha1
 kind: Layer2VIPConfig
 name: 10.0.100.10
 link: ethSel0
@@ -56,3 +62,11 @@ kind: LinkConfig
 name: ethSel3
 addresses:
   - address: 169.254.100.11/32
+---
+# IOT VLAN (10.0.111.0/24): link is only brought up for the multus `iot`
+# macvlan; the node gets a link-local placeholder, not an IOT address.
+apiVersion: v1alpha1
+kind: LinkConfig
+name: ethSel4
+addresses:
+  - address: 169.254.111.11/32
