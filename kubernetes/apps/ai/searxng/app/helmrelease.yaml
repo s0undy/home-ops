@@ -62,7 +62,7 @@ spec:
           app:
             image:
               repository: docker.io/isokoliuk/mcp-searxng
-              tag: 2.6.0@sha256:9389eed474a62bc35aafbf4d819b77ee54ecc25b5a1d1310ad0d45db2a056e0f
+              tag: 2.9.0@sha256:8f1dd92a9e2875cb4e8df7036785ec4c088b7600cefb611de472a352a3dcba60
             env:
               TZ: "${TZ}"
               SEARXNG_URL: "http://searxng.ai.svc.cluster.local:8080"
