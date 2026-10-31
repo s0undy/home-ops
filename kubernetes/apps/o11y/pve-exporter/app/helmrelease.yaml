@@ -18,7 +18,7 @@ spec:
           app:
             image:
               repository: docker.io/prompve/prometheus-pve-exporter
-              tag: 3.10.1
+              tag: 3.10.2
             env:
               TZ: "${TZ}"
               # Proxmox serves the API with a self-signed certificate.
