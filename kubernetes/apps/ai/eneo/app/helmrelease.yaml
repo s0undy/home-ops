@@ -16,6 +16,9 @@ spec:
       backend:
         annotations:
           reloader.stakater.com/auto: "true"
+        pod:
+          # Crawls get up to 70s to wind down (compose stop_grace_period)
+          terminationGracePeriodSeconds: 70
         initContainers:
           # Creates the role + database; on first creation it also runs
           # /initdb/eneo.sql as superuser, since pgvector is not a trusted extension
@@ -128,7 +131,9 @@ spec:
               RUN_AS_WORKER: "true"
             envFrom: *backendEnvFrom
             probes:
-              # Verifies the ARQ heartbeat in Redis (refreshed every 60s)
+              # Verifies the ARQ heartbeat in Redis (refreshed every 60s).
+              # Each check imports the app, ~10s of CPU on an idle node, so
+              # a shorter timeout restarts a healthy worker and fails readyz
               liveness:
                 enabled: true
                 custom: true
@@ -136,13 +141,40 @@ spec:
                   exec:
                     command: ["arq", "--check", "src.eneo.worker.arq.WorkerSettings"]
                   initialDelaySeconds: 30
-                  periodSeconds: 30
-                  timeoutSeconds: 10
+                  periodSeconds: 60
+                  timeoutSeconds: 30
                   failureThreshold: 3
             securityContext: *securityContext
             resources:
               requests:
-                cpu: 25m
+                cpu: 100m
+                memory: 256Mi
+              limits:
+                memory: 2Gi
+          # Consumes arq:crawler. Kept in this pod so Recreate stops every
+          # writer before 02-init-eneo migrates, as upstream requires
+          crawler:
+            image: *backendImage
+            env:
+              <<: *backendEnv
+              RUN_AS_WORKER: "true"
+              WORKER_ROLE: crawler
+            envFrom: *backendEnvFrom
+            probes:
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  exec:
+                    command: ["arq", "--check", "src.eneo.worker.arq.CrawlerWorkerSettings"]
+                  initialDelaySeconds: 30
+                  periodSeconds: 60
+                  timeoutSeconds: 30
+                  failureThreshold: 3
+            securityContext: *securityContext
+            resources:
+              requests:
+                cpu: 100m
                 memory: 256Mi
               limits:
                 memory: 2Gi
@@ -262,6 +294,14 @@ spec:
           frontend:
             app:
               - path: /tmp
+      # Crawler startup recovery needs a private /tmp, so it must not share
+      # the volume above, which holds upload staging and audit log exports
+      crawler-tmp:
+        type: emptyDir
+        advancedMounts:
+          backend:
+            crawler:
+              - path: /tmp
       # Only holds runtime debug flags (/app/data/debug_flags), nothing persistent
       data:
         type: emptyDir
@@ -270,4 +310,6 @@ spec:
             app:
               - path: /app/data
             worker:
+              - path: /app/data
+            crawler:
               - path: /app/data
