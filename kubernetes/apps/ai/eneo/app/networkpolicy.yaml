@@ -1,0 +1,40 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: eneo-tool-runtime
+spec:
+  # Stands in for compose's internal tool_runtime_net: only the backend pod may
+  # call the runtime, and the runtime may only reach the backend for signed
+  # file downloads. No route to Postgres, Redis, the LAN or the internet.
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: eneo
+      app.kubernetes.io/controller: tool-runtime
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: eneo
+            app.kubernetes.io/controller: backend
+      toPorts:
+        - ports:
+            - port: "3010"
+              protocol: TCP
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: eneo
+            app.kubernetes.io/controller: backend
+      toPorts:
+        - ports:
+            - port: "8000"
+              protocol: TCP
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: kube-system
+            k8s-app: kube-dns
+      toPorts:
+        - ports:
+            - port: "53"
+              protocol: ANY

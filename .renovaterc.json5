@@ -58,7 +58,11 @@
       description: "Eneo Group",
       groupName: "eneo",
       matchDatasources: ["docker"],
-      matchPackageNames: ["ghcr.io/eneo-ai/eneo-backend", "ghcr.io/eneo-ai/eneo-frontend"],
+      matchPackageNames: [
+        "ghcr.io/eneo-ai/eneo-backend",
+        "ghcr.io/eneo-ai/eneo-frontend",
+        "ghcr.io/eneo-ai/eneo-tool-runtime",
+      ],
       group: {
         commitMessageTopic: "{{{groupName}}} group",
       },
