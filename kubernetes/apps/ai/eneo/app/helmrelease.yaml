@@ -70,6 +70,10 @@ spec:
               # Users are matched by email and must already exist in Eneo.
               # Password login: /login?showUsernameAndPassword=true
               OIDC_DISCOVERY_ENDPOINT: "https://auth.${SECRET_DOMAIN}/application/o/eneo/.well-known/openid-configuration"
+              # Bundled MCP tools. Signed file links use the internal address
+              # so the runtime needs no route out through Envoy
+              TOOL_RUNTIME_URL: http://eneo-tool-runtime.ai.svc.cluster.local:3010
+              FILE_REFERENCE_BASE_URL: &backendInternalUrl http://eneo-backend.ai.svc.cluster.local:8000
             envFrom: &backendEnvFrom
               - secretRef:
                   name: eneo-secret
@@ -218,6 +222,46 @@ spec:
                 memory: 128Mi
               limits:
                 memory: 512Mi
+      # Runs model-written code, so it stays in its own pod with only the token
+      # from eneo-secret, and networkpolicy.yaml confines its traffic
+      tool-runtime:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        containers:
+          app:
+            image:
+              repository: ghcr.io/eneo-ai/eneo-tool-runtime
+              tag: 2.3.1@sha256:d261b74d06ac2fff46b1243075867bbfc518c3af0326ec51213405ee89ee8a93
+            env:
+              TZ: "${TZ}"
+              TOOL_RUNTIME_FILE_ORIGINS: *backendInternalUrl
+              # Refuse to start or run jobs without Landlock confinement
+              TOOL_RUNTIME_REQUIRE_CONFINEMENT: "true"
+              TOOL_RUNTIME_TOKEN:
+                valueFrom:
+                  secretKeyRef:
+                    name: eneo-secret
+                    key: TOOL_RUNTIME_TOKEN
+            probes:
+              liveness: &toolRuntimeProbe
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /health/ready
+                    port: &toolRuntimePort 3010
+                  periodSeconds: 30
+                  timeoutSeconds: 5
+              readiness: *toolRuntimeProbe
+            securityContext: *securityContext
+            # Limits match the reference compose stack
+            resources:
+              requests:
+                cpu: 10m
+                memory: 128Mi
+              limits:
+                cpu: 2
+                memory: 2Gi
     defaultPodOptions:
       securityContext:
         runAsNonRoot: true
@@ -236,6 +280,11 @@ spec:
         ports:
           http:
             port: *frontendPort
+      tool-runtime:
+        controller: tool-runtime
+        ports:
+          http:
+            port: *toolRuntimePort
     route:
       app:
         annotations:
@@ -301,6 +350,16 @@ spec:
         advancedMounts:
           backend:
             crawler:
+              - path: /tmp
+      # Job scratch plus the 256MiB tabular cache; counts towards the memory
+      # limit. Compose mounts this noexec, which an emptyDir cannot do
+      tool-runtime-tmp:
+        type: emptyDir
+        medium: Memory
+        sizeLimit: 512Mi
+        advancedMounts:
+          tool-runtime:
+            app:
               - path: /tmp
       # Only holds runtime debug flags (/app/data/debug_flags), nothing persistent
       data:
