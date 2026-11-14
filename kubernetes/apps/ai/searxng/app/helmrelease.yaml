@@ -19,7 +19,7 @@ spec:
             image:
               # Same images as Docker Hub, without its pull rate limits
               repository: ghcr.io/searxng/searxng
-              tag: 2026.11.9-57ff753ad@sha256:287af61f1a13e86d02974fcde91a3413a9945788de38b61ffbc491d81a19bcc2
+              tag: 2026.11.14-a7128d5d1@sha256:eb8b09ffa83aebbe8b8d3ded23cfd224b2d3b01db4f3af9eb03876ef6def6dda
             env:
               TZ: "${TZ}"
               SEARXNG_BASE_URL: "https://{{ .Release.Name }}.${SECRET_DOMAIN}/"
