@@ -187,7 +187,7 @@ spec:
           nginx:
             image:
               repository: ghcr.io/nginx/nginx-unprivileged
-              tag: 1.31.8-alpine@sha256:16de44aff58d6a3906f4eb1499d930378b7f0fa96fdebc7d10962d2b2a4e794b
+              tag: 1.31.9-alpine@sha256:60214a103e6f38e953ff957f34b1f2e97a9db801ab2df3821da955d0fe6cadd6
             env:
               NGINX_ENTRYPOINT_QUIET_LOGS: "1"
             probes:
