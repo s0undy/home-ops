@@ -33,7 +33,7 @@ spec:
           02-init-eneo:
             image: &backendImage
               repository: ghcr.io/eneo-ai/eneo-backend
-              tag: 2.3.1@sha256:409a530f60ce721e1ef4bda351b2cd73c521eefc4e16ac109b1c3af3bc6354ad
+              tag: 2.3.3@sha256:f75a365c93d7a11fc647b9280c33f84e9edab41cc2352533473ab454763e9dca
             command: ["python", "init_db.py"]
             env: &backendEnv
               TZ: "${TZ}"
@@ -189,7 +189,7 @@ spec:
           app:
             image:
               repository: ghcr.io/eneo-ai/eneo-frontend
-              tag: 2.3.1@sha256:01f9af481f741ce3b969e555fd6f0e368f3b80fe50f52400d29699c0c357bcde
+              tag: 2.3.3@sha256:39a41d2464412013a9500b870afbcd616b7ecf33335dee6cde251117ebd1e7a2
             env:
               TZ: "${TZ}"
               NODE_ENV: production
@@ -231,7 +231,7 @@ spec:
           app:
             image:
               repository: ghcr.io/eneo-ai/eneo-tool-runtime
-              tag: 2.3.1@sha256:d261b74d06ac2fff46b1243075867bbfc518c3af0326ec51213405ee89ee8a93
+              tag: 2.3.3@sha256:b7e5b294742435b336e3cde80363a9d96ceff8b5e3c5d4174c1f8faf80002fc3
             env:
               TZ: "${TZ}"
               TOOL_RUNTIME_FILE_ORIGINS: *backendInternalUrl
