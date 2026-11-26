@@ -12,7 +12,9 @@ spec:
   # using only 1 replica: very difficult to drain the node where postgres is running
   # using more than 1 replica: write amplification issues when leveraging replicated storage (e.g. ceph)
   instances: 2
-  imageName: ghcr.io/cloudnative-pg/postgresql:18.1-202512290807-standard-trixie@sha256:f445b2f8e9b4b3b9a4df56d944c976a2d7eb9b50280f3a6986b0fc7c422f7f27
+  # Major bumps run pg_upgrade and need serverName changed with them; Renovate
+  # only proposes minor/patch/digest updates for this image
+  imageName: ghcr.io/cloudnative-pg/postgresql:18.7-standard-trixie@sha256:1abcfd1cac6d53cda5185706819aab36d66a4ed88e99fc2ae44ab0826aa99f00
   primaryUpdateStrategy: unsupervised
   storage:
     size: 20Gi
