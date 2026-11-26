@@ -28,12 +28,17 @@ spec:
           # services to the `ds` user. It also starts a bundled RabbitMQ, and a
           # bundled redis-server that sits idle, since this build keeps editor
           # state in memory and never connects to Redis.
+          # Nextcloud-branded build of Euro-Office: same entrypoint and uids,
+          # but installed under nextcloud-office paths.
           app:
             image:
-              repository: ghcr.io/euro-office/documentserver
-              tag: v9.3.8@sha256:0f19cb676d48f85b826e199ac9e773ea12130f7d32bfc9a45e86aea320441b8a
+              repository: ghcr.io/nextcloud-releases/office-documentserver
+              tag: v9.3.8@sha256:27d5aa94509856bdc2b622b50bbbc9f56264f471b7ac9a828293387698a4258d
             env:
               TZ: "${TZ}"
+              # The entrypoint defaults this to the euro-office path, so its
+              # ownership repair would skip the mounted volume
+              EO_LIB: &lib /var/lib/nextcloud-office/documentserver
               # The entrypoint applies the schema itself, as DB_USER
               DB_HOST: postgres-rw.databases.svc.cluster.local
               DB_NAME: eurooffice
@@ -43,7 +48,7 @@ spec:
               ALLOW_PRIVATE_IP_ADDRESS: "true"
             envFrom:
               # JWT_SECRET, SECURE_LINK_SECRET and DB_PWD. Setting both secrets
-              # means nothing under /var/www/euro-office/Data needs to persist.
+              # means nothing under /var/www/*/Data needs to persist.
               - secretRef:
                   name: euro-office-secret
             probes:
@@ -98,4 +103,4 @@ spec:
       data:
         existingClaim: *app
         globalMounts:
-          - path: /var/lib/euro-office/documentserver
+          - path: *lib

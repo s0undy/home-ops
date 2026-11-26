@@ -145,10 +145,10 @@
       enabled: false,
     },
     {
-      description: "Euro-Office tags hotfixes as vX.Y.Z-hotfix.N, which docker versioning would treat as a separate compatibility line",
+      description: "Nextcloud Office tags patch builds as vX.Y.Z-N, which docker versioning would treat as a separate compatibility line; also skips -rc.N and per-arch tags",
       matchDatasources: ["docker"],
-      matchPackageNames: ["ghcr.io/euro-office/documentserver"],
-      versioning: "regex:^v(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)(?:-hotfix\\.(?<build>\\d+))?$",
+      matchPackageNames: ["ghcr.io/nextcloud-releases/office-documentserver"],
+      versioning: "regex:^v(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)(?:-(?<build>\\d+))?$",
     },
     {
       description: "SearXNG tags are YYYY.M.D-<commit>, which docker versioning would treat as a separate compatibility line per commit",
