@@ -32,6 +32,11 @@ spec:
     enablePodMonitor: true
   # https://github.com/cloudnative-pg/cloudnative-pg/issues/2570
   enablePDB: false
+  # Pod terminationGracePeriodSeconds follows stopDelay (default 1800s). The
+  # instance manager can hang after Postgres has stopped, so keep this under
+  # topf's ~5 min drain timeout or `just talos upgrade-node` fails to drain.
+  stopDelay: 240
+  smartShutdownTimeout: 60
   resources:
     requests:
       memory: "512Mi"
